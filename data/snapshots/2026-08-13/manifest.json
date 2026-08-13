@@ -1,5 +1,101 @@
 {
   "files": {
+    "fantasypros_projections_qb_2026.json": {
+      "bytes": 38578,
+      "endpoint_family": "public_v2",
+      "license": "provider_specific",
+      "notes": "83 QB rows, season 2026. Row keys observed: ['filename', 'fpid', 'mflid', 'name', 'position_id', 'stats', 'team_id']",
+      "observed_row_keys": [
+        "filename",
+        "fpid",
+        "mflid",
+        "name",
+        "position_id",
+        "stats",
+        "team_id"
+      ],
+      "position": "QB",
+      "provider_id": "fantasypros",
+      "retrieved_at": "2026-08-13T22:30:41+00:00",
+      "row_count": 83,
+      "season": 2026,
+      "sha256": "2e47c4fee5aa536758320cb62c0d56c498e6e1ead38fb3a825a46ba50505cc8c",
+      "source": "fantasypros_api",
+      "transport": "api",
+      "url": "https://api.fantasypros.com/public/v2/json/nfl/2026/projections"
+    },
+    "fantasypros_projections_rb_2026.json": {
+      "bytes": 55342,
+      "endpoint_family": "public_v2",
+      "license": "provider_specific",
+      "notes": "130 RB rows, season 2026. Row keys observed: ['filename', 'fpid', 'mflid', 'name', 'position_id', 'stats', 'team_id']",
+      "observed_row_keys": [
+        "filename",
+        "fpid",
+        "mflid",
+        "name",
+        "position_id",
+        "stats",
+        "team_id"
+      ],
+      "position": "RB",
+      "provider_id": "fantasypros",
+      "retrieved_at": "2026-08-13T22:30:41+00:00",
+      "row_count": 130,
+      "season": 2026,
+      "sha256": "d9ce528b0feadc47281bb94e2938a99c2d25fbdb600ddb83b3309418d542d907",
+      "source": "fantasypros_api",
+      "transport": "api",
+      "url": "https://api.fantasypros.com/public/v2/json/nfl/2026/projections"
+    },
+    "fantasypros_projections_te_2026.json": {
+      "bytes": 41788,
+      "endpoint_family": "public_v2",
+      "license": "provider_specific",
+      "notes": "122 TE rows, season 2026. Row keys observed: ['filename', 'fpid', 'mflid', 'name', 'position_id', 'stats', 'team_id']",
+      "observed_row_keys": [
+        "filename",
+        "fpid",
+        "mflid",
+        "name",
+        "position_id",
+        "stats",
+        "team_id"
+      ],
+      "position": "TE",
+      "provider_id": "fantasypros",
+      "retrieved_at": "2026-08-13T22:30:41+00:00",
+      "row_count": 122,
+      "season": 2026,
+      "sha256": "b0efb9681d178a48f776437577dc425cff5f1725cbd863ceab387790537a243c",
+      "source": "fantasypros_api",
+      "transport": "api",
+      "url": "https://api.fantasypros.com/public/v2/json/nfl/2026/projections"
+    },
+    "fantasypros_projections_wr_2026.json": {
+      "bytes": 79717,
+      "endpoint_family": "public_v2",
+      "license": "provider_specific",
+      "notes": "189 WR rows, season 2026. Row keys observed: ['filename', 'fpid', 'mflid', 'name', 'position_id', 'stats', 'team_id']",
+      "observed_row_keys": [
+        "filename",
+        "fpid",
+        "mflid",
+        "name",
+        "position_id",
+        "stats",
+        "team_id"
+      ],
+      "position": "WR",
+      "provider_id": "fantasypros",
+      "retrieved_at": "2026-08-13T22:30:41+00:00",
+      "row_count": 189,
+      "season": 2026,
+      "sha256": "3f9879acacec59cf01afc825e026f422c037e50e8c1e18d34f267053922c0c3a",
+      "source": "fantasypros_api",
+      "transport": "api",
+      "url": "https://api.fantasypros.com/public/v2/json/nfl/2026/projections"
+    },
     "ffc_adp_2qb_12team_2018.json": {
       "attribution": "ADP data courtesy of Fantasy Football Calculator.",
       "bytes": 40658,
