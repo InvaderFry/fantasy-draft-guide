@@ -47,7 +47,7 @@ PLAYER_WEEK_COLUMNS = (
     "passing_yards", "passing_tds", "interceptions", "fumbles_lost",
     "offensive_snaps", "snap_share",
     "red_zone_targets", "red_zone_carries", "goal_line_carries",
-    "team_pass_attempts", "team_rush_attempts", "team_points",
+    "team_pass_attempts", "team_rush_attempts", "team_air_yards", "team_points",
     "target_share", "air_yard_share",
 )
 
@@ -68,7 +68,7 @@ PLAYER_SEASON_COLUMNS = (
 PLAYER_SEASON_OUTCOME_COLUMNS = (
     "season", "player_id", "position", "team",
     "as_of", "source_as_of", "value_type", "is_outcome",
-    "games", "games_missed", "games_missed_injury",
+    "games", "rostered_weeks", "games_missed", "games_missed_injury",
     "fantasy_points_standard", "fantasy_points_half_ppr", "fantasy_points_ppr",
     "fantasy_ppg", "fantasy_ppg_active",
 )
