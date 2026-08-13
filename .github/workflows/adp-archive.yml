@@ -1,0 +1,75 @@
+# ADP archival program (S84).
+#
+# The only item in the spec whose value expires. Intra-summer ADP movement is
+# not purchasable retroactively: whatever is not captured this summer is gone.
+# This runs on a GitHub runner rather than a laptop so a capture does not
+# depend on anyone being awake, and it commits each dated snapshot back to the
+# repo, where the immutability rule (S84 `never: overwrite`) is enforced by
+# pipeline/snapshot.py.
+
+name: ADP archive
+
+on:
+  schedule:
+    # 11:00 UTC daily. FFC updates once per day; a fixed hour keeps the
+    # intra-summer series evenly spaced, which S31.3 (recency weighting) needs.
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+    inputs:
+      season:
+        description: "Season the capture describes (default: current year)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+# A capture is dated. Two runs racing the same date would have one of them fail
+# the overwrite guard and report a false alarm.
+concurrency:
+  group: adp-archive
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/initial-repo-setup-mzttyy
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install project
+        run: uv sync
+
+      - name: Capture ADP and projection snapshots
+        # Non-zero exit on an empty capture is deliberate: a silent no-op day
+        # looks like success and costs a day of price movement.
+        run: |
+          uv run research snapshot \
+            --sources ffc,projections \
+            ${{ inputs.season && format('--season {0}', inputs.season) || '' }}
+
+      - name: Verify hashes
+        run: uv run research validate
+
+      - name: Commit snapshot
+        run: |
+          if [ -z "$(git status --porcelain data/snapshots)" ]; then
+            echo "::error::no snapshot files were produced - a capture day would be lost"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/snapshots
+          git commit -m "ADP archive: $(date -u +%Y-%m-%d) [skip ci]"
+          for attempt in 1 2 3 4; do
+            git pull --rebase origin claude/initial-repo-setup-mzttyy && \
+              git push origin claude/initial-repo-setup-mzttyy && exit 0
+            sleep $((2 ** attempt))
+          done
+          exit 1

@@ -1,0 +1,62 @@
+# Standard outcome definitions (S15, S15.1).
+#
+# Centralized so definitions are never scattered through code. Every chapter
+# links to the exact outcome definition it used. Outcome columns come from the
+# future by construction: they live in outcome tables flagged `is_outcome:
+# true` and are never joined into a feature frame (S6.1).
+#
+# S15.1: season outcome = games_played x points_per_game_when_active. Those are
+# different processes and are modelled separately, so every season-level
+# outcome below has an availability-conditional twin.
+
+outcomes:
+  # --- season-total variants -------------------------------------------
+  rb_high_end:
+    type: positional_finish
+    position: RB
+    max_finish: 12
+    scope: season_total
+    is_outcome: true
+
+  wr_high_end:
+    type: ppg_threshold
+    position: WR
+    min_ppg: 15.0
+    min_games: 8
+    scope: season_total
+    is_outcome: true
+
+  beat_adp:
+    type: value_over_adp_baseline
+    scope: season_total
+    is_outcome: true
+
+  bust:
+    type: value_over_adp_percentile
+    threshold: -0.75
+    scope: season_total
+    is_outcome: true
+
+  # --- availability-conditional variants (S15.1) ------------------------
+  rb_high_end_active:
+    type: positional_finish_ppg
+    position: RB
+    min_games: 10
+    max_finish_ppg: 12
+    scope: per_game_conditional_on_active
+    is_outcome: true
+
+  wr_breakout_active:
+    type: ppg_threshold
+    position: WR
+    min_ppg: 15.0
+    min_games: 10
+    scope: per_game_conditional_on_active
+    is_outcome: true
+
+  # --- availability component (S15.1 component a) -----------------------
+  availability_14:
+    type: games_threshold
+    min_games: 14
+    scope: availability
+    is_outcome: true

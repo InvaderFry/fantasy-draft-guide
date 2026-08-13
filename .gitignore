@@ -1,0 +1,16 @@
+# Raw and derived data are reproducible from snapshots + code; snapshots are not.
+data/raw/**
+!data/raw/**/.gitkeep
+data/processed/**
+!data/processed/.gitkeep
+*.duckdb
+
+# Snapshots ARE the archival product (S84) - never ignore them.
+!data/snapshots/**
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dist/

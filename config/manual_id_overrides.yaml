@@ -1,0 +1,15 @@
+# Manual player-ID corrections (S12).
+#
+# Version-controlled overrides that win over both the nflverse crosswalk and
+# the deterministic name matcher. Add an entry whenever a join is wrong;
+# never patch a name match in code.
+#
+# overrides:
+#   - gsis_id: "00-0000000"
+#     source: ffc                  # ffc | fantasypros | projection_csv | sleeper
+#     source_name: "Mike Williams"
+#     source_team: LAC
+#     position: WR
+#     note: "Two active Mike Williams; name+pos+team is ambiguous."
+
+overrides: []
