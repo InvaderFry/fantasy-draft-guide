@@ -95,3 +95,48 @@ def test_a_capture_missing_source_as_of_stops_the_build(archive, monkeypatch):
     monkeypatch.setattr(adp_history.ffc_adp, "parse", without_source_as_of)
     with pytest.raises(LeakageError, match="source_as_of"):
         adp_history.build(archive, crosswalk=CROSSWALK)
+
+
+PAYLOAD_WITH_WINDOW = {
+    "meta": {"type": "PPR", "teams": 12, "total_drafts": 8470,
+             "start_date": "2025-08-25", "end_date": "2025-09-01"},
+    "players": PAYLOAD["players"],
+}
+
+
+def test_as_of_is_the_window_close_not_the_capture_date(tmp_path):
+    """A 2025 ADP fetched in 2026 became knowable in 2025 (S6.1).
+
+    This is what makes a retroactive backfill datable at all: without it every
+    historical row would claim to have been knowable on the day we ran the job.
+    """
+    directory = tmp_path / "2026-08-13"
+    directory.mkdir()
+    (directory / "ffc_adp_ppr_12team_2025.json").write_text(json.dumps(PAYLOAD_WITH_WINDOW))
+
+    frame = adp_history.build(tmp_path, crosswalk=CROSSWALK)
+    assert frame["snapshot_date"].unique().to_list() == [dt.date(2026, 8, 13)]
+    assert frame["as_of"].unique().to_list() == [dt.date(2025, 9, 1)]
+    assert frame["source_as_of"].unique().to_list() == [dt.date(2025, 9, 1)]
+    assert frame["window_start"].unique().to_list() == [dt.date(2025, 8, 25)]
+    assert frame["total_drafts"].unique().to_list() == [8470]
+
+
+def test_a_payload_without_a_window_falls_back_to_the_capture_date(archive):
+    """The fixture payloads carry no meta; the capture date is the best available."""
+    frame = adp_history.build(archive, crosswalk=CROSSWALK)
+    assert frame["window_end"].null_count() == frame.height
+    assert frame["as_of"].to_list() == frame["snapshot_date"].to_list()
+
+
+def test_position_adp_does_not_interleave_two_seasons(tmp_path):
+    """A backfill captures many seasons on one day; each ranks on its own."""
+    directory = tmp_path / "2026-08-13"
+    directory.mkdir()
+    for year in (2024, 2025):
+        (directory / f"ffc_adp_ppr_12team_{year}.json").write_text(json.dumps(PAYLOAD))
+
+    frame = adp_history.build(tmp_path, crosswalk=CROSSWALK)
+    assert frame.height == 4
+    # one RB and one WR per season, so every row ranks 1 within its own season
+    assert frame["position_adp"].unique().to_list() == [1]

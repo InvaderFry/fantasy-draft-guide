@@ -193,7 +193,7 @@ def _pbp_frame() -> pl.DataFrame:
                         receiver=None, rusher=rusher,
                     )
                 )
-    return pl.DataFrame(rows)
+    return pl.DataFrame(rows, schema_overrides={"td_team": pl.String})
 
 
 def _play(game_id, week, team, *, drive, pass_attempt, rush_attempt,
@@ -203,7 +203,8 @@ def _play(game_id, week, team, *, drive, pass_attempt, rush_attempt,
         "game_id": game_id, "posteam": team, "play": 1,
         "pass_attempt": pass_attempt, "rush_attempt": rush_attempt,
         "yards_gained": 6, "pass_touchdown": 0, "rush_touchdown": 0,
-        "touchdown": 0, "interception": 0, "fumble_lost": 0,
+        "touchdown": 0, "td_team": None, "interception": 0, "fumble_lost": 0,
+        "extra_point_attempt": 0, "two_point_attempt": 0,
         "qtr": 1, "score_differential": 0, "yardline_100": yardline_100,
         "fixed_drive": drive,
         "receiver_player_id": receiver, "rusher_player_id": rusher,

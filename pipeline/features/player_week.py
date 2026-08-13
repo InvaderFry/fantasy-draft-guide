@@ -173,6 +173,16 @@ def build(season: int) -> pl.DataFrame:
         pl.col("week_end").alias("source_as_of"),
         pl.lit("observed").alias("value_type"),
         *[pl.col(c).fill_null(0).alias(c) for c in COUNTING_STATS],
+    )
+
+    # Computed here rather than taken from nflverse's own target_share /
+    # air_yards_share columns, which use a different denominator. Passing
+    # theirs through left the weekly and season columns of the same name on
+    # different scales -- the very thing _team_receiving exists to prevent.
+    # Null, not NaN, when the team recorded none: see _share in player_season.
+    frame = frame.with_columns(
+        _weekly_share("targets", "team_targets").alias("target_share"),
+        _weekly_share("air_yards", "team_air_yards").alias("air_yard_share"),
     ).drop(
         "report_status", "report_injury", "week_end", "week_start",
         "roster_status", "roster_code", "roster_team", "roster_position", "stats_position",
@@ -181,6 +191,15 @@ def build(season: int) -> pl.DataFrame:
 
     assert_as_of_present(frame, f"player_week[{season}]")
     return frame
+
+
+def _weekly_share(numerator: str, denominator: str) -> pl.Expr:
+    """A player's share of team opportunity in one week, null on a week not played."""
+    return (
+        pl.when((pl.col("games_active") == 1) & (pl.col(denominator) != 0))
+        .then(pl.col(numerator) / pl.col(denominator))
+        .otherwise(None)
+    )
 
 
 def _active_status() -> pl.Expr:
@@ -311,8 +330,6 @@ def _weekly_stats(season: int) -> pl.DataFrame:
         pl.col("passing_tds"),
         pl.col("interceptions"),
         pl.col("fumbles_lost"),
-        pl.col("target_share"),
-        pl.col("air_yards_share").alias("air_yard_share"),
         pl.lit(1).alias("_has_stats"),
     ).unique(subset=["season", "week", "player_id"], keep="first")
 
@@ -377,26 +394,35 @@ def _pbp_aggregates(season: int) -> tuple[pl.DataFrame, pl.DataFrame]:
     team_points = _team_points(season)
     team = (
         team.join(team_points, on=["season", "week", "team"], how="left")
-        .join(_team_air_yards(season), on=["season", "week", "team"], how="left")
+        .join(_team_receiving(season), on=["season", "week", "team"], how="left")
     )
     return player, team
 
 
-def _team_air_yards(season: int) -> pl.DataFrame:
-    """Air yards thrown by each team each week (S13).
+def _team_receiving(season: int) -> pl.DataFrame:
+    """Team targets and air yards per week, the denominators of the two shares (S13).
 
-    Summed from the same column the player numerator comes from, and over every
-    position rather than the fantasy subset, so a player's share of it is
-    internally consistent. nflverse publishes its own ``air_yards_share`` off a
-    slightly different denominator; using theirs would leave the season
-    aggregate disagreeing with the weekly rows it is built from.
+    Both are summed from the same columns the player numerators come from, and
+    over every position rather than the fantasy subset, so a player's share of
+    them is internally consistent.
+
+    Targets deliberately do NOT come from play-by-play ``pass_attempt``, which
+    counts sacks and passes with no identified receiver: summed player targets
+    are 88.8% of team pass attempts across 2024 (1,314 sacks in 19,224 pass
+    plays, plus throwaways). Dividing by pass attempts understates every target
+    share by roughly a ninth and disagrees with nflverse's own ``target_share``
+    on the same row. Rushing has no equivalent problem -- player carries sum to
+    exactly ``rush_attempt`` -- so rush_share still uses the play-by-play count.
     """
     stats = _normalize_columns(
         sources.load(f"player_stats_{season}.parquet")
     ).filter(pl.col("season_type") == "REG")
     return (
         stats.group_by(["season", "week", pl.col("recent_team").alias("team")])
-        .agg(pl.col("receiving_air_yards").fill_null(0).sum().alias("team_air_yards"))
+        .agg(
+            pl.col("targets").fill_null(0).sum().alias("team_targets"),
+            pl.col("receiving_air_yards").fill_null(0).sum().alias("team_air_yards"),
+        )
     )
 
 

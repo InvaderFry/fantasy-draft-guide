@@ -26,6 +26,32 @@ outcomes:
     scope: season_total
     is_outcome: true
 
+  # S21.1 asks for an "RB usable hit rate" alongside the high-end and bust
+  # rates and never defines it, and S15 forbids defining it in code. A usable
+  # season is one that returned starter-grade production: a top-24 finish in a
+  # 12-team league is the RB2 line, which is the weekly starter a drafter in
+  # this ADP range is actually buying.
+  rb_usable:
+    type: positional_finish
+    position: RB
+    max_finish: 24
+    scope: season_total
+    is_outcome: true
+
+  wr_usable:
+    type: positional_finish
+    position: WR
+    max_finish: 36        # 3 WR starters x 12 teams
+    scope: season_total
+    is_outcome: true
+
+  te_high_end:
+    type: positional_finish
+    position: TE
+    max_finish: 12
+    scope: season_total
+    is_outcome: true
+
   beat_adp:
     type: value_over_adp_baseline
     scope: season_total

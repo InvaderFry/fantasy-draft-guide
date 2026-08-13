@@ -1,4 +1,4 @@
-.PHONY: setup ingest ids tables validate test lint snapshot all
+.PHONY: setup ingest ids tables research validate test lint snapshot all
 
 SEASONS ?= 2012-2025
 
@@ -20,6 +20,9 @@ tables:
 snapshot:
 	uv run research snapshot --sources ffc,projections
 
+research:
+	uv run research run-research
+
 validate:
 	uv run research validate
 
@@ -29,4 +32,4 @@ test:
 lint:
 	uv run ruff check .
 
-all: setup ingest ids tables validate test
+all: setup ingest ids tables research validate test

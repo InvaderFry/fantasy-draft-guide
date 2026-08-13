@@ -47,7 +47,8 @@ PLAYER_WEEK_COLUMNS = (
     "passing_yards", "passing_tds", "interceptions", "fumbles_lost",
     "offensive_snaps", "snap_share",
     "red_zone_targets", "red_zone_carries", "goal_line_carries",
-    "team_pass_attempts", "team_rush_attempts", "team_air_yards", "team_points",
+    "team_pass_attempts", "team_rush_attempts", "team_targets", "team_air_yards",
+    "team_points",
     "target_share", "air_yard_share",
 )
 
@@ -85,7 +86,8 @@ TEAM_SEASON_COLUMNS = (
 
 # S13 adp_history
 ADP_HISTORY_COLUMNS = (
-    "season", "snapshot_date", "as_of", "source_as_of", "value_type",
+    "season", "snapshot_date", "as_of", "source_as_of",
+    "window_start", "window_end", "total_drafts", "value_type",
     "source", "format", "teams",
     "player_id", "source_player_id", "source_player_name", "position", "team",
     "bye", "adp", "position_adp", "sample_size_if_available",

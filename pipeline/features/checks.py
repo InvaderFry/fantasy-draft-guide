@@ -146,6 +146,7 @@ def _check_adp_history(frame: pl.DataFrame) -> list[tuple[str, bool]]:
     if frame.height == 0:
         return [_ok("adp_history: empty (no snapshots captured yet)")]
     out = _season_check(frame, "adp_history") + _value_type_check(frame, "adp_history")
+    out.extend(_check_adp_against_decision_dates(frame))
     bad = frame.filter(pl.col("adp").is_not_null() & ~pl.col("adp").is_between(1, 400)).height
     out.append(
         _ok("adp_history: adp within 1-400")
@@ -180,6 +181,19 @@ PANDEMIC_SEASON = 2020
 # injury-related. A season far below that is reporting a source limitation, not
 # a healthier league.
 EXPECTED_INJURY_SHARE = 0.45
+
+
+def _share_text(share: float | None) -> str:
+    """Render an injury share, including the case where there is nothing to divide.
+
+    A season in which nobody missed a game has a null share rather than a zero
+    one, and formatting that null with `:.0%` raised TypeError out of
+    `research validate`. That matters more than a report bug: the ADP archive
+    workflow runs capture, then validate, then commit, so anything that raises
+    in validate loses the payloads captured seconds earlier -- the one thing
+    S84 says cannot be bought back.
+    """
+    return "no absences" if share is None else f"{share:.0%}"
 
 
 def _check_availability_coverage(frame: pl.DataFrame) -> list[tuple[str, bool]]:
@@ -228,15 +242,15 @@ def _check_availability_coverage(frame: pl.DataFrame) -> list[tuple[str, bool]]:
         out.append(
             _ok(
                 f"player_season_outcomes: {PANDEMIC_SEASON} at "
-                f"{pandemic['share'][0]:.0%} -- Reserve/COVID-19 and Reserve/Opt-out "
-                "are absences, not injuries, and are counted as neither"
+                f"{_share_text(pandemic['share'][0])} -- Reserve/COVID-19 and "
+                "Reserve/Opt-out are absences, not injuries, and are counted as neither"
             )
         )
 
     legacy = by_season.filter(pl.col("season") < FIRST_SEASON_WITH_RESERVE_CODES)
     if legacy.height:
         shares = ", ".join(
-            f"{row['season']}: {row['share']:.0%}" for row in legacy.to_dicts()
+            f"{row['season']}: {_share_text(row['share'])}" for row in legacy.to_dicts()
         )
         out.append(
             _ok(
@@ -246,3 +260,41 @@ def _check_availability_coverage(frame: pl.DataFrame) -> list[tuple[str, bool]]:
             )
         )
     return out
+
+
+def _check_adp_against_decision_dates(frame: pl.DataFrame) -> list[tuple[str, bool]]:
+    """How each season's ADP sits relative to the date we pretend to draft on (S6.1).
+
+    Deliberately a report rather than an assertion. Fantasy Football Calculator
+    serves a historical season as its *final preseason* window -- 2025 comes
+    back covering 2025-08-25 to 2025-09-01 -- while `decision_dates.yaml` puts
+    the 2025 draft on 2025-08-23. `assert_knowable` would therefore fail on
+    data that is correct and is the only historical ADP that exists.
+
+    The honest handling is to say how large the gap is, so an analysis that
+    buckets players by price knows it is using a price fixed a few days after
+    the notional draft, not to pretend the gap is not there.
+    """
+    if "window_end" not in frame.columns:
+        return [_fail("adp_history: no window_end -- captures predate the S31.3 window fix")]
+
+    dates = decision_dates()
+    late = []
+    for row in (
+        frame.group_by("season")
+        .agg(pl.col("as_of").max().alias("as_of"))
+        .sort("season")
+        .to_dicts()
+    ):
+        cutoff = dates.get(row["season"])
+        if cutoff and row["as_of"] and row["as_of"] > cutoff:
+            late.append(f"{row['season']}: +{(row['as_of'] - cutoff).days}d")
+    if not late:
+        return [_ok("adp_history: every season's ADP predates its decision date")]
+    return [
+        _ok(
+            "adp_history: ADP postdates the decision date for " + ", ".join(late)
+            + " -- FFC serves a historical season as its final preseason window, so a "
+            "bucket analysis is using a price fixed after the notional draft (S6.1, S21.1)"
+        )
+    ]

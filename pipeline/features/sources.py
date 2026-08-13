@@ -41,6 +41,47 @@ KEY_DTYPES: dict[str, pl.DataType] = {
     "week": pl.Int32,
 }
 
+# nflverse spells the same franchise differently depending on which file you
+# open, and the differences are invisible until a join quietly drops rows:
+#
+#   play_by_play / player_stats  current code, retroactively applied  (LA, LAC, LV)
+#   roster_weekly                era-contemporary, PFR-flavoured      (ARZ, BLT, CLV, HST, SD, SL)
+#   games.csv                    era-contemporary, NFL-flavoured      (STL, SD, OAK)
+#
+# Left alone this splits one franchise into two: 2012 Arizona appears as ARI on
+# the rows of players who played and ARZ on the rows of players who did not,
+# and `points` goes missing for every Rams, Chargers and Raiders season before
+# their moves -- 17 of 448 team-seasons, silently, on the column S25 regresses.
+#
+# Distinct from names.TEAM_ALIASES, which maps in the other direction (LA ->
+# LAR) to meet Fantasy Football Calculator's spelling. That is the matching
+# layer; this is the table layer. They are not interchangeable.
+TEAM_CODE_COLUMNS = ("team", "posteam", "defteam", "recent_team", "home_team", "away_team")
+
+CANONICAL_TEAM_CODES = {
+    "ARZ": "ARI",
+    "BLT": "BAL",
+    "CLV": "CLE",
+    "HST": "HOU",
+    "SD": "LAC",
+    "SL": "LA",
+    "STL": "LA",
+    "LAR": "LA",
+    "OAK": "LV",
+    "LVR": "LV",
+    "WSH": "WAS",
+}
+
+
+def normalize_team_codes(frame: pl.DataFrame) -> pl.DataFrame:
+    """Map every team column onto the play-by-play spelling."""
+    present = [c for c in TEAM_CODE_COLUMNS if c in frame.columns]
+    if not present:
+        return frame
+    return frame.with_columns(
+        pl.col(c).replace(CANONICAL_TEAM_CODES).alias(c) for c in present
+    )
+
 
 def normalize_keys(frame: pl.DataFrame) -> pl.DataFrame:
     casts = [
@@ -52,7 +93,7 @@ def normalize_keys(frame: pl.DataFrame) -> pl.DataFrame:
 
 
 def load(filename: str) -> pl.DataFrame:
-    return normalize_keys(pl.read_parquet(raw_path(filename)))
+    return normalize_team_codes(normalize_keys(pl.read_parquet(raw_path(filename))))
 
 
 def available_seasons(prefix: str = "player_stats_") -> list[int]:
@@ -72,8 +113,10 @@ def schedule() -> pl.DataFrame:
             f"{SCHEDULE_FILE} not found. Run `research ingest` -- it fetches the game "
             "calendar alongside the release assets (S85.1)."
         )
-    return pl.read_csv(SCHEDULE_FILE, infer_schema_length=20000).with_columns(
-        pl.col("gameday").str.to_date(strict=False).alias("gameday")
+    return normalize_team_codes(
+        pl.read_csv(SCHEDULE_FILE, infer_schema_length=20000).with_columns(
+            pl.col("gameday").str.to_date(strict=False).alias("gameday")
+        )
     )
 
 

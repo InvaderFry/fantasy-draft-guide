@@ -1,0 +1,1175 @@
+{
+  "method_id": "rb_dead_zone_bucket_rates",
+  "title": "Running back dead zone -- observed hit rates by ADP bucket",
+  "version": "1.0.0",
+  "claim_type": "DESCRIPTIVE",
+  "spec_sections": [
+    "S21.1",
+    "S4",
+    "S15"
+  ],
+  "generated_on": "2026-08-13",
+  "population": {
+    "adp_format": "half-ppr",
+    "teams": 12,
+    "seasons": [
+      2018,
+      2025
+    ],
+    "bucket_size": 12
+  },
+  "outcome": "rb_high_end",
+  "sample_size": 1285,
+  "primary_results": {
+    "n": 1285,
+    "seasons": [
+      2018,
+      2025
+    ],
+    "season_list": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "bucket_size": 12,
+    "coverage": {
+      "drafted_players_in_scope": 1320,
+      "dropped_no_id_match": 34,
+      "dropped_no_outcome_row": 1,
+      "analysed": 1285,
+      "retained_share": 0.9735,
+      "note": "Players lost here are disproportionately fringe, so every rate below is an upper bound by roughly the share dropped (S12 name matching)."
+    },
+    "buckets": [
+      {
+        "bucket": 1,
+        "bucket_label": "1-12",
+        "position": "RB",
+        "n": 63,
+        "mean_ppg": 18.0545,
+        "mean_games": 13.7143,
+        "rb_high_end": {
+          "hits": 40,
+          "rate": 0.6349,
+          "ci_low": 0.5115,
+          "ci_high": 0.7428
+        },
+        "rb_usable": {
+          "hits": 51,
+          "rate": 0.8095,
+          "ci_low": 0.6959,
+          "ci_high": 0.8875
+        }
+      },
+      {
+        "bucket": 1,
+        "bucket_label": "1-12",
+        "position": "WR",
+        "n": 31,
+        "mean_ppg": 18.5384,
+        "mean_games": 14.3226,
+        "wr_high_end": {
+          "hits": 25,
+          "rate": 0.8065,
+          "ci_low": 0.6372,
+          "ci_high": 0.9081
+        },
+        "wr_usable": {
+          "hits": 28,
+          "rate": 0.9032,
+          "ci_low": 0.751,
+          "ci_high": 0.9665
+        }
+      },
+      {
+        "bucket": 1,
+        "bucket_label": "1-12",
+        "position": "TE",
+        "n": 2,
+        "mean_ppg": 15.5258,
+        "mean_games": 15.5,
+        "te_high_end": {
+          "hits": 2,
+          "rate": 1.0,
+          "ci_low": 0.3424,
+          "ci_high": 1.0
+        }
+      },
+      {
+        "bucket": 2,
+        "bucket_label": "13-24",
+        "position": "RB",
+        "n": 39,
+        "mean_ppg": 15.1641,
+        "mean_games": 13.7179,
+        "rb_high_end": {
+          "hits": 20,
+          "rate": 0.5128,
+          "ci_low": 0.362,
+          "ci_high": 0.6613
+        },
+        "rb_usable": {
+          "hits": 27,
+          "rate": 0.6923,
+          "ci_low": 0.5358,
+          "ci_high": 0.8143
+        }
+      },
+      {
+        "bucket": 2,
+        "bucket_label": "13-24",
+        "position": "WR",
+        "n": 41,
+        "mean_ppg": 16.2948,
+        "mean_games": 14.3902,
+        "wr_high_end": {
+          "hits": 25,
+          "rate": 0.6098,
+          "ci_low": 0.4573,
+          "ci_high": 0.7434
+        },
+        "wr_usable": {
+          "hits": 31,
+          "rate": 0.7561,
+          "ci_low": 0.6066,
+          "ci_high": 0.8617
+        }
+      },
+      {
+        "bucket": 2,
+        "bucket_label": "13-24",
+        "position": "TE",
+        "n": 7,
+        "mean_ppg": 15.1309,
+        "mean_games": 13.5714,
+        "te_high_end": {
+          "hits": 5,
+          "rate": 0.7143,
+          "ci_low": 0.3589,
+          "ci_high": 0.9178
+        }
+      },
+      {
+        "bucket": 3,
+        "bucket_label": "25-36",
+        "position": "RB",
+        "n": 39,
+        "mean_ppg": 13.5205,
+        "mean_games": 13.5128,
+        "rb_high_end": {
+          "hits": 9,
+          "rate": 0.2308,
+          "ci_low": 0.1265,
+          "ci_high": 0.3834
+        },
+        "rb_usable": {
+          "hits": 23,
+          "rate": 0.5897,
+          "ci_low": 0.4342,
+          "ci_high": 0.7292
+        }
+      },
+      {
+        "bucket": 3,
+        "bucket_label": "25-36",
+        "position": "WR",
+        "n": 47,
+        "mean_ppg": 14.2981,
+        "mean_games": 13.8936,
+        "wr_high_end": {
+          "hits": 19,
+          "rate": 0.4043,
+          "ci_low": 0.2764,
+          "ci_high": 0.5466
+        },
+        "wr_usable": {
+          "hits": 35,
+          "rate": 0.7447,
+          "ci_low": 0.6049,
+          "ci_high": 0.8475
+        }
+      },
+      {
+        "bucket": 3,
+        "bucket_label": "25-36",
+        "position": "TE",
+        "n": 9,
+        "mean_ppg": 13.5255,
+        "mean_games": 13.6667,
+        "te_high_end": {
+          "hits": 7,
+          "rate": 0.7778,
+          "ci_low": 0.4526,
+          "ci_high": 0.9368
+        }
+      },
+      {
+        "bucket": 4,
+        "bucket_label": "37-48",
+        "position": "RB",
+        "n": 34,
+        "mean_ppg": 11.8607,
+        "mean_games": 12.4118,
+        "rb_high_end": {
+          "hits": 4,
+          "rate": 0.1176,
+          "ci_low": 0.0467,
+          "ci_high": 0.2662
+        },
+        "rb_usable": {
+          "hits": 15,
+          "rate": 0.4412,
+          "ci_low": 0.2888,
+          "ci_high": 0.6055
+        }
+      },
+      {
+        "bucket": 4,
+        "bucket_label": "37-48",
+        "position": "WR",
+        "n": 45,
+        "mean_ppg": 14.2894,
+        "mean_games": 14.4667,
+        "wr_high_end": {
+          "hits": 19,
+          "rate": 0.4222,
+          "ci_low": 0.2897,
+          "ci_high": 0.567
+        },
+        "wr_usable": {
+          "hits": 30,
+          "rate": 0.6667,
+          "ci_low": 0.5207,
+          "ci_high": 0.7864
+        }
+      },
+      {
+        "bucket": 4,
+        "bucket_label": "37-48",
+        "position": "TE",
+        "n": 6,
+        "mean_ppg": 14.448,
+        "mean_games": 15.0,
+        "te_high_end": {
+          "hits": 5,
+          "rate": 0.8333,
+          "ci_low": 0.4365,
+          "ci_high": 0.9699
+        }
+      },
+      {
+        "bucket": 5,
+        "bucket_label": "49-60",
+        "position": "RB",
+        "n": 32,
+        "mean_ppg": 11.3576,
+        "mean_games": 13.5938,
+        "rb_high_end": {
+          "hits": 3,
+          "rate": 0.0938,
+          "ci_low": 0.0324,
+          "ci_high": 0.2422
+        },
+        "rb_usable": {
+          "hits": 16,
+          "rate": 0.5,
+          "ci_low": 0.3363,
+          "ci_high": 0.6637
+        }
+      },
+      {
+        "bucket": 5,
+        "bucket_label": "49-60",
+        "position": "WR",
+        "n": 40,
+        "mean_ppg": 12.395,
+        "mean_games": 13.45,
+        "wr_high_end": {
+          "hits": 9,
+          "rate": 0.225,
+          "ci_low": 0.1232,
+          "ci_high": 0.375
+        },
+        "wr_usable": {
+          "hits": 21,
+          "rate": 0.525,
+          "ci_low": 0.375,
+          "ci_high": 0.6706
+        }
+      },
+      {
+        "bucket": 5,
+        "bucket_label": "49-60",
+        "position": "TE",
+        "n": 11,
+        "mean_ppg": 11.6147,
+        "mean_games": 13.7273,
+        "te_high_end": {
+          "hits": 6,
+          "rate": 0.5455,
+          "ci_low": 0.2801,
+          "ci_high": 0.7873
+        }
+      },
+      {
+        "bucket": 6,
+        "bucket_label": "61-72",
+        "position": "RB",
+        "n": 27,
+        "mean_ppg": 10.882,
+        "mean_games": 13.0741,
+        "rb_high_end": {
+          "hits": 4,
+          "rate": 0.1481,
+          "ci_low": 0.0592,
+          "ci_high": 0.3248
+        },
+        "rb_usable": {
+          "hits": 13,
+          "rate": 0.4815,
+          "ci_low": 0.3074,
+          "ci_high": 0.6601
+        }
+      },
+      {
+        "bucket": 6,
+        "bucket_label": "61-72",
+        "position": "WR",
+        "n": 37,
+        "mean_ppg": 13.0538,
+        "mean_games": 13.4595,
+        "wr_high_end": {
+          "hits": 8,
+          "rate": 0.2162,
+          "ci_low": 0.1139,
+          "ci_high": 0.372
+        },
+        "wr_usable": {
+          "hits": 21,
+          "rate": 0.5676,
+          "ci_low": 0.4091,
+          "ci_high": 0.7133
+        }
+      },
+      {
+        "bucket": 6,
+        "bucket_label": "61-72",
+        "position": "TE",
+        "n": 12,
+        "mean_ppg": 10.9571,
+        "mean_games": 13.0,
+        "te_high_end": {
+          "hits": 6,
+          "rate": 0.5,
+          "ci_low": 0.2538,
+          "ci_high": 0.7462
+        }
+      },
+      {
+        "bucket": 7,
+        "bucket_label": "73-84",
+        "position": "RB",
+        "n": 32,
+        "mean_ppg": 8.8696,
+        "mean_games": 13.0312,
+        "rb_high_end": {
+          "hits": 1,
+          "rate": 0.0312,
+          "ci_low": 0.0055,
+          "ci_high": 0.1574
+        },
+        "rb_usable": {
+          "hits": 8,
+          "rate": 0.25,
+          "ci_low": 0.1325,
+          "ci_high": 0.4211
+        }
+      },
+      {
+        "bucket": 7,
+        "bucket_label": "73-84",
+        "position": "WR",
+        "n": 35,
+        "mean_ppg": 11.8535,
+        "mean_games": 14.1143,
+        "wr_high_end": {
+          "hits": 8,
+          "rate": 0.2286,
+          "ci_low": 0.1207,
+          "ci_high": 0.3902
+        },
+        "wr_usable": {
+          "hits": 17,
+          "rate": 0.4857,
+          "ci_low": 0.3299,
+          "ci_high": 0.6443
+        }
+      },
+      {
+        "bucket": 7,
+        "bucket_label": "73-84",
+        "position": "TE",
+        "n": 16,
+        "mean_ppg": 9.1091,
+        "mean_games": 13.5625,
+        "te_high_end": {
+          "hits": 7,
+          "rate": 0.4375,
+          "ci_low": 0.231,
+          "ci_high": 0.6682
+        }
+      },
+      {
+        "bucket": 8,
+        "bucket_label": "85-96",
+        "position": "RB",
+        "n": 31,
+        "mean_ppg": 9.1141,
+        "mean_games": 12.7097,
+        "rb_high_end": {
+          "hits": 4,
+          "rate": 0.129,
+          "ci_low": 0.0513,
+          "ci_high": 0.2885
+        },
+        "rb_usable": {
+          "hits": 7,
+          "rate": 0.2258,
+          "ci_low": 0.114,
+          "ci_high": 0.3981
+        }
+      },
+      {
+        "bucket": 8,
+        "bucket_label": "85-96",
+        "position": "WR",
+        "n": 35,
+        "mean_ppg": 11.309,
+        "mean_games": 14.1714,
+        "wr_high_end": {
+          "hits": 4,
+          "rate": 0.1143,
+          "ci_low": 0.0454,
+          "ci_high": 0.2595
+        },
+        "wr_usable": {
+          "hits": 16,
+          "rate": 0.4571,
+          "ci_low": 0.3047,
+          "ci_high": 0.6181
+        }
+      },
+      {
+        "bucket": 8,
+        "bucket_label": "85-96",
+        "position": "TE",
+        "n": 8,
+        "mean_ppg": 9.3003,
+        "mean_games": 12.25,
+        "te_high_end": {
+          "hits": 1,
+          "rate": 0.125,
+          "ci_low": 0.0224,
+          "ci_high": 0.4709
+        }
+      },
+      {
+        "bucket": 9,
+        "bucket_label": "97-108",
+        "position": "RB",
+        "n": 27,
+        "mean_ppg": 7.6861,
+        "mean_games": 13.1481,
+        "rb_high_end": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.1246
+        },
+        "rb_usable": {
+          "hits": 1,
+          "rate": 0.037,
+          "ci_low": 0.0066,
+          "ci_high": 0.1828
+        }
+      },
+      {
+        "bucket": 9,
+        "bucket_label": "97-108",
+        "position": "WR",
+        "n": 37,
+        "mean_ppg": 9.6974,
+        "mean_games": 13.8108,
+        "wr_high_end": {
+          "hits": 1,
+          "rate": 0.027,
+          "ci_low": 0.0048,
+          "ci_high": 0.1382
+        },
+        "wr_usable": {
+          "hits": 11,
+          "rate": 0.2973,
+          "ci_low": 0.1749,
+          "ci_high": 0.4578
+        }
+      },
+      {
+        "bucket": 9,
+        "bucket_label": "97-108",
+        "position": "TE",
+        "n": 11,
+        "mean_ppg": 10.8703,
+        "mean_games": 13.3636,
+        "te_high_end": {
+          "hits": 6,
+          "rate": 0.5455,
+          "ci_low": 0.2801,
+          "ci_high": 0.7873
+        }
+      },
+      {
+        "bucket": 10,
+        "bucket_label": "109-120",
+        "position": "RB",
+        "n": 27,
+        "mean_ppg": 10.011,
+        "mean_games": 15.1481,
+        "rb_high_end": {
+          "hits": 4,
+          "rate": 0.1481,
+          "ci_low": 0.0592,
+          "ci_high": 0.3248
+        },
+        "rb_usable": {
+          "hits": 8,
+          "rate": 0.2963,
+          "ci_low": 0.1585,
+          "ci_high": 0.4848
+        }
+      },
+      {
+        "bucket": 10,
+        "bucket_label": "109-120",
+        "position": "WR",
+        "n": 31,
+        "mean_ppg": 8.6218,
+        "mean_games": 13.7097,
+        "wr_high_end": {
+          "hits": 2,
+          "rate": 0.0645,
+          "ci_low": 0.0179,
+          "ci_high": 0.2072
+        },
+        "wr_usable": {
+          "hits": 9,
+          "rate": 0.2903,
+          "ci_low": 0.161,
+          "ci_high": 0.4659
+        }
+      },
+      {
+        "bucket": 10,
+        "bucket_label": "109-120",
+        "position": "TE",
+        "n": 11,
+        "mean_ppg": 10.411,
+        "mean_games": 14.3636,
+        "te_high_end": {
+          "hits": 8,
+          "rate": 0.7273,
+          "ci_low": 0.4344,
+          "ci_high": 0.9025
+        }
+      },
+      {
+        "bucket": 11,
+        "bucket_label": "121-132",
+        "position": "RB",
+        "n": 26,
+        "mean_ppg": 7.7398,
+        "mean_games": 12.7692,
+        "rb_high_end": {
+          "hits": 1,
+          "rate": 0.0385,
+          "ci_low": 0.0068,
+          "ci_high": 0.1889
+        },
+        "rb_usable": {
+          "hits": 3,
+          "rate": 0.1154,
+          "ci_low": 0.04,
+          "ci_high": 0.2898
+        }
+      },
+      {
+        "bucket": 11,
+        "bucket_label": "121-132",
+        "position": "WR",
+        "n": 32,
+        "mean_ppg": 10.2457,
+        "mean_games": 12.8438,
+        "wr_high_end": {
+          "hits": 1,
+          "rate": 0.0312,
+          "ci_low": 0.0055,
+          "ci_high": 0.1574
+        },
+        "wr_usable": {
+          "hits": 12,
+          "rate": 0.375,
+          "ci_low": 0.2293,
+          "ci_high": 0.5475
+        }
+      },
+      {
+        "bucket": 11,
+        "bucket_label": "121-132",
+        "position": "TE",
+        "n": 10,
+        "mean_ppg": 9.2691,
+        "mean_games": 14.1,
+        "te_high_end": {
+          "hits": 4,
+          "rate": 0.4,
+          "ci_low": 0.1682,
+          "ci_high": 0.6873
+        }
+      },
+      {
+        "bucket": 12,
+        "bucket_label": "133-144",
+        "position": "RB",
+        "n": 19,
+        "mean_ppg": 6.7852,
+        "mean_games": 12.4737,
+        "rb_high_end": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.1682
+        },
+        "rb_usable": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.1682
+        }
+      },
+      {
+        "bucket": 12,
+        "bucket_label": "133-144",
+        "position": "WR",
+        "n": 22,
+        "mean_ppg": 9.7553,
+        "mean_games": 13.7727,
+        "wr_high_end": {
+          "hits": 2,
+          "rate": 0.0909,
+          "ci_low": 0.0253,
+          "ci_high": 0.2781
+        },
+        "wr_usable": {
+          "hits": 5,
+          "rate": 0.2273,
+          "ci_low": 0.1012,
+          "ci_high": 0.4344
+        }
+      },
+      {
+        "bucket": 12,
+        "bucket_label": "133-144",
+        "position": "TE",
+        "n": 6,
+        "mean_ppg": 10.2225,
+        "mean_games": 13.6667,
+        "te_high_end": {
+          "hits": 2,
+          "rate": 0.3333,
+          "ci_low": 0.0968,
+          "ci_high": 0.7
+        }
+      },
+      {
+        "bucket": 13,
+        "bucket_label": "145-156",
+        "position": "RB",
+        "n": 36,
+        "mean_ppg": 6.5729,
+        "mean_games": 11.0278,
+        "rb_high_end": {
+          "hits": 1,
+          "rate": 0.0278,
+          "ci_low": 0.0049,
+          "ci_high": 0.1417
+        },
+        "rb_usable": {
+          "hits": 4,
+          "rate": 0.1111,
+          "ci_low": 0.0441,
+          "ci_high": 0.2531
+        }
+      },
+      {
+        "bucket": 13,
+        "bucket_label": "145-156",
+        "position": "WR",
+        "n": 17,
+        "mean_ppg": 7.9404,
+        "mean_games": 12.0,
+        "wr_high_end": {
+          "hits": 1,
+          "rate": 0.0588,
+          "ci_low": 0.0105,
+          "ci_high": 0.2698
+        },
+        "wr_usable": {
+          "hits": 4,
+          "rate": 0.2353,
+          "ci_low": 0.0956,
+          "ci_high": 0.4726
+        }
+      },
+      {
+        "bucket": 13,
+        "bucket_label": "145-156",
+        "position": "TE",
+        "n": 22,
+        "mean_ppg": 8.0453,
+        "mean_games": 12.6364,
+        "te_high_end": {
+          "hits": 6,
+          "rate": 0.2727,
+          "ci_low": 0.1315,
+          "ci_high": 0.4815
+        }
+      },
+      {
+        "bucket": 14,
+        "bucket_label": "157-168",
+        "position": "RB",
+        "n": 23,
+        "mean_ppg": 5.4098,
+        "mean_games": 11.4348,
+        "rb_high_end": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.1431
+        },
+        "rb_usable": {
+          "hits": 1,
+          "rate": 0.0435,
+          "ci_low": 0.0077,
+          "ci_high": 0.2099
+        }
+      },
+      {
+        "bucket": 14,
+        "bucket_label": "157-168",
+        "position": "WR",
+        "n": 46,
+        "mean_ppg": 7.3818,
+        "mean_games": 13.8261,
+        "wr_high_end": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0771
+        },
+        "wr_usable": {
+          "hits": 7,
+          "rate": 0.1522,
+          "ci_low": 0.0757,
+          "ci_high": 0.2822
+        }
+      },
+      {
+        "bucket": 14,
+        "bucket_label": "157-168",
+        "position": "TE",
+        "n": 14,
+        "mean_ppg": 6.9661,
+        "mean_games": 14.0714,
+        "te_high_end": {
+          "hits": 3,
+          "rate": 0.2143,
+          "ci_low": 0.0757,
+          "ci_high": 0.4759
+        }
+      },
+      {
+        "bucket": 15,
+        "bucket_label": "169-180",
+        "position": "RB",
+        "n": 3,
+        "mean_ppg": 9.1357,
+        "mean_games": 9.3333,
+        "rb_high_end": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.5615
+        },
+        "rb_usable": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.5615
+        }
+      },
+      {
+        "bucket": 15,
+        "bucket_label": "169-180",
+        "position": "WR",
+        "n": 2,
+        "mean_ppg": 7.9207,
+        "mean_games": 13.5,
+        "wr_high_end": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.6576
+        },
+        "wr_usable": {
+          "hits": 0,
+          "rate": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.6576
+        }
+      },
+      {
+        "bucket": 15,
+        "bucket_label": "169-180",
+        "position": "TE",
+        "n": 1,
+        "mean_ppg": 8.97,
+        "mean_games": 16.0,
+        "te_high_end": {
+          "hits": 1,
+          "rate": 1.0,
+          "ci_low": 0.2065,
+          "ci_high": 1.0
+        }
+      }
+    ],
+    "rb_vs_wr": [
+      {
+        "bucket": 1,
+        "bucket_label": "1-12",
+        "comparable": true,
+        "n_rb": 63,
+        "n_wr": 31,
+        "rb_high_end_rate": 0.6349,
+        "rb_ci": [
+          0.5115,
+          0.7428
+        ],
+        "wr_high_end_rate": 0.8065,
+        "wr_ci": [
+          0.6372,
+          0.9081
+        ],
+        "absolute_difference_pp": -17.15,
+        "risk_ratio": 0.7873,
+        "odds_ratio": 0.4393
+      },
+      {
+        "bucket": 2,
+        "bucket_label": "13-24",
+        "comparable": true,
+        "n_rb": 39,
+        "n_wr": 41,
+        "rb_high_end_rate": 0.5128,
+        "rb_ci": [
+          0.362,
+          0.6613
+        ],
+        "wr_high_end_rate": 0.6098,
+        "wr_ci": [
+          0.4573,
+          0.7434
+        ],
+        "absolute_difference_pp": -9.69,
+        "risk_ratio": 0.841,
+        "odds_ratio": 0.6802
+      },
+      {
+        "bucket": 3,
+        "bucket_label": "25-36",
+        "comparable": true,
+        "n_rb": 39,
+        "n_wr": 47,
+        "rb_high_end_rate": 0.2308,
+        "rb_ci": [
+          0.1265,
+          0.3834
+        ],
+        "wr_high_end_rate": 0.4043,
+        "wr_ci": [
+          0.2764,
+          0.5466
+        ],
+        "absolute_difference_pp": -17.35,
+        "risk_ratio": 0.5709,
+        "odds_ratio": 0.4552
+      },
+      {
+        "bucket": 4,
+        "bucket_label": "37-48",
+        "comparable": true,
+        "n_rb": 34,
+        "n_wr": 45,
+        "rb_high_end_rate": 0.1176,
+        "rb_ci": [
+          0.0467,
+          0.2662
+        ],
+        "wr_high_end_rate": 0.4222,
+        "wr_ci": [
+          0.2897,
+          0.567
+        ],
+        "absolute_difference_pp": -30.46,
+        "risk_ratio": 0.2786,
+        "odds_ratio": 0.2005
+      },
+      {
+        "bucket": 5,
+        "bucket_label": "49-60",
+        "comparable": true,
+        "n_rb": 32,
+        "n_wr": 40,
+        "rb_high_end_rate": 0.0938,
+        "rb_ci": [
+          0.0324,
+          0.2422
+        ],
+        "wr_high_end_rate": 0.225,
+        "wr_ci": [
+          0.1232,
+          0.375
+        ],
+        "absolute_difference_pp": -13.12,
+        "risk_ratio": 0.4167,
+        "odds_ratio": 0.3934
+      },
+      {
+        "bucket": 6,
+        "bucket_label": "61-72",
+        "comparable": true,
+        "n_rb": 27,
+        "n_wr": 37,
+        "rb_high_end_rate": 0.1481,
+        "rb_ci": [
+          0.0592,
+          0.3248
+        ],
+        "wr_high_end_rate": 0.2162,
+        "wr_ci": [
+          0.1139,
+          0.372
+        ],
+        "absolute_difference_pp": -6.81,
+        "risk_ratio": 0.6852,
+        "odds_ratio": 0.6646
+      },
+      {
+        "bucket": 7,
+        "bucket_label": "73-84",
+        "comparable": true,
+        "n_rb": 32,
+        "n_wr": 35,
+        "rb_high_end_rate": 0.0312,
+        "rb_ci": [
+          0.0055,
+          0.1574
+        ],
+        "wr_high_end_rate": 0.2286,
+        "wr_ci": [
+          0.1207,
+          0.3902
+        ],
+        "absolute_difference_pp": -19.73,
+        "risk_ratio": 0.1367,
+        "odds_ratio": 0.1541
+      },
+      {
+        "bucket": 8,
+        "bucket_label": "85-96",
+        "comparable": true,
+        "n_rb": 31,
+        "n_wr": 35,
+        "rb_high_end_rate": 0.129,
+        "rb_ci": [
+          0.0513,
+          0.2885
+        ],
+        "wr_high_end_rate": 0.1143,
+        "wr_ci": [
+          0.0454,
+          0.2595
+        ],
+        "absolute_difference_pp": 1.47,
+        "risk_ratio": 1.129,
+        "odds_ratio": 1.1455
+      },
+      {
+        "bucket": 9,
+        "bucket_label": "97-108",
+        "comparable": true,
+        "n_rb": 27,
+        "n_wr": 37,
+        "rb_high_end_rate": 0.0,
+        "rb_ci": [
+          0.0,
+          0.1246
+        ],
+        "wr_high_end_rate": 0.027,
+        "wr_ci": [
+          0.0048,
+          0.1382
+        ],
+        "absolute_difference_pp": -2.7,
+        "risk_ratio": 0.0,
+        "odds_ratio": 0.4424
+      },
+      {
+        "bucket": 10,
+        "bucket_label": "109-120",
+        "comparable": true,
+        "n_rb": 27,
+        "n_wr": 31,
+        "rb_high_end_rate": 0.1481,
+        "rb_ci": [
+          0.0592,
+          0.3248
+        ],
+        "wr_high_end_rate": 0.0645,
+        "wr_ci": [
+          0.0179,
+          0.2072
+        ],
+        "absolute_difference_pp": 8.36,
+        "risk_ratio": 2.2963,
+        "odds_ratio": 2.2596
+      },
+      {
+        "bucket": 11,
+        "bucket_label": "121-132",
+        "comparable": true,
+        "n_rb": 26,
+        "n_wr": 32,
+        "rb_high_end_rate": 0.0385,
+        "rb_ci": [
+          0.0068,
+          0.1889
+        ],
+        "wr_high_end_rate": 0.0312,
+        "wr_ci": [
+          0.0055,
+          0.1574
+        ],
+        "absolute_difference_pp": 0.72,
+        "risk_ratio": 1.2308,
+        "odds_ratio": 1.2353
+      },
+      {
+        "bucket": 12,
+        "bucket_label": "133-144",
+        "comparable": true,
+        "n_rb": 19,
+        "n_wr": 22,
+        "rb_high_end_rate": 0.0,
+        "rb_ci": [
+          0.0,
+          0.1682
+        ],
+        "wr_high_end_rate": 0.0909,
+        "wr_ci": [
+          0.0253,
+          0.2781
+        ],
+        "absolute_difference_pp": -9.09,
+        "risk_ratio": 0.0,
+        "odds_ratio": 0.2103
+      },
+      {
+        "bucket": 13,
+        "bucket_label": "145-156",
+        "comparable": true,
+        "n_rb": 36,
+        "n_wr": 17,
+        "rb_high_end_rate": 0.0278,
+        "rb_ci": [
+          0.0049,
+          0.1417
+        ],
+        "wr_high_end_rate": 0.0588,
+        "wr_ci": [
+          0.0105,
+          0.2698
+        ],
+        "absolute_difference_pp": -3.1,
+        "risk_ratio": 0.4722,
+        "odds_ratio": 0.4648
+      },
+      {
+        "bucket": 14,
+        "bucket_label": "157-168",
+        "comparable": true,
+        "n_rb": 23,
+        "n_wr": 46,
+        "rb_high_end_rate": 0.0,
+        "rb_ci": [
+          0.0,
+          0.1431
+        ],
+        "wr_high_end_rate": 0.0,
+        "wr_ci": [
+          0.0,
+          0.0771
+        ],
+        "absolute_difference_pp": 0.0,
+        "risk_ratio": null,
+        "odds_ratio": null
+      },
+      {
+        "bucket": 15,
+        "bucket_label": "169-180",
+        "comparable": true,
+        "n_rb": 3,
+        "n_wr": 2,
+        "rb_high_end_rate": 0.0,
+        "rb_ci": [
+          0.0,
+          0.5615
+        ],
+        "wr_high_end_rate": 0.0,
+        "wr_ci": [
+          0.0,
+          0.6576
+        ],
+        "absolute_difference_pp": 0.0,
+        "risk_ratio": null,
+        "odds_ratio": null
+      }
+    ]
+  },
+  "limitations": [
+    "DESCRIPTIVE only (S88): observed rates, no model, no evidence grade, no dead_zone_score, no robustness sweep, no exception research (S21.2).",
+    "Fantasy Football Calculator serves historical ADP only from 2018, not from 2007 as S10B states -- 2015 and 2017 return empty. The window is therefore 8 seasons, against the 14 S5.1 assumed when it estimated n~175 for the 37-72 band, so every bucket is smaller than the power note anticipated.",
+    "Historical ADP is a single final-preseason value per season, not the price on any particular draft day, and its window closes a few days after the decision date in config/decision_dates.yaml.",
+    "ADP is the Fantasy Football Calculator draft population, not the whole fantasy market (S10B).",
+    "rb_high_end is a season-total positional finish, so it is unaffected by the pre-2020 gap in games_missed_injury. An availability-conditional variant would not be, and none is reported here.",
+    "Roughly 3% of drafted players carry no ID match and leave the denominator; they skew fringe, so every rate here is a slight upper bound (see coverage)."
+  ],
+  "sources": [
+    "Fantasy Football Calculator ADP API",
+    "nflverse player stats"
+  ]
+}

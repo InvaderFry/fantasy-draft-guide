@@ -142,6 +142,55 @@ def build_tables(
         typer.echo(f"{name}: {path}")
 
 
+@app.command("run-research")
+def run_research(
+    modules: Annotated[str, typer.Option(help="comma list, default all runnable")] = "",
+    edition: Annotated[str, typer.Option(help="artifact edition, default today")] = "",
+) -> None:
+    """Run the S88 Week 2 research modules and export their S16 artifacts (S47 stage 8).
+
+    Blocked modules report why and do not stop the run: S19.3 is blocked by
+    design until a real league profile and a projection source exist, and a
+    blocked module is a finding rather than a failure.
+    """
+    from research import method as method_mod
+    from research.foundations import tiers
+    from research.running_back import dead_zone
+    from research.teams import team_scoring_regression
+
+    runnable = {
+        team_scoring_regression.METHOD_ID: team_scoring_regression.run,
+        dead_zone.METHOD_ID: dead_zone.run,
+    }
+    blocked = {tiers.METHOD_ID: tiers.run}
+
+    wanted = [m.strip() for m in modules.split(",") if m.strip()] or [*runnable, *blocked]
+    unknown = [m for m in wanted if m not in runnable and m not in blocked]
+    if unknown:
+        raise typer.BadParameter(f"unknown module(s) {unknown}")
+
+    edition_name = edition or method_mod.default_edition()
+    failures = 0
+    for name in wanted:
+        if name in blocked:
+            try:
+                blocked[name]()
+            except Exception as exc:  # noqa: BLE001 - reported, not raised
+                typer.echo(f"{name}: BLOCKED\n  {exc}")
+            continue
+        try:
+            _results, artifact = runnable[name]()
+        except Exception as exc:  # noqa: BLE001 - one module must not stop the rest
+            failures += 1
+            typer.echo(f"{name}: FAILED -- {exc}", err=True)
+            continue
+        path = artifact.write(edition_name)
+        typer.echo(f"{name}: n={artifact.sample_size} -> {path}")
+
+    if failures:
+        raise typer.Exit(code=1)
+
+
 @app.command()
 def validate() -> None:
     """Re-hash snapshots and run schema + leakage checks."""

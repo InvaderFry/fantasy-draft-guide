@@ -110,11 +110,23 @@ def test_a_traded_player_is_credited_against_each_weeks_own_team(tables):
     assert share != pytest.approx(40 / 110)
 
 
-def test_all_three_shares_use_the_same_denominator_convention(tables):
-    """target_share and rush_share were already active-week; air_yard_share was not."""
+def test_target_share_divides_by_team_targets_not_pass_attempts(tables):
+    """Pass attempts count sacks and throwaways; targets are what a share is of.
+
+    TE1 played weeks 1, 3 and 4 for 12 targets. AAA's targets in those weeks
+    were 24, 14 and 17 -- not the 20 pass plays per week the play-by-play
+    fixture generates, which is what the old denominator would have used.
+    """
     row = _row(tables["player_season"], TE1)
-    # TE1 played weeks 1, 3 and 4: three weeks x 20 team pass attempts
-    assert row["target_share"] == pytest.approx(12 / 60)
+    assert row["target_share"] == pytest.approx(12 / 55)
+    assert row["target_share"] != pytest.approx(12 / 60)
+
+
+def test_a_player_who_never_played_gets_null_shares_not_nan(tables):
+    """0/0 is NaN in polars, and NaN sorts ahead of every real value."""
+    season = tables["player_season"]
+    for column in ("target_share", "rush_share", "air_yard_share"):
+        assert season.filter(pl.col(column).is_nan()).height == 0
 
 
 def test_team_season_still_builds_from_play_by_play(tables):
