@@ -25,6 +25,7 @@ import datetime as dt
 
 import polars as pl
 
+from pipeline.config import decision_date
 from pipeline.features import player_week as pw
 from pipeline.features import sources
 from pipeline.features.assertions import assert_as_of_present, assert_no_outcome_columns
@@ -185,10 +186,21 @@ def _availability(season: int) -> pl.DataFrame:
         rostered.join(played, on=["season", "player_id"], how="left")
         .join(injured_out, on=["season", "player_id"], how="left")
         .with_columns(
-            (pl.col("rostered_weeks") - pl.col("_played").fill_null(0))
-            .clip(lower_bound=0)
-            .alias("games_missed"),
-            pl.col("_weeks_out").fill_null(0).alias("games_missed_injury"),
+            # Counts arrive as unsigned; subtracting them without a cast wraps a
+            # negative difference to ~4.3 billion instead of failing.
+            pl.col("rostered_weeks").cast(pl.Int64),
+            pl.col("_played").fill_null(0).cast(pl.Int64),
+            pl.col("_weeks_out").fill_null(0).cast(pl.Int64),
+        )
+        .with_columns(
+            # A player who appeared in a game was rostered that week, whatever
+            # the weekly roster file says -- practice-squad elevations show up
+            # as DEV and would otherwise report more games than weeks.
+            pl.max_horizontal("rostered_weeks", "_played").alias("rostered_weeks")
+        )
+        .with_columns(
+            (pl.col("rostered_weeks") - pl.col("_played")).alias("games_missed"),
+            pl.col("_weeks_out").alias("games_missed_injury"),
         )
         .select("season", "player_id", "rostered_weeks", "games_missed", "games_missed_injury")
     )
@@ -213,47 +225,58 @@ def _biographical(season: int) -> pl.DataFrame:
 
 
 def _preseason_depth_chart(season: int) -> pl.DataFrame:
-    """Depth-chart rank as of the earliest chart published in the season (S86).
+    """Depth-chart rank as of the last chart published on or before the decision date (S86).
 
-    ``as_of`` is set conservatively to the first gameday of the week the chart
-    covers. nflverse depth charts for recent seasons contain no preseason
-    (``PRE``) rows, so for those seasons this value is NOT knowable at the
-    August decision date -- and the leakage assertion will say so rather than
-    the feature quietly being used. That is the intended behaviour; resolving
-    it needs a genuinely preseason source, not an earlier-looking date.
+    Two upstream formats have to be handled, and they differ in a way that
+    matters for leakage rather than only for parsing:
+
+    * legacy (through 2024) -- keyed by week, earliest chart is regular-season
+      week 1. Its ``as_of`` therefore falls AFTER the August decision date, so
+      the value is not knowable at the draft and this function returns nothing
+      for those seasons. That is the honest answer, not a gap to paper over:
+      dating a week-1 chart as if it were preseason is exactly the leakage
+      S6.1 exists to stop.
+    * current (2025+) -- carries a real publication timestamp ``dt``, with
+      charts published from early August. Those genuinely are preseason, so the
+      latest chart at or before the decision date is used, dated by ``dt``.
     """
+    empty = pl.DataFrame(
+        schema={
+            "season": pl.Int32,
+            "player_id": pl.String,
+            "depth_chart_rank_preseason": pl.Int64,
+            "depth_chart_rank_preseason_as_of": pl.Date,
+        }
+    )
     try:
         charts = sources.load(f"depth_charts_{season}.parquet")
     except sources.MissingRawData:
-        return pl.DataFrame(
-            schema={
-                "season": pl.Int32, "player_id": pl.String,
-                "depth_chart_rank_preseason": pl.Int64,
-                "depth_chart_rank_preseason_as_of": pl.Date,
-            }
-        )
-
-    charts = charts.filter(pl.col("gsis_id").is_not_null() & pl.col("week").is_not_null())
+        return empty
     if charts.height == 0:
-        return pl.DataFrame(
-            schema={
-                "season": pl.Int32, "player_id": pl.String,
-                "depth_chart_rank_preseason": pl.Int64,
-                "depth_chart_rank_preseason_as_of": pl.Date,
-            }
+        return empty
+
+    cutoff = decision_date(season)
+
+    if "dt" in charts.columns:  # current format
+        charts = charts.with_columns(
+            pl.col("dt").str.slice(0, 10).str.to_date(strict=False).alias("chart_date")
+        ).filter((pl.col("chart_date") <= pl.lit(cutoff)) & pl.col("gsis_id").is_not_null())
+        if charts.height == 0:
+            return empty
+        latest = charts.select(pl.col("chart_date").max()).item()
+        return (
+            charts.filter(pl.col("chart_date") == latest)
+            .group_by(pl.col("gsis_id").alias("player_id"))
+            .agg(pl.col("pos_rank").cast(pl.Int64).min().alias("depth_chart_rank_preseason"))
+            .with_columns(
+                pl.lit(season, dtype=pl.Int32).alias("season"),
+                pl.lit(latest).alias("depth_chart_rank_preseason_as_of"),
+            )
+            .select(
+                "season", "player_id",
+                "depth_chart_rank_preseason", "depth_chart_rank_preseason_as_of",
+            )
         )
 
-    earliest = charts.select(pl.col("week").min()).item()
-    week_dates = sources.week_end_dates(season)
-    chart_date = (
-        week_dates.filter(pl.col("week") == earliest).select("week_start").item()
-        if week_dates.filter(pl.col("week") == earliest).height
-        else sources.season_end_date(season)
-    )
-
-    return (
-        charts.filter(pl.col("week") == earliest)
-        .group_by(["season", pl.col("gsis_id").alias("player_id")])
-        .agg(pl.col("depth_team").cast(pl.Int64).min().alias("depth_chart_rank_preseason"))
-        .with_columns(pl.lit(chart_date).alias("depth_chart_rank_preseason_as_of"))
-    )
+    # legacy format: the earliest chart is week 1, which postdates the draft
+    return empty

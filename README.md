@@ -39,7 +39,22 @@ make test
 ```
 
 The full research window is `SEASONS=2012-2025` (~300 MB of raw play-by-play,
-streamed and reduced during the table build).
+streamed and reduced during the table build). It produces:
+
+| Table | Rows (2012–2025) |
+|---|---|
+| `player_week` | 72,859 |
+| `player_season` / `player_season_outcomes` | 7,971 each |
+| `team_season` | 448 — the population §25 runs on |
+| `adp_history` | grows daily from the archival job |
+
+One upstream wrinkle worth knowing: nflverse moved weekly player stats to a new
+release (`stats_player`) with renamed columns, and **only the new location
+carries 2025**. The adapter tries locations in order and the builder normalizes
+the renamed columns, so a 14-season build spans both shapes. Depth charts
+changed format too — the 2025+ files carry real publication timestamps, which
+is why preseason depth-chart rank is available for 2025 and null for earlier
+seasons, where the first chart is dated week 1 and postdates the draft.
 
 ## Two rules the code enforces rather than documents
 

@@ -19,8 +19,10 @@ RED_ZONE_YARDLINE = 20
 
 
 def build(season: int) -> pl.DataFrame:
-    lf = pl.scan_parquet(sources.raw_path(f"play_by_play_{season}.parquet")).filter(
-        (pl.col("season_type") == "REG") & pl.col("posteam").is_not_null()
+    lf = (
+        pl.scan_parquet(sources.raw_path(f"play_by_play_{season}.parquet"))
+        .with_columns(pl.col("season").cast(pl.Int32), pl.col("week").cast(pl.Int32))
+        .filter((pl.col("season_type") == "REG") & pl.col("posteam").is_not_null())
     )
 
     base = (

@@ -32,8 +32,27 @@ def raw_path(filename: str) -> Path:
     return path
 
 
+# Key dtypes drift across nflverse seasons -- `injuries` publishes season and
+# week as Float64 before 2024 and Int32 after -- which turns a join into a
+# schema error halfway through a 14-season build. Normalize on load rather than
+# at every call site.
+KEY_DTYPES: dict[str, pl.DataType] = {
+    "season": pl.Int32,
+    "week": pl.Int32,
+}
+
+
+def normalize_keys(frame: pl.DataFrame) -> pl.DataFrame:
+    casts = [
+        pl.col(col).cast(dtype)
+        for col, dtype in KEY_DTYPES.items()
+        if col in frame.columns and frame.schema[col] != dtype
+    ]
+    return frame.with_columns(casts) if casts else frame
+
+
 def load(filename: str) -> pl.DataFrame:
-    return pl.read_parquet(raw_path(filename))
+    return normalize_keys(pl.read_parquet(raw_path(filename)))
 
 
 def available_seasons(prefix: str = "player_stats_") -> list[int]:

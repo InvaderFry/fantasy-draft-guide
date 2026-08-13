@@ -16,13 +16,41 @@ from pipeline.features.assertions import assert_as_of_present
 from pipeline.normalize.player_ids import load_player_ids
 from pipeline.scoring import built_in_scoring_exprs
 
-FANTASY_POSITIONS = ("QB", "RB", "WR", "TE")
+# The current nflverse weekly stats release carries every position, including
+# defenders; the legacy one carried offensive skill players only. Filtering
+# keeps a 14-season table consistent across that change. Kickers and team
+# defenses are out of scope for every S88 Week 2 analysis and have no scoring
+# rules configured, so they are excluded rather than half-supported.
+FANTASY_POSITIONS = ("QB", "RB", "WR", "TE", "FB")
 RED_ZONE_YARDLINE = 20
 GOAL_LINE_YARDLINE = 5
 
+# nflverse moved weekly player stats to a new release with renamed columns
+# (the `stats_player` release, which is the only one carrying 2025+). Seasons
+# straddle the two shapes, so normalize to the legacy names the builder uses.
+COLUMN_ALIASES = {
+    "team": "recent_team",
+    "passing_interceptions": "interceptions",
+    "sacks_suffered": "sacks",
+    "sack_yards_lost": "sack_yards",
+}
+
+
+def _normalize_columns(frame: pl.DataFrame) -> pl.DataFrame:
+    renames = {
+        new: old
+        for new, old in COLUMN_ALIASES.items()
+        if new in frame.columns and old not in frame.columns
+    }
+    return frame.rename(renames) if renames else frame
+
 
 def build(season: int) -> pl.DataFrame:
-    stats = sources.load(f"player_stats_{season}.parquet").filter(pl.col("season_type") == "REG")
+    stats = _normalize_columns(
+        sources.load(f"player_stats_{season}.parquet")
+    ).filter(
+        (pl.col("season_type") == "REG") & pl.col("position").is_in(FANTASY_POSITIONS)
+    )
 
     stats = stats.with_columns(
         (
@@ -106,7 +134,9 @@ def _pbp_aggregates(season: int) -> tuple[pl.DataFrame, pl.DataFrame]:
     pbp is ~270MB and none of it needs to be held once aggregated.
     """
     path = sources.raw_path(f"play_by_play_{season}.parquet")
-    lf = pl.scan_parquet(path).filter(pl.col("season_type") == "REG")
+    lf = pl.scan_parquet(path).with_columns(
+        pl.col("season").cast(pl.Int32), pl.col("week").cast(pl.Int32)
+    ).filter(pl.col("season_type") == "REG")
 
     rz_targets = (
         lf.filter(

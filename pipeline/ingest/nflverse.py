@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from pipeline.config import RAW_DIR, source
-from pipeline.ingest.base import Fetched, http_get
+from pipeline.ingest.base import Fetched, FetchError, http_get
 
 SOURCE_NAME = "nflverse"
 ASSET_BASE = "https://github.com/nflverse/nflverse-data/releases/download"
@@ -36,61 +36,82 @@ FIRST_SEASON = 2012
 
 @dataclass(frozen=True)
 class Dataset:
-    """One nflverse release asset family."""
+    """One nflverse release asset family.
+
+    ``locations`` is an ordered list of (release tag, filename) candidates,
+    tried in turn. nflverse moves datasets between releases -- weekly player
+    stats migrated from ``player_stats/player_stats_{season}`` to
+    ``stats_player/stats_player_week_{season}``, and only the new location
+    carries 2025 -- so a single hard-coded URL silently loses the most recent
+    season, which is the one a draft depends on.
+    """
 
     name: str
-    tag: str
-    filename: str          # may contain {season}
+    locations: tuple[tuple[str, str], ...]
     per_season: bool
     purpose: str
+    # Local filename pattern, kept stable when upstream moves a dataset.
+    local_pattern: str | None = None
+
+    def _fill(self, filename: str, season: int | None) -> str:
+        return filename.format(season=season) if self.per_season else filename
+
+    def urls(self, season: int | None = None) -> list[str]:
+        return [f"{ASSET_BASE}/{tag}/{self._fill(name, season)}" for tag, name in self.locations]
 
     def url(self, season: int | None = None) -> str:
-        filename = self.filename.format(season=season) if self.per_season else self.filename
-        return f"{ASSET_BASE}/{self.tag}/{filename}"
+        return self.urls(season)[0]
 
     def local_name(self, season: int | None = None) -> str:
-        return self.filename.format(season=season) if self.per_season else self.filename
+        """Stable local filename, independent of which upstream location served it."""
+        return self._fill(self.local_pattern or self.locations[0][1], season)
 
 
 DATASETS: dict[str, Dataset] = {
     "player_stats": Dataset(
-        "player_stats", "player_stats", "player_stats_{season}.parquet", True,
+        "player_stats",
+        (
+            ("stats_player", "stats_player_week_{season}.parquet"),   # current
+            ("player_stats", "player_stats_{season}.parquet"),        # legacy
+        ),
+        True,
         "weekly fantasy production, targets, carries, air yards",
+        local_pattern="player_stats_{season}.parquet",
     ),
     "pbp": Dataset(
-        "pbp", "pbp", "play_by_play_{season}.parquet", True,
+        "pbp", (("pbp", "play_by_play_{season}.parquet"),), True,
         "team_season aggregates, red-zone and goal-line opportunity",
     ),
     "snap_counts": Dataset(
-        "snap_counts", "snap_counts", "snap_counts_{season}.parquet", True,
+        "snap_counts", (("snap_counts", "snap_counts_{season}.parquet"),), True,
         "offensive snaps and snap share",
     ),
     "rosters": Dataset(
-        "rosters", "rosters", "roster_{season}.parquet", True,
+        "rosters", (("rosters", "roster_{season}.parquet"),), True,
         "team, position, age, experience",
     ),
     "weekly_rosters": Dataset(
-        "weekly_rosters", "weekly_rosters", "roster_weekly_{season}.parquet", True,
+        "weekly_rosters", (("weekly_rosters", "roster_weekly_{season}.parquet"),), True,
         "in-season roster status by week",
     ),
     "depth_charts": Dataset(
-        "depth_charts", "depth_charts", "depth_charts_{season}.parquet", True,
+        "depth_charts", (("depth_charts", "depth_charts_{season}.parquet"),), True,
         "preseason depth chart rank as a role signal (S86)",
     ),
     "injuries": Dataset(
-        "injuries", "injuries", "injuries_{season}.parquet", True,
+        "injuries", (("injuries", "injuries_{season}.parquet"),), True,
         "weekly injury designations; inactive_reason for S15.1",
     ),
     "draft_picks": Dataset(
-        "draft_picks", "draft_picks", "draft_picks.parquet", False,
+        "draft_picks", (("draft_picks", "draft_picks.parquet"),), False,
         "draft capital as a role proxy",
     ),
     "players": Dataset(
-        "players", "players", "players.parquet", False,
+        "players", (("players", "players.parquet"),), False,
         "player ID crosswalk and biographical data (S12)",
     ),
     "combine": Dataset(
-        "combine", "combine", "combine.parquet", False,
+        "combine", (("combine", "combine.parquet"),), False,
         "combine metrics",
     ),
 }
@@ -154,10 +175,23 @@ class NflverseAdapter:
             if path.exists() and not force:
                 written.append(path)
                 continue
-            data = http_get(ds.url(season), timeout=120)
+            data, _url = self._fetch_first(ds, season)
             path.write_bytes(data)
             written.append(path)
         return written
+
+    @staticmethod
+    def _fetch_first(ds: Dataset, season: int | None) -> tuple[bytes, str]:
+        """Try each candidate location in order; report all failures together."""
+        errors: list[str] = []
+        for url in ds.urls(season):
+            try:
+                return http_get(url, timeout=120, retries=2), url
+            except FetchError as exc:
+                errors.append(str(exc))
+        raise FetchError(
+            f"no location served {ds.name} for season {season}. Tried:\n  " + "\n  ".join(errors)
+        )
 
     def fetch(self) -> list[Fetched]:
         """Adapter protocol: return payloads for snapshotting.
@@ -167,12 +201,12 @@ class NflverseAdapter:
         """
         out: list[Fetched] = []
         for ds, season in self.targets():
-            data = http_get(ds.url(season), timeout=120)
+            data, url = self._fetch_first(ds, season)
             out.append(
                 Fetched(
                     filename=ds.local_name(season),
                     data=data,
-                    url=ds.url(season),
+                    url=url,
                     source=SOURCE_NAME,
                     license=self.meta.get("license"),
                     notes=ds.purpose,
