@@ -63,14 +63,45 @@ def _board(counts=None, points=None) -> pl.DataFrame:
 # -- the gates -------------------------------------------------------------
 
 
-def test_both_blockers_are_reported_not_just_the_first(monkeypatch):
+def test_both_blockers_are_reported_not_just_the_first(monkeypatch, tmp_path):
     """Fixing one and re-running should not surface a second surprise."""
     monkeypatch.setattr(tiers, "real_profiles", list)
-    monkeypatch.setattr(tiers, "projection_source_available", lambda: False)
-    problems = tiers.blockers()
+    problems = tiers.blockers(processed_dir=tmp_path)  # no projection table
     assert len(problems) == 2
     assert any("real: true" in p for p in problems)
     assert any("projection" in p for p in problems)
+
+
+def test_an_archived_capture_clears_the_projection_blocker_without_a_key(
+    monkeypatch, tmp_path
+):
+    """The blocker asks what is on disk, not what this machine could fetch.
+
+    Basing it on `projection_source_available()` made it permanent on every
+    machine without FANTASYPROS_API_KEY -- including every rebuild from the
+    committed archive, which is the reason the archive is committed.
+    """
+    import polars as pl
+
+    monkeypatch.setattr(tiers, "real_profiles", lambda: [PROFILE])
+    monkeypatch.delenv("FANTASYPROS_API_KEY", raising=False)
+    assert tiers.blockers(processed_dir=tmp_path)  # nothing archived yet
+
+    pl.DataFrame({"season": [2026], "projected_fantasy_points": [1.0]}).write_parquet(
+        tmp_path / "projection_snapshot.parquet"
+    )
+    assert tiers.blockers(processed_dir=tmp_path) == []
+
+
+def test_an_empty_projection_table_is_still_a_blocker(monkeypatch, tmp_path):
+    """A table that exists and holds nothing prices nothing."""
+    import polars as pl
+
+    monkeypatch.setattr(tiers, "real_profiles", lambda: [PROFILE])
+    pl.DataFrame({"season": [], "projected_fantasy_points": []}).write_parquet(
+        tmp_path / "projection_snapshot.parquet"
+    )
+    assert any("projection" in p for p in tiers.blockers(processed_dir=tmp_path))
 
 
 def test_a_configured_provider_clears_the_projection_blocker(monkeypatch, tmp_path):
@@ -95,7 +126,11 @@ def test_a_configured_provider_clears_the_projection_blocker(monkeypatch, tmp_pa
         assert config.sources().get("projection_providers") is None
         assert config.projection_providers()
         assert config.projection_source_available()
-        assert tiers.blockers() == []
+        # The provider is configured but nothing has been captured through it
+        # yet, so the blocker stands -- and now names that as the reason.
+        remaining = tiers.blockers(processed_dir=tmp_path)
+        assert any("no projection capture has landed" in p for p in remaining)
+        assert any("build-tables" in p for p in remaining)
     finally:
         config.projection_providers.cache_clear()
         config.sources.cache_clear()

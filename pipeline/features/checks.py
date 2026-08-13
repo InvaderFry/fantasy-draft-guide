@@ -168,16 +168,17 @@ def _check_adp_history(frame: pl.DataFrame) -> list[tuple[str, bool]]:
 
 
 def _check_projection_snapshot(frame: pl.DataFrame) -> list[tuple[str, bool]]:
-    """S13, S38.1. The empty case is the current state and is not a failure.
+    """S13, S38.1. An empty table is a reportable state, not a failure.
 
-    Neither projection path is configured -- no FANTASYPROS_API_KEY and no manual
-    export -- so this table is empty by design, and S19.3 reports it as a blocker
-    rather than this check reporting it as a fault.
+    A projection missed today is fetchable tomorrow, unlike ADP (S84), so an empty
+    table means a capture has not landed yet rather than that something broke.
+    S19.3 reports it as a blocker; `research validate` names which of S11's paths
+    is live. This check stays quiet about the cause it cannot see from here.
     """
     if frame.height == 0:
         return [
             _ok(
-                "projection_snapshot: empty -- no projection source configured (S11). "
+                "projection_snapshot: empty -- no projection capture has landed (S11). "
                 "S19.3 tiers are blocked on it."
             )
         ]

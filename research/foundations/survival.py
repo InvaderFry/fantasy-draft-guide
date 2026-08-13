@@ -29,7 +29,13 @@ from typing import Any
 
 import polars as pl
 
-from pipeline.config import PROCESSED_DIR, ConfigError, profile_adp_format, real_profiles
+from pipeline.config import (
+    PROCESSED_DIR,
+    ConfigError,
+    draft_slot,
+    profile_adp_format,
+    real_profiles,
+)
 from research import stats
 from research.method import MethodArtifact
 
@@ -147,12 +153,8 @@ def compute(
     drawn.
     """
     teams = int(profile["teams"])
-    slot = profile.get("draft_slot")
-    slots = (
-        list(range(1, teams + 1))
-        if slot in (None, UNKNOWN_SLOT, "TODO")
-        else [int(slot)]
-    )
+    slot = draft_slot(profile)
+    slots = list(range(1, teams + 1)) if slot is None else [slot]
 
     with_spread = adp.filter(pl.col("adp_stdev").is_not_null() & (pl.col("adp_stdev") > 0)).height
     by_slot = []
@@ -173,7 +175,7 @@ def compute(
         "profile_id": profile.get("id"),
         "profile_label": profile.get("label"),
         "teams": teams,
-        "draft_slot": slot if slots != list(range(1, teams + 1)) else UNKNOWN_SLOT,
+        "draft_slot": UNKNOWN_SLOT if slot is None else slot,
         "rounds": rounds,
         "opportunity_cost_method": OPPORTUNITY_COST_METHOD,
         "adp_snapshot_date": str(adp["snapshot_date"].max()),

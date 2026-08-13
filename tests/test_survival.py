@@ -107,9 +107,25 @@ def test_an_undrawn_slot_reports_every_slot_rather_than_guessing_one():
     assert results["by_slot"][0]["held_picks"] == [1, 24]
 
 
-def test_a_todo_slot_is_treated_as_undrawn():
-    """config/league_profiles.yaml ships the placeholder as the string TODO."""
-    results = survival.compute(_adp(), {**PROFILE, "draft_slot": "TODO"}, rounds=1)
+def test_a_todo_slot_is_rejected_rather_than_treated_as_undrawn():
+    """The placeholder and the answer are no longer the same thing.
+
+    `unknown` is a stated answer -- the order is drawn an hour before the draft
+    -- and it produces twelve slots on purpose. A leftover TODO producing the
+    same twelve slots would be an unanswered question rendering as a confident
+    output, so it raises instead.
+    """
+    from pipeline.config import ConfigError
+
+    with pytest.raises(ConfigError, match="neither a seat number"):
+        survival.compute(_adp(), {**PROFILE, "draft_slot": "TODO"}, rounds=1)
+
+
+def test_an_unknown_draft_date_does_not_stop_survival():
+    """The date is not known and nothing here reads it (S31.2)."""
+    results = survival.compute(
+        _adp(), {**PROFILE, "draft_slot": "unknown", "draft_date": "unknown"}, rounds=1
+    )
     assert len(results["by_slot"]) == 12
 
 

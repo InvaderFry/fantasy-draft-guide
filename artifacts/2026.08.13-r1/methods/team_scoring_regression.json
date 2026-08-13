@@ -615,9 +615,9 @@
             "z_from": -2.0,
             "z_to": -1.0,
             "n": 61,
-            "mean_next_change": 0.3875,
+            "mean_next_change": 0.3876,
             "ci_low": 0.2748,
-            "ci_high": 0.5002,
+            "ci_high": 0.5004,
             "share_moving_toward_mean": 0.7869
           },
           {
@@ -773,14 +773,14 @@
           "team": "LV",
           "metric": "yards_per_play",
           "value": 4.3849,
-          "z": -1.839,
+          "z": -1.838,
           "direction": "below league"
         },
         {
           "team": "TEN",
           "metric": "yards_per_play",
           "value": 4.3954,
-          "z": -1.818,
+          "z": -1.817,
           "direction": "below league"
         },
         {
@@ -815,7 +815,7 @@
           "team": "LA",
           "metric": "yards_per_play",
           "value": 6.1777,
-          "z": 1.735,
+          "z": 1.734,
           "direction": "above league"
         },
         {
@@ -829,7 +829,7 @@
           "team": "NE",
           "metric": "yards_per_play",
           "value": 6.1652,
-          "z": 1.71,
+          "z": 1.709,
           "direction": "above league"
         },
         {

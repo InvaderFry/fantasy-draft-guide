@@ -20,6 +20,16 @@ on:
         description: "Season the capture describes (default: current year)"
         required: false
         type: string
+      sources:
+        # A dated capture is immutable (S84), so re-running a source that has
+        # already landed today fails the overwrite guard -- correctly, but it
+        # also aborts the run before a source that has NOT landed gets its turn.
+        # Narrowing the source list is how a projection capture is attempted on
+        # a day whose ADP is already archived.
+        description: "Comma list of sources to capture (default: ffc,projections)"
+        required: false
+        default: "ffc,projections"
+        type: string
 
 permissions:
   contents: write
@@ -54,15 +64,14 @@ jobs:
         # Non-zero exit on an empty capture is deliberate: a silent no-op day
         # looks like success and costs a day of price movement.
         #
-        # FANTASYPROS_API_KEY is optional and currently unset. The `projections`
-        # source falls back API -> manual CSV -> skip (S11), so an absent secret
-        # reports itself and leaves the ADP capture -- the part whose value
-        # expires -- unaffected.
+        # The `projections` source falls back API -> manual CSV -> skip (S11), so
+        # an absent FANTASYPROS_API_KEY reports itself and leaves the ADP
+        # capture -- the part whose value expires -- unaffected.
         env:
           FANTASYPROS_API_KEY: ${{ secrets.FANTASYPROS_API_KEY }}
         run: |
           uv run research snapshot \
-            --sources ffc,projections \
+            --sources "${{ inputs.sources || 'ffc,projections' }}" \
             ${{ inputs.season && format('--season {0}', inputs.season) || '' }}
 
       - name: Verify hashes

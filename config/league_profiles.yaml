@@ -14,29 +14,41 @@
 # per-league inputs to survival probability (S31.2) and the simulator (S36.2).
 # S83 generates the draft-day sheet per profile for exactly this reason.
 #
-# The two below are the leagues actually being drafted. Both are still
-# `real: false` because two values are unknown -- `draft_date` and
-# `draft_slot`. Filling those in and flipping the flag is the whole remaining
-# change; scoring and starters are already correct.
+# The two below are the leagues actually being drafted, and both are real.
 #
-# Everything downstream of this gate is now built and tested: S19.3 tiers and
-# replacement level, S31.2 survival at held picks, and the S83 draft-day sheet.
-# They run against fixtures and refuse to run against these profiles. So the two
-# TODOs below are not a note to self -- they are the only thing between the
-# repository and a real draft-day sheet. `draft_slot` may be set to `unknown`
-# if the order is undrawn; survival then reports every slot rather than one, and
-# the tier board is unaffected.
+# `draft_date` and `draft_slot` are both `unknown`, which is a stated answer and
+# not an unfinished one. The dates have not been set, and the draft position is
+# drawn roughly an hour before the draft starts -- so a gate that waited for
+# either would still be shut on draft morning, and the sheet this whole build
+# exists to produce would never be generated.
+#
+# What each unknown costs:
+#
+#   draft_date   Nothing today. No code reads it. The sheet prices off the most
+#                recent archived ADP capture (S84), which is the correct rule
+#                when the draft is imminent and the only one available when the
+#                date is unknown. S36.2's simulator will want a real date.
+#
+#   draft_slot   S31.2 computes survival for every slot rather than guessing one,
+#                and S83 pre-renders a draft-day sheet per slot. When the order
+#                is drawn you open the sheet for your seat; nothing is rebuilt,
+#                nothing needs a network, and the tier board never depended on
+#                the slot in the first place.
+#
+# `unknown` is accepted; the literal string TODO is not. `pipeline.config.
+# validate_profile()` raises on it, because a placeholder that flows through as
+# "undrawn" produces a plausible output from a question nobody answered.
 #
 # Both formats are covered by `adp_capture` below, so their price history is
 # being archived daily already (S84).
 
 active_profiles:
   - id: half_ppr_12
-    real: false                 # set true once draft_date is known
+    real: true
     label: "12-team half-PPR, 1QB"
     teams: 12
-    draft_date: "TODO"          # e.g. 2026-08-24 -- gates S31.2 survival + S36.2
-    draft_slot: "TODO"          # e.g. 7, or `unknown` if the order is undrawn
+    draft_date: unknown         # not set; S36.2 will want it, nothing today does
+    draft_slot: unknown         # drawn an hour before the draft -- see above
     scoring:
       pass_td: 4
       pass_yd: 0.04
@@ -61,13 +73,13 @@ active_profiles:
   # Same roster shape as above; the reception value is the only difference, and
   # it is enough to reorder receivers against backs. Kept as a separate profile
   # rather than a scoring variant of one, because the draft date and slot will
-  # differ and those drive which picks are actually held.
+  # differ once both are drawn, and those drive which picks are actually held.
   - id: ppr_12
-    real: false                 # set true once draft_date is known
+    real: true
     label: "12-team full PPR, 1QB"
     teams: 12
-    draft_date: "TODO"
-    draft_slot: "TODO"
+    draft_date: unknown
+    draft_slot: unknown
     scoring:
       pass_td: 4
       pass_yd: 0.04
@@ -92,7 +104,8 @@ active_profiles:
 # ADP capture formats (S84). Deliberately a SUPERSET of the profiles above:
 # the archival job's value expires daily, so it captures every plausible
 # format now rather than waiting for the real profiles to be encoded.
-# Narrow this once `active_profiles` is real if the request volume matters.
+# Narrow this if the request volume ever matters; a test asserts the list still
+# covers every profile's derived format, real or not (S14, S84).
 adp_capture:
   - {format: standard, teams: 12}
   - {format: half-ppr, teams: 12}

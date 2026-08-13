@@ -275,3 +275,123 @@ def test_a_projection_scores_to_something_other_than_zero():
     )
     scored = score_frame(pl.DataFrame(rows), profile, alias="projected_points")
     assert scored["projected_points"].max() > 0
+
+
+# -- the shape, once it was finally observed (S11) --------------------------
+
+# The real envelope, from the first successful runner call on 2026-08-13:
+# data/snapshots/2026-08-13/fantasypros_projections_rb_2026.json. Identity is
+# flat on the row and every projected quantity is nested under `stats`, which the
+# blind guess in config/sources.yaml did not anticipate.
+LIVE_CONFIG = {
+    **FP_CONFIG,
+    "stat_container_key": "stats",
+    "stat_map": {
+        "rush_att": "carries",
+        "rush_yds": "rushing_yards",
+        "rush_tds": "rushing_tds",
+        "rec_rec": "receptions",
+        "rec_yds": "receiving_yards",
+        "rec_tds": "receiving_tds",
+        "fumbles": "fumbles_lost",
+        "points": "projected_fantasy_points",
+    },
+}
+
+LIVE_PAYLOAD = {
+    "season": "2026",
+    "week": "0",
+    "count": "1",
+    "positions": "RB",
+    "scoring": "STD",
+    "players": [
+        {
+            "fpid": 22968,
+            "name": "Jahmyr Gibbs",
+            "position_id": "RB",
+            "team_id": "DET",
+            "stats": {
+                "points": 301.85,
+                "points_ppr": 372.76,
+                "points_half": 337.31,
+                "rush_att": 274.73,
+                "rush_yds": 1382.69,
+                "rush_tds": 13.83,
+                "rec_rec": 70.92,
+                "rec_yds": 580.79,
+                "rec_tds": 4.13,
+                "fumbles": 1.13,
+            },
+        }
+    ],
+}
+
+
+def test_nested_stats_are_read_through_the_configured_container():
+    """The shape is configuration, so correcting it is a YAML edit (S11)."""
+    rows = fantasypros.parse(
+        json.dumps(LIVE_PAYLOAD).encode(),
+        snapshot_date=dt.date(2026, 8, 13),
+        season=2026,
+        config=LIVE_CONFIG,
+    )
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["source_player_name"] == "Jahmyr Gibbs"   # identity stays flat
+    assert row["team"] == "DET"
+    assert row["rushing_yards"] == 1382.69               # stats come from `stats`
+    assert row["receptions"] == 70.92
+    assert row["fumbles_lost"] == 1.13
+
+
+def test_a_flat_payload_still_parses_with_no_container_configured():
+    """Not every provider nests. An unset key means the row IS the stats."""
+    rows = fantasypros.parse(
+        json.dumps(PAYLOAD).encode(),
+        snapshot_date=dt.date(2026, 8, 13),
+        season=2026,
+        config=FP_CONFIG,
+    )
+    assert rows and rows[0]["rushing_yards"] is not None
+
+
+def test_nested_stats_under_the_wrong_container_key_raise_rather_than_null_out():
+    """A frame of nulls looks like a provider with no projections."""
+    with pytest.raises(fantasypros.ResponseShapeError, match="no configured stat_map"):
+        fantasypros.parse(
+            json.dumps(LIVE_PAYLOAD).encode(),
+            snapshot_date=dt.date(2026, 8, 13),
+            season=2026,
+            config={**LIVE_CONFIG, "stat_container_key": "projections"},
+        )
+
+
+def test_the_repository_scorer_reproduces_the_providers_own_half_ppr_total():
+    """The check that the stat map is right, not merely non-empty.
+
+    S11 maps FantasyPros' columns onto player_week's spelling so that
+    pipeline/scoring.py prices a projection with the same expression it prices a
+    real season with. If that mapping is wrong the points still compute -- they
+    are just quietly wrong. FantasyPros publishes its own half-PPR total, so the
+    mapping has an independent answer to be checked against.
+    """
+    import polars as pl
+
+    from pipeline.scoring import score_frame
+
+    rows = fantasypros.parse(
+        json.dumps(LIVE_PAYLOAD).encode(),
+        snapshot_date=dt.date(2026, 8, 13),
+        season=2026,
+        config=LIVE_CONFIG,
+    )
+    profile = {
+        "id": "half_ppr",
+        "scoring": {
+            "rush_yd": 0.10, "rush_td": 6, "reception": 0.5,
+            "receiving_yd": 0.10, "receiving_td": 6, "fumble_lost": -2,
+        },
+    }
+    scored = score_frame(pl.DataFrame(rows), profile, alias="projected_points")
+    published_half_ppr = LIVE_PAYLOAD["players"][0]["stats"]["points_half"]
+    assert scored["projected_points"][0] == pytest.approx(published_half_ppr, abs=0.01)

@@ -192,6 +192,31 @@ questions:
       config/sources.yaml has an empty projection_providers map with the
       FantasyPros API deferred. Encoding a league profile alone will not
       unblock it. research/foundations/tiers.py reports both and refuses to run.
+    kill_rule_outcome_2026_08_13b: >
+      UNBLOCKED, and it ran. Both gates opened on the same day.
+      The profile gate opened by answering the question rather than by waiting
+      for it: `draft_date` and `draft_slot` are both `unknown` in
+      config/league_profiles.yaml and both profiles are now real: true. Neither
+      value was going to arrive in time -- the dates are unset and the draft
+      order is drawn about an hour before the draft -- so a gate that waited for
+      them would have been shut on draft morning. Nothing reads draft_date today;
+      an undrawn slot is answered by S31.2 reporting every slot and S83 rendering
+      a sheet per slot.
+      The projection gate opened because FANTASYPROS_API_KEY turned out to be
+      configured as a repository secret and had simply never been exercised: every
+      archive run to that point predated the adapter. One dispatch captured four
+      payloads (QB/RB/WR/TE, 2026). See fantasypros_projection_shape for what the
+      payload actually looked like.
+      Result: tier boards for both profiles on n=486 projected players, and
+      survival for all 12 slots of both (n=1,724 half-PPR, n=1,880 PPR). The S83
+      sheet now carries TIERS and SURVIVAL as content rather than as BLOCKED
+      notices, 26 sheets in all, each verified to print on one page.
+      A second defect surfaced on the way: blockers() asked
+      projection_source_available(), which reports whether THIS MACHINE could
+      fetch projections. That is a different question from whether projections
+      exist, and it made the blocker permanent on every machine without the API
+      key -- including every rebuild from the committed archive, which is the
+      reason the archive is committed. It now asks whether a capture has landed.
     kill_rule_outcome_2026_08_14: >
       STILL BLOCKED, and by the same two things -- but the machinery below them
       is now built and tested, so clearing the gates is the whole remaining
@@ -209,14 +234,14 @@ questions:
       unclearable -- it would have kept firing after someone did exactly what it
       asked. config.projection_providers() is now the single accessor and a test
       reproduces the old behaviour.
-    remaining_to_unblock: >
+    remaining_to_unblock_resolved_2026_08_13: >
       (1) config/league_profiles.yaml: draft_date and draft_slot on either
       profile, then real: true. draft_slot may be `unknown`; survival then
       reports every slot instead of one. (2) A projection source: either
       FANTASYPROS_API_KEY as a repository secret (S11 option 1, adapter built
       and wired into the archive workflow) or a manual export declared under
       projection_providers (S11 option 1B).
-    status: blocked_week2
+    status: completed_week3
     claim_type_permitted: DESCRIPTIVE
     first_edition: null
 
@@ -242,25 +267,62 @@ questions:
       the raw bytes unmodified and records the row keys it observed in the
       snapshot manifest, so the answer comes from the archive rather than from a
       re-fetch that may return a different shape.
-    status: UNRESOLVED
-    why_unresolved: >
+    status: RESOLVED
+    resolved_on: 2026-08-13
+    answer: >
+      The envelope is {season, week, count, positions, scoring, players[...]}
+      and `container_key: players` was right. Identity is flat on each row --
+      fpid, name, team_id, position_id, all as configured -- but EVERY PROJECTED
+      QUANTITY IS NESTED under a `stats` object, which the blind mapping did not
+      anticipate: it read the stat columns off the row and would have found none
+      of them.
+      Three column names were wrong. `rec` is `rec_rec`. `fpts` is `points`,
+      alongside `points_ppr` and `points_half` (the payload is served with
+      scoring=STD and carries all three totals). And targets and games played are
+      NOT PUBLISHED AT ALL -- there is no `rec_tgt` and no games column -- so both
+      mappings were removed rather than aimed at a near-miss column.
+      One name is a genuine ambiguity resolved by arithmetic: `fumbles` is priced
+      at -2 in the provider's own published half-PPR total, which is the
+      fumbles-LOST rate, so it is fumbles lost under a shorter name. Scoring the
+      mapped frame under a half-PPR profile reproduces `points_half` to the cent,
+      which is the check that the whole stat_map is right rather than merely
+      non-empty.
+      Row counts on the first capture: QB 83, RB 130, WR 189, TE 122.
+    what_changed: >
+      config/sources.yaml gained `stat_container_key: stats` and a corrected
+      stat_map; pipeline/ingest/fantasypros.py gained `_stats()`, which reads the
+      configured sub-object and falls back to the row when no container is
+      configured, so a flat provider still parses. The adapter now records
+      observed_stat_keys in the snapshot manifest as well as observed_row_keys --
+      the row keys alone looked entirely correct and hid the whole problem.
+      pipeline/features/schema.py gained fumbles_lost, two_point_conversions and
+      special_teams_tds, which the payload carries and S13's whitelist rejected;
+      omitting them would have dropped three scoring terms from every projected
+      total.
+    why_it_was_unresolved: >
       api.fantasypros.com answers 403 at CONNECT from the development sandbox --
-      the same wall that put the ADP capture on a GitHub runner (S84) -- and the
-      API requires a key that is not configured. So the adapter could not be
-      written against an observed payload the way pipeline/ingest/ffc_adp.py
-      was.
-    mitigation: >
-      Every shape-dependent value is configuration, not a literal in Python:
-      projections_path, container_key, id/name/team/position columns and the
-      stat_map all live in config/sources.yaml. A wrong guess is corrected in
-      YAML. parse() raises and names the keys actually present rather than
-      emitting a frame of nulls, which would be indistinguishable from a
-      provider with no projections.
+      the same wall that put the ADP capture on a GitHub runner (S84) -- so the
+      adapter could not be written against an observed payload the way
+      pipeline/ingest/ffc_adp.py was. It was resolved the way this entry said it
+      would be: from the first archived payload, on a runner, with the secret set.
+    mitigation_outcome: >
+      The mitigation worked and is worth recording as having worked. Every
+      shape-dependent value was configuration rather than a literal in Python, so
+      four wrong guesses cost four YAML edits and one small function. parse()
+      raising and naming the keys it actually saw is what surfaced the nesting
+      immediately; a frame of nulls would have been indistinguishable from a
+      provider with no projections, and would have reached the tier board as a
+      board of zeroes.
     note: >
       S11's canonical schema names two columns this repository deliberately
       spells differently. `pass_yards`/`rush_yards` are mapped to player_week's
       `passing_yards`/`rushing_yards` so pipeline/scoring.py prices a projection
       with the same code and profile it prices a real season with; and
-      `fantasy_points`/`games` are mapped to `projected_fantasy_points`/
-      `projected_games` because the bare names are outcome columns meaning what
-      actually happened.
+      `fantasy_points` is mapped to `projected_fantasy_points` because the bare
+      name is an outcome column meaning what actually happened. `projected_games`
+      survives in the schema but is never populated from this provider, which
+      does not publish games played.
+    carried_limitation: >
+      No targets column. S22.3 and anything else keyed on projected opportunity
+      share cannot be built from this provider's board, and the tier metric is
+      points-only in consequence.

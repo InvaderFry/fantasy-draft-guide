@@ -87,7 +87,7 @@ sources:
       - expert_consensus_rankings
     license: provider_specific
     attribution_required: true
-    status: key_required        # adapter built; no FANTASYPROS_API_KEY configured yet
+    status: configured          # FANTASYPROS_API_KEY is set; first payload 2026-08-13
     notes: >
       S11 option 1, the preferred projection path. The key is read from
       FANTASYPROS_API_KEY on every fetch, travels in a header, and is never
@@ -96,13 +96,20 @@ sources:
       failure: unlike ADP (S84), a projection missed today is fetchable
       tomorrow. Fallback is projection_csv below.
 
-      EVERYTHING BELOW IS UNVERIFIED. api.fantasypros.com answers 403 at CONNECT
-      from the development sandbox, so this adapter could not be written against
-      an observed payload the way fantasy_football_calculator was. The path,
-      envelope and column names are configuration precisely so the first
-      successful runner call corrects them here rather than in Python. The
-      adapter persists the raw payload unmodified and records the row keys it
-      actually saw; see `fantasypros_projection_shape` in research/questions.yaml.
+      SHAPE VERIFIED 2026-08-13 against the first successful runner call
+      (data/snapshots/2026-08-13/fantasypros_projections_*.json). It was written
+      blind -- api.fantasypros.com answers 403 at CONNECT from the development
+      sandbox -- and the guess was close but wrong in three ways, all corrected
+      below and none of them in Python, which is what the shape being
+      configuration was for:
+
+        * stats are NESTED under `stats`; identity stays flat on the row. Hence
+          `stat_container_key` and pipeline/ingest/fantasypros.py's `_stats()`.
+        * `rec` is `rec_rec`; `fpts` is `points` (and `points_ppr`/`points_half`).
+        * targets and games are NOT PUBLISHED. Both mappings are gone rather than
+          pointed at a near-miss column.
+
+      See `fantasypros_projection_shape` in research/questions.yaml.
 
     # {season} and {position} are substituted by the adapter.
     projections_path: "nfl/{season}/projections"
@@ -111,6 +118,7 @@ sources:
     params:
       week: 0                   # 0 = full-season / draft projections
     container_key: players      # where the row list lives in the response
+    stat_container_key: stats   # ...and where the stat columns live on each row
     id_col: fpid
     name_col: name
     team_col: team_id
@@ -127,17 +135,32 @@ sources:
       rush_att: carries
       rush_yds: rushing_yards
       rush_tds: rushing_tds
-      rec_tgt: targets
-      rec: receptions
+      rec_rec: receptions
       rec_yds: receiving_yards
       rec_tds: receiving_tds
-      # S11's canonical schema calls these `fantasy_points` and `games`. Both
-      # names are already taken by OUTCOME_COLUMNS, where they mean what a player
-      # actually scored and actually played. A projection column sharing a name
-      # with an outcome column is the bug this repo already shipped once with
-      # target_share, so the projection side is prefixed.
-      fpts: projected_fantasy_points
-      games: projected_games
+      2pt_tds: two_point_conversions
+      ret_tds: special_teams_tds
+      # Named `fumbles`, but it is fumbles LOST. The provider prices this column
+      # at -2 in its own published half-PPR total, which is the fumble-lost rate,
+      # not the all-fumbles rate; scoring the mapped frame under a half-PPR
+      # profile reproduces that total to the cent (tests/test_projections.py).
+      # Checked rather than assumed, because a rename that is quietly a
+      # substitution still computes -- it is just wrong by a couple of points.
+      fumbles: fumbles_lost
+      # S11's canonical schema calls this `fantasy_points`. That name is already
+      # taken by OUTCOME_COLUMNS, where it means what a player actually scored.
+      # A projection column sharing a name with an outcome column is the bug this
+      # repo already shipped once with target_share, so the projection side is
+      # prefixed.
+      #
+      # This is the provider's own STANDARD-scoring total and is NOT what tiers
+      # rank on: S19.3 ranks `projected_points`, recomputed from the stats above
+      # under each league profile by pipeline/scoring.py. Carried for provider
+      # comparison (S38.1). `points_ppr` and `points_half` are also published.
+      points: projected_fantasy_points
+      # NOT PUBLISHED, and so not mapped: targets (`rec_tgt` does not exist in
+      # the payload) and games played. An absent column is left absent rather
+      # than aimed at the nearest-looking one.
 
 # Column mappings for manual projection imports (S11 option 1B).
 # Add one block per provider export you actually drop in data/raw/projections/.

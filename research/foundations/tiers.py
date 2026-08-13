@@ -62,21 +62,45 @@ class BlockedError(ConfigError):
     """A prerequisite is missing, and guessing at it would produce a plausible lie."""
 
 
-def blockers() -> list[str]:
+def projections_archived(processed_dir=PROCESSED_DIR) -> bool:
+    """Whether a projection capture has actually landed in the table.
+
+    Deliberately not `projection_source_available()`, which asks whether this
+    machine could FETCH projections. Those are different questions, and answering
+    the second one here made the blocker permanent on every machine without the
+    API key -- including this one, and including every rebuild from the committed
+    archive, which is the point of committing it. What S19.3 needs is projected
+    points on disk; where they were fetched from, and by whom, does not matter.
+    """
+    path = processed_dir / "projection_snapshot.parquet"
+    if not path.exists():
+        return False
+    return pl.scan_parquet(path).select(pl.len()).collect().item() > 0
+
+
+def blockers(processed_dir=PROCESSED_DIR) -> list[str]:
     """Everything standing between here and a tier board."""
     out = []
     if not real_profiles():
         out.append(
             "no league profile is marked `real: true` in config/league_profiles.yaml "
-            "-- replacement level is undefined without teams and starter counts (S14, S19.4). "
-            "Fill in draft_date and draft_slot."
+            "-- replacement level is undefined without teams and starter counts (S14, S19.4)."
         )
-    if not projection_source_available():
+    if not projections_archived(processed_dir):
+        detail = (
+            "run `research snapshot --sources projections` then `research build-tables "
+            "--tables projection_snapshot` (S13)"
+            if projection_source_available()
+            else (
+                "and no source is configured to capture one: set FANTASYPROS_API_KEY "
+                "(S11 option 1) or declare a manual export under `projection_providers` "
+                "in config/sources.yaml (S11 option 1B)"
+            )
+        )
         out.append(
-            "no projection source is configured -- S19.3's tier metric is "
-            "projected_points - replacement_points, and there are no projected points. "
-            "Set FANTASYPROS_API_KEY (S11 option 1) or declare a manual export under "
-            "`projection_providers` in config/sources.yaml (S11 option 1B)."
+            "no projection capture has landed -- S19.3's tier metric is "
+            f"projected_points - replacement_points, and there are no projected points; "
+            f"{detail}."
         )
     return out
 
@@ -355,7 +379,7 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
 
 def run(processed_dir=PROCESSED_DIR) -> list[tuple[dict[str, Any], MethodArtifact]]:
     """One board per real league profile (S83 generates the sheet per profile too)."""
-    problems = blockers()
+    problems = blockers(processed_dir)
     if problems:
         raise BlockedError(
             f"{METHOD_ID} is blocked, not killed (S88 Week 2):\n  - " + "\n  - ".join(problems)

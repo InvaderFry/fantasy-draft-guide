@@ -23,6 +23,58 @@ def test_research_is_blocked_until_a_real_league_profile_exists():
         config.require_real_profiles()
 
 
+# -- the two values that were never going to arrive in time -----------------
+
+
+def test_the_shipped_profiles_are_real_and_validate():
+    """S14's gate is closed, and it closed without a draft date or a slot.
+
+    Both were unknowable at encode time -- the dates are unset and the order is
+    drawn about an hour before the draft -- so a gate that waited for them would
+    still be shut on draft morning.
+    """
+    profiles = config.require_real_profiles()
+    assert len(profiles) == 2
+    assert {p["id"] for p in profiles} == {"half_ppr_12", "ppr_12"}
+
+
+@pytest.mark.parametrize("field", ["draft_date", "draft_slot"])
+def test_unknown_is_an_answer_and_todo_is_not(field):
+    """`unknown` is a decision the build handles; TODO is an unanswered question.
+
+    Treating them alike is how a placeholder becomes twelve confidently rendered
+    sheets nobody asked for.
+    """
+    base = {"id": "t", "teams": 12, "draft_date": "unknown", "draft_slot": "unknown"}
+    assert config.validate_profile(base) is base
+    with pytest.raises(config.ConfigError, match=field):
+        config.validate_profile({**base, field: "TODO"})
+
+
+def test_an_unknown_slot_reads_as_undrawn_and_a_number_reads_as_a_seat():
+    base = {"id": "t", "teams": 12, "draft_date": "unknown"}
+    assert config.draft_slot({**base, "draft_slot": "unknown"}) is None
+    assert config.draft_slot({**base, "draft_slot": None}) is None
+    assert config.draft_slot({**base, "draft_slot": 7}) == 7
+    assert config.draft_slot({**base, "draft_slot": "7"}) == 7
+
+
+def test_a_slot_outside_the_league_is_rejected_at_config_time():
+    with pytest.raises(config.ConfigError, match="outside 1..12"):
+        config.draft_slot({"id": "t", "teams": 12, "draft_slot": 13})
+
+
+def test_an_unparseable_slot_does_not_fall_through_as_undrawn():
+    with pytest.raises(config.ConfigError, match="neither a seat number"):
+        config.draft_slot({"id": "t", "teams": 12, "draft_slot": "seven"})
+
+
+def test_a_known_draft_date_still_parses():
+    """Unknown today; S36.2 will want a real one, and it is read the same way."""
+    assert config.draft_date({"id": "t", "draft_date": "unknown"}) is None
+    assert config.draft_date({"id": "t", "draft_date": "2026-08-24"}) == dt.date(2026, 8, 24)
+
+
 def test_every_profile_declares_scoring_and_starters():
     for profile in config.league_profiles():
         assert profile.get("scoring"), f"{profile['id']} has no scoring block"

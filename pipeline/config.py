@@ -45,6 +45,84 @@ def real_profiles() -> list[dict[str, Any]]:
     return [p for p in league_profiles() if p.get("real") is True]
 
 
+# A value the drafter has actually established is unknowable right now, as
+# distinct from one nobody has got round to. `unknown` is an answer; TODO is the
+# absence of one, and validate_profile() refuses to let a TODO through the S14
+# gate. The difference is the whole reason a profile can be real without a draft
+# date: a league whose slot is drawn an hour before the draft is not an
+# incompletely configured league.
+UNKNOWN = "unknown"
+_PLACEHOLDER = "TODO"
+
+
+def _is_unknown(value: Any) -> bool:
+    return value is None or (isinstance(value, str) and value.strip().lower() == UNKNOWN)
+
+
+def draft_slot(profile: dict[str, Any]) -> int | None:
+    """The drafter's seat, or None if the order is undrawn (S31.2).
+
+    None is a supported state, not a failure. Survival answers it by reporting
+    every slot and S83 by pre-rendering a sheet per slot, so the hour between
+    the draw and the first pick costs a file open rather than a rebuild.
+    """
+    value = profile.get("draft_slot")
+    if _is_unknown(value):
+        return None
+    try:
+        slot = int(value)
+    except (TypeError, ValueError):
+        raise ConfigError(
+            f"profile {profile.get('id')!r} sets draft_slot {value!r}, which is neither a "
+            f"seat number nor `{UNKNOWN}`. An unparseable slot must not fall through as "
+            "undrawn -- that turns a typo into twelve confidently rendered sheets."
+        ) from None
+    teams = int(profile["teams"])
+    if not 1 <= slot <= teams:
+        raise ConfigError(
+            f"profile {profile.get('id')!r} sets draft_slot {slot}, which is outside "
+            f"1..{teams}. A slot outside the league is a typo, not a draft position."
+        )
+    return slot
+
+
+def draft_date(profile: dict[str, Any]) -> dt.date | None:
+    """When the league drafts, or None if that is not yet known.
+
+    Nothing in the current build reads this: the sheet prices off the most recent
+    archived ADP capture, which is the right rule when the draft is imminent and
+    the only rule available when the date is unknown. S36.2's simulator will want
+    a real date; until then an unknown one costs nothing and is recorded as a
+    stated limitation rather than pretended away.
+    """
+    value = profile.get("draft_date")
+    if _is_unknown(value):
+        return None
+    return value if isinstance(value, dt.date) else dt.date.fromisoformat(str(value))
+
+
+def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
+    """Reject a profile still carrying a placeholder (S14).
+
+    A profile marked `real: true` with `draft_slot: "TODO"` in it would flow
+    through as an undrawn slot and generate twelve sheets nobody asked for -- a
+    plausible output from an unanswered question, which is the exact failure S14
+    exists to prevent. `unknown` passes; TODO does not.
+    """
+    for field in ("draft_date", "draft_slot"):
+        value = profile.get(field)
+        if isinstance(value, str) and value.strip().upper() == _PLACEHOLDER:
+            raise ConfigError(
+                f"profile {profile.get('id')!r} still has {field}: {value!r} in "
+                "config/league_profiles.yaml. Set the real value, or `unknown` if it "
+                "genuinely is not known yet -- `unknown` is an answer the build handles "
+                "(S31.2 reports every slot, S83 renders a sheet per slot) and TODO is not."
+            )
+    draft_slot(profile)
+    draft_date(profile)
+    return profile
+
+
 def require_real_profiles() -> list[dict[str, Any]]:
     """Gate every research entry point (S14).
 
@@ -58,9 +136,9 @@ def require_real_profiles() -> list[dict[str, Any]]:
             "no league profile is marked `real: true` in config/league_profiles.yaml. "
             "S14 requires the leagues actually being drafted to be encoded before any "
             "research runs -- every downstream conclusion is conditional on scoring and "
-            "roster structure. Fill in the TODO values and set `real: true`."
+            "roster structure. Encode the leagues and set `real: true`."
         )
-    return profiles
+    return [validate_profile(p) for p in profiles]
 
 
 class UnknownFormatError(ConfigError):
