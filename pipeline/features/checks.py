@@ -21,6 +21,7 @@ def run_all(processed_dir: Path = PROCESSED_DIR) -> list[tuple[str, bool]]:
     for name, fn in (
         ("player_week", _check_player_week),
         ("player_season", _check_player_season),
+        ("player_season_outcomes", _check_availability_coverage),
         ("team_season", _check_team_season),
         ("adp_history", _check_adp_history),
     ):
@@ -161,4 +162,87 @@ def _check_adp_history(frame: pl.DataFrame) -> list[tuple[str, bool]]:
             "config/manual_id_overrides.yaml (S12)"
         )
     )
+    return out
+
+
+# Reserve-list transaction codes are populated from 2020. Before that the
+# weekly roster file records that a player was on a reserve list but not why,
+# and 2012-2015 do not mark game-day inactives at all, so an absence can only be
+# called injury-related when the weekly injury report happens to name it.
+FIRST_SEASON_WITH_RESERVE_CODES = 2020
+
+# 2020 has reserve codes but also Reserve/COVID-19 and Reserve/Opt-out, which
+# are absences and not injuries. Its share sits near 38% for that reason rather
+# than because anything is wrong with it.
+PANDEMIC_SEASON = 2020
+
+# Seasons with full coverage classify roughly 60% of missed games as
+# injury-related. A season far below that is reporting a source limitation, not
+# a healthier league.
+EXPECTED_INJURY_SHARE = 0.45
+
+
+def _check_availability_coverage(frame: pl.DataFrame) -> list[tuple[str, bool]]:
+    """How much of `games_missed` can be explained, season by season (S15.1).
+
+    Not a pass/fail on the data so much as a warning about comparing across
+    2020: the classification improves sharply there because the source does,
+    and an availability model fitted across the whole window would read that
+    discontinuity as a change in the game.
+    """
+    if "games_missed" not in frame.columns:
+        return [_fail("player_season_outcomes: missing games_missed (S15.1)")]
+
+    by_season = (
+        frame.group_by("season")
+        .agg(
+            pl.col("games_missed").sum().alias("missed"),
+            pl.col("games_missed_injury").sum().alias("injury"),
+        )
+        .with_columns(
+            pl.when(pl.col("missed") > 0)
+            .then(pl.col("injury") / pl.col("missed"))
+            .alias("share")
+        )
+        .sort("season")
+    )
+
+    thin = by_season.filter(
+        (pl.col("season") >= FIRST_SEASON_WITH_RESERVE_CODES)
+        & (pl.col("season") != PANDEMIC_SEASON)
+        & (pl.col("share") < EXPECTED_INJURY_SHARE)
+    )
+    out = [
+        _fail(
+            "player_season_outcomes: injury-classified share below "
+            f"{EXPECTED_INJURY_SHARE:.0%} in {thin['season'].to_list()} despite reserve "
+            "codes being available -- the reserve-code mapping in player_week has "
+            "probably drifted from the source"
+        )
+        if thin.height
+        else _ok("player_season_outcomes: injury share as expected where codes exist")
+    ]
+
+    pandemic = by_season.filter(pl.col("season") == PANDEMIC_SEASON)
+    if pandemic.height:
+        out.append(
+            _ok(
+                f"player_season_outcomes: {PANDEMIC_SEASON} at "
+                f"{pandemic['share'][0]:.0%} -- Reserve/COVID-19 and Reserve/Opt-out "
+                "are absences, not injuries, and are counted as neither"
+            )
+        )
+
+    legacy = by_season.filter(pl.col("season") < FIRST_SEASON_WITH_RESERVE_CODES)
+    if legacy.height:
+        shares = ", ".join(
+            f"{row['season']}: {row['share']:.0%}" for row in legacy.to_dicts()
+        )
+        out.append(
+            _ok(
+                "player_season_outcomes: pre-2020 seasons carry no reserve codes, so "
+                f"games_missed_injury undercounts there ({shares}). Do not pool these "
+                f"with {FIRST_SEASON_WITH_RESERVE_CODES}+ in an availability model (S15.1)"
+            )
+        )
     return out

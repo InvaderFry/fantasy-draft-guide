@@ -59,10 +59,21 @@ INJURY_RESERVE_CODES = ("R01", "R04", "R05", "R27", "R47", "R48", "R49")
 #   R40  Reserve/Suspended by commissioner .. Cameron Sutton, Azeez Al-Shaair
 SUSPENSION_RESERVE_CODES = ("R33", "R40")
 
+#   R62  Reserve/COVID-19 and R59 Reserve/Opt-out are 2020 only, and are
+#        deliberately NOT injury: a positive test, a close contact and a season
+#        opted out of are absences, but folding them into games_missed_injury
+#        would make 2020 look like the most injured season in the window when
+#        what changed was the pandemic. They fall through to `unknown` below.
+#
 # Every other reserve code is a real absence that is not a health absence and
 # not a suspension -- R03 did not report (Haason Reddick's holdout), R06 left
 # squad, R23 reserve/future (postseason only) -- and is labelled `unknown`
 # rather than folded into one of the categories it is not.
+#
+# Before 2020 the source carries no reserve codes at all: the roster file says a
+# player was on a reserve list but not why, and 2012-2015 do not mark game-day
+# inactives. games_missed_injury undercounts those seasons and checks.py reports
+# by how much rather than letting the discontinuity pass as football.
 
 # An injury-report designation strong enough to explain a missed game. A player
 # listed Questionable who then does not appear was ruled out at gametime.
