@@ -130,16 +130,17 @@ def test_z_scores_are_computed_within_season_not_across_the_window():
     )
 
 
-def test_tiers_reports_both_blockers_rather_than_the_first():
-    problems = tiers.blockers()
+def test_tiers_reports_both_blockers_rather_than_the_first(monkeypatch, tmp_path):
+    monkeypatch.setattr(tiers, "real_profiles", list)
+    problems = tiers.blockers(processed_dir=tmp_path)
     assert len(problems) == 2
     assert any("real: true" in p for p in problems)
     assert any("projection" in p for p in problems)
 
 
-def test_tiers_refuses_to_run_while_blocked():
+def test_tiers_refuses_to_run_while_blocked(tmp_path):
     with pytest.raises(tiers.BlockedError, match="blocked, not killed"):
-        tiers.run()
+        tiers.run(processed_dir=tmp_path)
 
 
 def _priced_frame() -> pl.DataFrame:

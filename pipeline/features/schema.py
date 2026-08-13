@@ -113,6 +113,11 @@ PROJECTION_SNAPSHOT_COLUMNS = (
     "pass_attempts", "pass_completions", "passing_yards", "passing_tds", "interceptions",
     "carries", "rushing_yards", "rushing_tds",
     "targets", "receptions", "receiving_yards", "receiving_tds",
+    # The rest of scoring.STAT_TO_RULE. Omitting them silently dropped three
+    # scoring terms from every projected total, which is the exact drift the
+    # shared stat spelling above exists to prevent: a projection has to be
+    # priceable by the same expression a realized season is.
+    "fumbles_lost", "two_point_conversions", "special_teams_tds",
     "projected_fantasy_points", "projected_games",
     "match_method", "match_confidence",
 )

@@ -18,11 +18,19 @@ sample sizes -- those belong in the guide. ``assert_sheet_constraints`` scans th
 rendered page for them and raises, so the rule survives a future contributor who
 adds a section without reading this docstring.
 
-**Per league profile.** Tiers, replacement level and survival all depend on
-scoring, team count and draft slot. S14 excludes non-real profiles from the sheet
-entirely, so with no profile marked real the only sheet that can honestly be
-produced is the profile-independent one: the S25 regression flags, and a
-statement of what is missing and why.
+**Per league profile, and per draft slot.** Tiers, replacement level and survival
+all depend on scoring, team count and draft slot. S14 excludes non-real profiles
+from the sheet entirely, so with no profile marked real the only sheet that can
+honestly be produced is the profile-independent one: the S25 regression flags,
+and a statement of what is missing and why.
+
+The slot is the awkward one: this drafter's is drawn about an hour before the
+draft starts. Waiting for it would mean generating the sheet in that hour, on
+whatever machine and network is to hand, which is precisely the situation S8 says
+the output must not depend on. So every slot is rendered ahead of time -- S31.2
+already computes all of them into one artifact -- and the draw becomes a matter of
+opening the right file. `index.html` is the chooser, and it is a list of links
+because a list of links needs no runtime.
 
 Self-contained HTML with inline CSS and no external assets -- S8 requires the
 output work offline, and a draft-day tool that needs a network is not one.
@@ -36,6 +44,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from pipeline.config import draft_slot as profile_draft_slot
 from pipeline.config import real_profiles
 from research.foundations import survival as survival_mod
 from research.foundations import tiers as tiers_mod
@@ -58,8 +67,20 @@ FORBIDDEN = (
 REGRESSION_Z = 1.0
 
 # Cut lists so the page stays one page at arm's length.
+#
+# MAX_TIER_PLAYERS is the one that binds, and it was measured rather than
+# guessed. Letter portrait at 0.35in margins gives 989px of body at 96dpi; with
+# every section finally filled in -- which only happened once the S14 profile
+# gate opened -- 24 players a position rendered 1,078px and printed on two pages.
+# 18 lands on 987px, which is inside the budget by two pixels and therefore not
+# inside it at all; 16 lands on 957px and leaves room for a longer name or an
+# extra tier break. Re-measure before raising it (see README, "Checking it is
+# still one page").
+#
+# MAX_SURVIVAL_PICKS costs no height -- the pick blocks are columns in one flex
+# row, so more of them makes each narrower rather than the page longer.
 MAX_REGRESSION_TEAMS = 8
-MAX_TIER_PLAYERS = 24
+MAX_TIER_PLAYERS = 16
 MAX_SURVIVAL_PICKS = 8
 
 
@@ -193,7 +214,9 @@ def _expected_move(buckets: list[dict[str, Any]], z: float) -> str:
     return "--"
 
 
-def survival_section(artifacts: dict[str, Any], profile: dict[str, Any] | None) -> str:
+def survival_section(
+    artifacts: dict[str, Any], profile: dict[str, Any] | None, slot: int | None = None
+) -> str:
     if profile is None:
         return _blocked(survival_mod.blockers() or ["no league profile selected"])
     art = artifacts.get(f"{survival_mod.METHOD_ID}__{profile['id']}")
@@ -202,14 +225,23 @@ def survival_section(artifacts: dict[str, Any], profile: dict[str, Any] | None) 
 
     results = art["primary_results"]
     slots = results.get("by_slot") or []
-    if len(slots) > 1:
-        return (
-            '<p class="missing"><strong>Draft slot undrawn.</strong> Survival is computed for '
-            f'all {results["teams"]} slots in the artifact; the sheet fills in once '
-            "<code>draft_slot</code> is set in config/league_profiles.yaml (S31.2).</p>"
-        )
+    if not slots:
+        return _blocked(["the survival artifact carries no slots (S31.2)"])
+
+    chosen = _slot_entry(slots, slot)
+    if chosen is None:
+        if slot is not None:
+            return _blocked(
+                [
+                    f"slot {slot} is not in the survival artifact, which covers "
+                    f"{', '.join(str(s['slot']) for s in slots)}. Re-run `make research` "
+                    "if the league's team count changed (S31.2)."
+                ]
+            )
+        return _undrawn_orientation(results, profile)
+
     blocks = []
-    for pick_block in slots[0]["picks"][:MAX_SURVIVAL_PICKS]:
+    for pick_block in chosen["picks"][:MAX_SURVIVAL_PICKS]:
         rows = "".join(
             '<tr><td>{player}</td><td>{pos}</td><td>{adp}</td><td>{p}</td></tr>'.format(
                 player=html.escape(str(c["player"])),
@@ -230,11 +262,64 @@ def survival_section(artifacts: dict[str, Any], profile: dict[str, Any] | None) 
             "<table><thead><tr><th>Player</th><th>Pos</th><th>ADP</th><th>Back?</th>"
             f"</tr></thead><tbody>{rows}</tbody></table></div>"
         )
+    held = ", ".join(str(p) for p in chosen["held_picks"][:MAX_SURVIVAL_PICKS])
     return (
-        '<p class="sub">On the board at each pick you hold, and P(still there at your '
-        "next one). Normal approximation from ADP mean and spread -- FFC publishes no "
-        "pick distribution (S19.4).</p>"
+        f'<p class="sub">Slot {chosen["slot"]} holds {held}. On the board at each, and '
+        "P(still there at your next one). Normal approximation from ADP mean and spread "
+        "-- FFC publishes no pick distribution (S19.4).</p>"
         f'<div class="cols">{"".join(blocks)}</div>'
+    )
+
+
+def _slot_entry(slots: list[dict[str, Any]], slot: int | None) -> dict[str, Any] | None:
+    """The one slot this page is for, or None if the page is not for a slot yet."""
+    if slot is not None:
+        return next((s for s in slots if int(s["slot"]) == int(slot)), None)
+    return slots[0] if len(slots) == 1 else None
+
+
+# Enough rounds to see the shape of a slot -- where the turn falls, how long the
+# wait is -- without turning the orientation block into a second sheet.
+ORIENTATION_ROUNDS = 5
+
+
+def _undrawn_orientation(results: dict[str, Any], profile: dict[str, Any]) -> str:
+    """What to print when the order has not been drawn yet.
+
+    Not BLOCKED. The slot being undrawn an hour before the draft is the expected
+    state for this drafter, and a sheet that goes blank in the expected state is
+    the failure S83 exists to prevent. Every slot has its own fully rendered page
+    already; this says which one to open, and shows the shape of each seat so the
+    wait between picks is not a surprise when the draw comes.
+    """
+    rows = []
+    for entry in results.get("by_slot") or []:
+        picks = ", ".join(str(p) for p in entry["held_picks"][:ORIENTATION_ROUNDS])
+        rows.append(
+            f'<tr><td class="tag">{entry["slot"]}</td><td>{picks}</td></tr>'
+        )
+    # Two columns. Twelve stacked rows push this page past one printed sheet,
+    # which is the one thing S83 does not let a section do.
+    half = -(-len(rows) // 2)
+    table = (
+        '<table><thead><tr><th>Slot</th><th>Picks</th></tr></thead>'
+        "<tbody>{}</tbody></table>"
+    )
+    columns = "".join(
+        f'<div class="pos">{table.format("".join(chunk))}</div>'
+        for chunk in (rows[:half], rows[half:])
+        if chunk
+    )
+    filename = f"{profile['id']}__slot&lt;NN&gt;.html"
+    return (
+        '<p class="missing"><strong>Draft order undrawn.</strong> No slot is guessed. '
+        f"A complete sheet for every one of the {results['teams']} slots is already "
+        f"rendered next to this one -- open <code>{filename}</code> for the seat you "
+        "draw, or <code>index.html</code> and pick it from the list. Nothing needs to "
+        "be rebuilt and nothing needs a network (S8, S31.2).</p>"
+        '<p class="sub">First '
+        f"{ORIENTATION_ROUNDS} picks each seat holds:</p>"
+        f'<div class="cols">{columns}</div>'
     )
 
 
@@ -253,6 +338,7 @@ def render(
     edition: str,
     *,
     profile: dict[str, Any] | None = None,
+    slot: int | None = None,
     artifacts: dict[str, Any] | None = None,
 ) -> str:
     arts = artifacts if artifacts is not None else load_artifacts(edition)
@@ -262,12 +348,14 @@ def render(
         "AVOIDS": _not_built("Avoids", "a research section (S28) requiring graded evidence"),
         "REGRESSION": regression_section(arts),
         "DARTS": _not_built("Dart throws", "a research section (S29)"),
-        "SURVIVAL": survival_section(arts, profile),
+        "SURVIVAL": survival_section(arts, profile, slot),
         "FALSE FRIENDS": _not_built(
             "False friends", "the current-player matching engine (S32, S34)"
         ),
     }
     title = profile["label"] if profile else "no league profile encoded"
+    if profile and slot is not None:
+        title = f"{title} \u00b7 slot {slot}"
     header_note = (
         ""
         if profile
@@ -276,8 +364,8 @@ def render(
             "profiles that are not marked <code>real: true</code> from the draft-day sheet, "
             "because tiers, replacement level and survival are all conditional on scoring, "
             "team count and draft slot. Only the sections that do not depend on a league are "
-            "filled in below. Set <code>draft_date</code> and <code>draft_slot</code> in "
-            "config/league_profiles.yaml to generate the real thing.</p>"
+            "filled in below. Encode the leagues in config/league_profiles.yaml and set "
+            "<code>real: true</code> to generate the real thing.</p>"
         )
     )
     sections_html = "".join(
@@ -311,21 +399,140 @@ def assert_sheet_constraints(page: str) -> None:
         )
 
 
-def write(edition: str | None = None, root: Path = ARTIFACT_DIR) -> list[Path]:
-    """One sheet per real profile (S83), or the profile-independent one if none is."""
+def slot_filename(profile_id: str, slot: int) -> str:
+    """Zero-padded so the files sort the way the slots are numbered."""
+    return f"{profile_id}__slot{slot:02d}.html"
+
+
+def slots_to_render(profile: dict[str, Any], slot: int | None = None) -> list[int]:
+    """Which seats this profile needs a sheet for.
+
+    A configured slot wins: the order is drawn and there is one answer. An
+    explicit `slot` argument is the draft-hour override, for regenerating a
+    single seat against a fresher ADP capture. Otherwise every seat, because the
+    draw has not happened and the whole point is that it costs nothing when it
+    does.
+    """
+    configured = profile_draft_slot(profile)
+    if configured is not None:
+        return [configured]
+    if slot is not None:
+        return [slot]
+    return list(range(1, int(profile["teams"]) + 1))
+
+
+def write(
+    edition: str | None = None,
+    root: Path = ARTIFACT_DIR,
+    *,
+    slot: int | None = None,
+    profile_id: str | None = None,
+) -> list[Path]:
+    """Every sheet a real profile needs (S83), plus the chooser.
+
+    A league whose order is drawn gets one sheet, named for the league. A league
+    whose order is not gets one per seat plus a slot-agnostic page, so draft hour
+    is a file open rather than a build. `slot` overrides a single seat -- the
+    draft-hour regeneration path -- and writes only that seat's page, leaving the
+    pre-rendered set alone.
+    """
     edition = edition or default_edition()
     arts = load_artifacts(edition, root)
     directory = root / edition / "sheets"
     directory.mkdir(parents=True, exist_ok=True)
 
     profiles = real_profiles()
-    written = []
+    if profile_id:
+        profiles = [p for p in profiles if p["id"] == profile_id]
+        if not profiles:
+            raise ValueError(
+                f"no real league profile with id {profile_id!r} in "
+                "config/league_profiles.yaml (S14)"
+            )
+
+    written: list[Path] = []
+    seats_by_profile: dict[str, list[int]] = {}
     for profile in profiles or [None]:
-        name = f"{profile['id']}.html" if profile else "no_profile.html"
-        path = directory / name
-        path.write_text(render(edition, profile=profile, artifacts=arts))
-        written.append(path)
+        if profile is None:
+            path = directory / "no_profile.html"
+            path.write_text(render(edition, profile=None, artifacts=arts))
+            written.append(path)
+            continue
+
+        configured = profile_draft_slot(profile)
+        if configured is not None:
+            # One league, one seat. The league's sheet IS the seat's sheet, so it
+            # keeps the league's name and no chooser is needed to find it.
+            path = directory / f"{profile['id']}.html"
+            path.write_text(render(edition, profile=profile, slot=configured, artifacts=arts))
+            written.append(path)
+            seats_by_profile[profile["id"]] = []
+            continue
+
+        seats = slots_to_render(profile, slot)
+        for seat in seats:
+            path = directory / slot_filename(profile["id"], seat)
+            path.write_text(render(edition, profile=profile, slot=seat, artifacts=arts))
+            written.append(path)
+
+        if slot is None:
+            # The page to read the week before, when the seat is still unknown:
+            # tiers and regression do not depend on it.
+            path = directory / f"{profile['id']}.html"
+            path.write_text(render(edition, profile=profile, artifacts=arts))
+            written.append(path)
+            seats_by_profile[profile["id"]] = seats
+
+    if profiles and any(p is not None for p in profiles):
+        written.append(write_index(directory, edition, profiles, seats_by_profile))
     return written
+
+
+def write_index(
+    directory: Path,
+    edition: str,
+    profiles: list[dict[str, Any]],
+    seats_by_profile: dict[str, list[int]],
+) -> Path:
+    """The draft-hour chooser: pick the seat you drew, open that sheet.
+
+    A list of links, inline CSS, relative hrefs, no script. It has to work from a
+    file:// URL on a phone with no signal (S8), and every mechanism fancier than
+    an anchor tag is a mechanism that can fail in the one hour it is needed.
+    """
+    blocks = []
+    for profile in profiles:
+        seats = seats_by_profile.get(profile["id"])
+        label = html.escape(str(profile["label"]))
+        if seats:
+            links = "".join(
+                f'<a class="slot" href="{slot_filename(profile["id"], s)}">{s}</a>'
+                for s in seats
+            )
+            body = (
+                '<p class="sub">Draft slot -- tap the seat you drew.</p>'
+                f'<div class="slots">{links}</div>'
+                f'<p class="sub"><a href="{profile["id"]}.html">Slot-agnostic sheet</a> '
+                "-- tiers and regression, which do not depend on the seat.</p>"
+            )
+        else:
+            configured = profile_draft_slot(profile)
+            seat_note = f" -- slot {configured}" if configured is not None else ""
+            body = (
+                f'<div class="slots"><a class="slot wide" href="{profile["id"]}.html">'
+                f"Open sheet{seat_note}</a></div>"
+            )
+        blocks.append(f"<section><h3>{label}</h3>{body}</section>")
+
+    page = _INDEX.format(
+        edition=html.escape(edition),
+        generated=dt.datetime.now(dt.UTC).date().isoformat(),
+        blocks="".join(blocks),
+    )
+    assert_sheet_constraints(page)
+    path = directory / "index.html"
+    path.write_text(page)
+    return path
 
 
 _PAGE = """<!doctype html>
@@ -364,6 +571,41 @@ _PAGE = """<!doctype html>
 S16 method artifacts, never edited by hand (S83).</p>
 {header_note}
 {sections}
+<footer>
+  Descriptive only (S2.2, S88). Nothing here is a prescriptive recommendation.
+  ADP data courtesy of Fantasy Football Calculator. Statistics from nflverse (CC-BY-4.0).
+</footer>
+"""
+
+
+_INDEX = """<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draft sheets -- {edition}</title>
+<style>
+  /* Opened on a phone an hour before the draft, possibly with no signal (S8).
+     Inline, no script, targets big enough to hit without aiming. */
+  body {{ font: 15px/1.4 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+         color: #111; background: #fff; margin: 0; padding: 18px; max-width: 40rem; }}
+  h1 {{ font-size: 19px; margin: 0 0 2px; }}
+  h3 {{ font-size: 15px; margin: 20px 0 4px; border-bottom: 1.5px solid #111;
+        padding-bottom: 2px; }}
+  p {{ margin: 2px 0 8px; }}
+  p.sub {{ color: #555; font-size: 13px; }}
+  .slots {{ display: flex; flex-wrap: wrap; gap: 8px; }}
+  a.slot {{ display: block; min-width: 3rem; padding: 14px 0; text-align: center;
+            box-sizing: border-box;
+            border: 1.5px solid #111; border-radius: 6px; text-decoration: none;
+            color: #111; font-weight: 700; font-size: 17px; }}
+  a.slot.wide {{ width: 100%; }}
+  footer {{ margin-top: 22px; color: #888; font-size: 12px;
+            border-top: 1px solid #ddd; padding-top: 6px; }}
+</style>
+<h1>Draft sheets</h1>
+<p class="sub">Edition {edition} &middot; generated {generated}</p>
+<p>The draft order is drawn about an hour before the draft. Every seat already has
+its own complete sheet, so there is nothing to run when it is: open yours.</p>
+{blocks}
 <footer>
   Descriptive only (S2.2, S88). Nothing here is a prescriptive recommendation.
   ADP data courtesy of Fantasy Football Calculator. Statistics from nflverse (CC-BY-4.0).

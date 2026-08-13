@@ -130,7 +130,8 @@ class FantasyProsAdapter:
                     license=self.config.get("license", "provider_specific"),
                     notes=(
                         f"{len(rows)} {position} rows, season {self.season}. "
-                        f"Row keys observed: {sorted(_observed_keys(rows))}"
+                        f"Row keys observed: {sorted(_observed_keys(rows))}. "
+                        f"Stat keys observed: {sorted(_observed_stat_keys(rows, self.config))}"
                     ),
                     extra={
                         "provider_id": "fantasypros",
@@ -141,6 +142,7 @@ class FantasyProsAdapter:
                         # S11's edition manifest asks for the exact provider path used.
                         "endpoint_family": self.config.get("endpoint_family"),
                         "observed_row_keys": sorted(_observed_keys(rows)),
+                        "observed_stat_keys": sorted(_observed_stat_keys(rows, self.config)),
                     },
                 )
             )
@@ -167,6 +169,28 @@ def _observed_keys(rows: list[dict[str, Any]]) -> set[str]:
     return keys
 
 
+def _stats(raw: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+    """The sub-object the stat columns live in.
+
+    FantasyPros nests them: identity is flat on the row (`name`, `team_id`) and
+    every projected quantity sits under `stats`. Which key that is -- or whether
+    there is one at all -- is configuration, like the rest of the envelope, so a
+    provider serving a flat row still parses with `stat_container_key` unset.
+    """
+    key = config.get("stat_container_key")
+    if not key:
+        return raw
+    nested = raw.get(str(key))
+    return nested if isinstance(nested, dict) else {}
+
+
+def _observed_stat_keys(rows: list[dict[str, Any]], config: dict[str, Any]) -> set[str]:
+    keys: set[str] = set()
+    for row in rows[:50]:
+        keys.update(_stats(row, config))
+    return keys
+
+
 def parse(
     payload_bytes: bytes,
     *,
@@ -187,7 +211,7 @@ def parse(
     if not rows:
         return []
 
-    observed = _observed_keys(rows)
+    observed = _observed_stat_keys(rows, cfg)
     mapped = {dest for src, dest in stat_map.items() if src in observed}
     if not mapped & set(CANONICAL_STATS):
         raise ResponseShapeError(
@@ -213,8 +237,9 @@ def parse(
             "position": (raw.get(cfg.get("position_col", "position_id")) or position),
             "value_type": "derived",
         }
+        stats = _stats(raw, cfg)
         for src_col, dest_col in stat_map.items():
-            row[dest_col] = _as_float(raw.get(src_col))
+            row[dest_col] = _as_float(stats.get(src_col))
         out.append(row)
     return out
 

@@ -229,20 +229,67 @@ def run_research(
 @app.command()
 def sheet(
     edition: Annotated[str, typer.Option(help="artifact edition, default today")] = "",
+    slot: Annotated[
+        int, typer.Option(help="render only this draft slot, e.g. after the order is drawn")
+    ] = 0,
+    profile: Annotated[str, typer.Option(help="render only this league profile id")] = "",
 ) -> None:
-    """Render the S83 draft-day sheet, one per real league profile.
+    """Render the S83 draft-day sheet, one per real league profile and draft slot.
 
     S78 makes this an acceptance criterion and S88 makes it the deliverable that
     survives if the schedule collapses. It formats the S16 artifacts and computes
     nothing, so it is only ever as complete as the research behind it -- sections
     with no artifact say so on the page.
+
+    With the draft order undrawn every slot is rendered, plus an index.html
+    chooser, so the draw costs a file open rather than a build. `--slot` is the
+    draft-hour path for regenerating one seat against a fresher ADP capture, on a
+    machine that happens to be available; it is not required, and the
+    pre-rendered pages are the deliverable.
     """
     from research import method as method_mod
     from research import sheet as sheet_mod
 
     edition_name = edition or method_mod.default_edition()
-    for path in sheet_mod.write(edition_name):
+    paths = sheet_mod.write(
+        edition_name, slot=slot or None, profile_id=profile or None
+    )
+    for path in paths:
         typer.echo(f"wrote {path}")
+    typer.echo(f"{len(paths)} file(s)")
+
+
+def _projection_status() -> str:
+    """Which of S11's paths is live, in one line.
+
+    S19.3's blocker message says a projection source is missing; it does not say
+    which of the two was expected to supply it, and answering that from a CI log
+    took longer than it should have. `validate` is where somebody already looks.
+    """
+    from pipeline.ingest import fantasypros
+
+    if fantasypros.api_key():
+        if config.fantasypros_config().get("api_base"):
+            return (
+                "FANTASYPROS_API_KEY is set -- S11 option 1, the FantasyPros API "
+                "adapter, is the live path"
+            )
+        return (
+            "FANTASYPROS_API_KEY is set but config/sources.yaml fantasypros_api has no "
+            "`api_base`, so no request can be made (S11)"
+        )
+    providers = config.projection_providers()
+    if providers:
+        return (
+            f"no API key; {len(providers)} manual provider(s) declared under "
+            f"`projection_providers` -- S11 option 1B is the live path: {sorted(providers)}"
+        )
+    return (
+        "NO SOURCE. Neither FANTASYPROS_API_KEY nor a `projection_providers` entry in "
+        "config/sources.yaml, so S19.3 tiers stay blocked (S11). Note the key is read "
+        "from the environment, so an unset key here says nothing about the repository "
+        "secret the archive workflow uses."
+    )
 
 
 @app.command()
@@ -268,13 +315,16 @@ def validate() -> None:
         failures += 1
         typer.echo(f"config: {exc}", err=True)
 
-    if config.real_profiles():
-        typer.echo(f"league profiles: {len(config.real_profiles())} marked real")
-    else:
-        typer.echo(
-            "league profiles: none marked `real: true` -- research entry points are blocked "
-            "until the real leagues are encoded (S14)",
-        )
+    try:
+        profiles = config.require_real_profiles()
+        unknown = [p["id"] for p in profiles if config.draft_slot(p) is None]
+        note = f", {len(unknown)} with the draft order undrawn" if unknown else ""
+        typer.echo(f"league profiles: {len(profiles)} marked real{note} (S14)")
+    except config.ConfigError as exc:
+        failures += 1
+        typer.echo(f"league profiles: {exc}", err=True)
+
+    typer.echo(f"projections: {_projection_status()}")
 
     from pipeline.features import checks
 

@@ -25,9 +25,9 @@ Built here:
 
 | Research modules | §88 Week 2 | §25 team scoring regression, §21.1 dead-zone bucket rates — both DESCRIPTIVE |
 | Projection ingest | §11 | FantasyPros API adapter (key-gated) with the manual-CSV fallback, `projection_snapshot` table |
-| Tiers and VOR | §19.3, §19.4 | replacement level per profile, adjacent-gap tier breaks — **gated, see below** |
-| Survival probability | §31.2, §19.4 | P(available) at held picks, normal approximation — **gated** |
-| Draft-day sheet | §83, §88 Week 3 | one printable page per league profile, generated from the §16 artifacts |
+| Tiers and VOR | §19.3, §19.4 | replacement level per profile, adjacent-gap tier breaks — running on real projections |
+| Survival probability | §31.2, §19.4 | P(available) at held picks, normal approximation, every slot |
+| Draft-day sheet | §83, §88 Week 3 | one printable page per league profile **and per draft slot**, plus an index |
 
 **Not** built here: evidence grading, the draft simulator, and any publication
 layer. Those are §79 Steps 4+.
@@ -40,7 +40,7 @@ make ingest SEASONS=2023-2024   # nflverse raw data (start small)
 make ids                        # player_ids.parquet
 make tables SEASONS=2023-2024   # canonical tables
 make research                   # S16 method artifacts
-make sheet                      # the S83 draft-day sheet
+make sheet                      # the S83 draft-day sheets, one per league per slot
 make validate                   # hashes, schema, leakage, data checks
 make test
 ```
@@ -127,12 +127,11 @@ as §10B states — 2015 and 2017 come back empty. And ~3% of drafted players ca
 no ID match and leave the denominator, skewing fringe, so each rate is a slight
 upper bound. The artifact carries both.
 
-**§19.3 tiers — built, and still gated by two config values.** The module is no
-longer a stub: replacement level, flex allocation, the value metric and tier
-breaks are implemented and tested against fixtures. It refuses to run on real
-data because no league profile is marked `real: true` and no projection source
-is configured. Both gates are listed under *Two values away from a real sheet*
-below.
+**§19.3 tiers — running.** Both gates are open, and the module produces boards
+for both leagues from n=486 projected players: replacement level with flex
+allocation, the value metric and adjacent-gap tier breaks. §31.2 survival runs
+alongside it for all 12 slots of each league (n=1,724 half-PPR, n=1,880 PPR).
+How the gates opened, and what it cost to open them, is under *Draft day* below.
 
 ## Three rules the code enforces rather than documents
 
@@ -160,8 +159,9 @@ look like a failure.
 ## The draft-day sheet (§83)
 
 ```bash
-make research    # writes artifacts/<edition>/methods/*.json
-make sheet       # writes artifacts/<edition>/sheets/*.html
+make research      # writes artifacts/<edition>/methods/*.json
+make sheet         # writes artifacts/<edition>/sheets/*.html, one per league per slot
+make sheet SLOT=7  # rewrites one seat, for a draft-hour refresh
 ```
 
 §78 makes the sheet an acceptance criterion and §88 makes it the deliverable
@@ -177,12 +177,12 @@ it. §83's seven sections and what each carries today:
 
 | Section | Spec | State |
 |---|---|---|
-| TIERS | §19.3 | blocked — needs a real profile and a projection source |
+| TIERS | §19.3 | **filled in** — tier, player, team, VOR by position |
 | TARGETS | §27 | not built — needs graded evidence (§79) |
 | AVOIDS | §28 | not built — needs graded evidence (§79) |
 | REGRESSION | §25 | **filled in** — teams flagged, with the expected move |
 | DARTS | §29 | not built (§79) |
-| SURVIVAL | §31.2 | blocked — needs a real profile |
+| SURVIVAL | §31.2 | **filled in** — who is on the board at each held pick, and P(back at the next) |
 | FALSE FRIENDS | §34 | not built — needs the matching engine (§32) |
 
 A section with nothing behind it prints `NOT BUILT` or `BLOCKED` with the
@@ -192,63 +192,121 @@ to prevent. §83 also forbids evidence grades, confidence intervals and sample
 sizes on the sheet — `assert_sheet_constraints` scans the rendered page for them
 and raises, so the rule survives a section added by someone who did not read it.
 
-With no profile marked `real: true`, §14 excludes every profile from the sheet,
-so the only honest output is the profile-independent one — `sheets/no_profile.html`,
-carrying the §25 regression flags and saying plainly that it is not a league
-sheet.
+Three of the seven sections now carry content, and the page is generated once per
+league **and once per draft slot** — 26 sheets plus an `index.html` chooser,
+because the draft order is drawn about an hour before the draft and that is not
+an hour to be running a build in. See *Draft day* below.
 
-## Two values away from a real sheet
+Each of the 26 has been rendered to PDF and verified to print on a single page.
+That is not decoration: the one-page rule broke the moment TIERS and SURVIVAL
+started carrying real content, and it broke silently.
 
-Everything downstream is built and tested against fixtures. Two configuration
-gates stand between that and a sheet for an actual draft:
+## Draft day: the order is drawn an hour before, so nothing is built then
 
-**1. A real league profile (§14).** `config/league_profiles.yaml` holds the two
-leagues being drafted with correct scoring and starters. Fill in `draft_date`
-and `draft_slot` and set `real: true`. `draft_slot` may be `unknown` if the
-order is undrawn — survival then reports all 12 slots instead of one, and the
-tier board is unaffected.
+Both gates are closed. `config/league_profiles.yaml` marks both leagues
+`real: true`, and the FantasyPros API is capturing projections, so §19.3 tiers
+and §31.2 survival run on real data and the §83 sheet carries them as content
+rather than as `BLOCKED` notices.
 
-**2. A projection source (§11).** §19.3's metric is
-`projected_points − replacement_points`, and there are no projected points. Two
-supported paths, tried in §11's order:
+The gates closed without the two values §14 was waiting for. **The draft dates
+are not set, and the draft position is drawn about an hour before the draft
+starts.** Both are recorded as `unknown`, which the build treats as an answer:
 
-```text
-FANTASYPROS_API_KEY set   →  FantasyPros API adapter   (§11 option 1)
-        ↓ no
-projection_providers set  →  manual provider CSV       (§11 option 1B)
-        ↓ no
-skip, with the reason printed
+| Value | State | What it costs |
+|---|---|---|
+| `draft_date` | `unknown` | Nothing today. No code reads it; the sheet prices off the most recent archived ADP capture, which is the right rule when the draft is imminent and the only one available when the date is not known. §36.2's simulator will want a real one. |
+| `draft_slot` | `unknown` | Nothing. §31.2 computes survival for every slot, and §83 renders a sheet for each. |
+
+`unknown` is accepted and the literal `TODO` is not — `pipeline.config.
+validate_profile()` raises on it. The distinction is the point: a placeholder
+that flows through as "undrawn" is an unanswered question rendering as twelve
+confident sheets.
+
+### What to do at the draft
+
+```
+artifacts/<edition>/sheets/
+  index.html                  <- open this
+  half_ppr_12__slot01.html    <- ...it links to these
+  half_ppr_12__slot02.html
+  ...
+  half_ppr_12.html            <- slot-agnostic: tiers + regression, for the week before
+  ppr_12__slot01.html
+  ...
 ```
 
-The API adapter is built and wired into the ADP archive workflow; add
-`FANTASYPROS_API_KEY` as a repository secret and the next scheduled run captures
-projections alongside ADP. The key travels in a header and is never written into
-a snapshot URL or manifest — this repository is public, and a key in a manifest
-is a key in the git history.
+Open `index.html`, tap the seat you drew, print or read that page. Nothing is
+rebuilt, nothing needs a network, and nothing needs the laptop to be working —
+§8 requires the output to work offline, and an hour before a draft is exactly
+when a build step fails. `artifacts/` is committed, so the sheets are reachable
+from a phone through GitHub with no local checkout at all.
 
-One caveat carried openly: `api.fantasypros.com` answers 403 at CONNECT from the
-development sandbox, exactly as Fantasy Football Calculator does, so the
-response shape is **unverified**. Everything shape-dependent — the path, the
-envelope, the column names — is configuration in `config/sources.yaml` rather
-than a literal in the adapter, the raw payload is persisted unmodified, and the
-parser raises naming the keys it actually saw instead of emitting a frame of
-nulls. The first successful runner call resolves
-`fantasypros_projection_shape` in `research/questions.yaml` from the archive.
+If a machine *is* to hand and you want the freshest ADP capture behind one seat:
 
-Two column names depart from §11's canonical schema deliberately.
-`pass_yards`/`rush_yards` become `passing_yards`/`rushing_yards`, which is what
-`pipeline/scoring.py` reads — so a projection is priced by the same code and the
-same league profile a real season is, with no second mapping to drift. And
-`fantasy_points`/`games` become `projected_fantasy_points`/`projected_games`,
-because the bare names are outcome columns meaning what actually happened.
+```bash
+make sheet SLOT=7            # rewrites that seat only, leaves the other 11 alone
+```
+
+Set `draft_slot: 7` in the profile instead if the order is drawn well in advance:
+the league then gets a single `half_ppr_12.html` and no per-slot fan-out.
+
+### Checking it is still one page
+
+§83's one-page rule is the constraint the sheet is most likely to break as
+sections fill in, and it did break: with TIERS and SURVIVAL finally carrying
+content, 24 players a position rendered 1,078px against a 989px budget and
+printed on two. `MAX_TIER_PLAYERS` in `research/sheet.py` is now 16, measured
+rather than guessed. Re-measure before raising it:
+
+```bash
+for f in artifacts/<edition>/sheets/*.html; do
+  chromium --headless --no-pdf-header-footer --print-to-pdf="/tmp/$(basename $f).pdf" "file://$PWD/$f"
+done   # every PDF must be 1 page
+```
+
+## The projection source (§11)
+
+`FANTASYPROS_API_KEY` is configured as a repository secret and the daily archive
+job captures QB/RB/WR/TE projections alongside ADP. The key travels in a header
+and is never written into a snapshot URL or manifest — this repository is public,
+and a key in a manifest is a key in the git history.
+
+`research validate` names which of §11's paths is live, so the question does not
+require reading a CI log. Note it reads the key from the environment, so an unset
+key on a laptop says nothing about the repository secret.
+
+The archive workflow takes a `sources` input, because a dated capture is
+immutable (§84): re-running `ffc` on a day whose ADP has already landed fails the
+overwrite guard — correctly — and aborts the run before `projections` gets its
+turn. `sources: projections` captures one without the other.
+
+### What the payload actually looked like
+
+The adapter was written blind (`api.fantasypros.com` answers 403 at CONNECT from
+the development sandbox) and every shape-dependent value was put in
+`config/sources.yaml` rather than in Python for exactly that reason. The guess was
+wrong in four ways, and all four were YAML edits:
+
+* **Stats are nested** under a `stats` object; identity stays flat on the row.
+  The mapping read stat columns off the row and would have found none.
+* `rec` is `rec_rec`; `fpts` is `points` (with `points_ppr` and `points_half`
+  alongside it).
+* **Targets and games played are not published at all**, so both mappings were
+  removed rather than pointed at a near-miss column. Nothing keyed on projected
+  opportunity share can be built from this provider's board.
+* `fumbles` is fumbles *lost* under a shorter name — the provider prices it at
+  −2 in its own published half-PPR total.
+
+That last one is also the check that the whole mapping is right rather than
+merely non-empty: scoring the mapped frame under a half-PPR profile reproduces
+FantasyPros' own `points_half` to the cent. A stat map can be wrong in a way that
+still computes, and a tier board built on it looks exactly like a correct one.
 
 ## Before running research
 
 `config/league_profiles.yaml` holds the two leagues actually being drafted —
-12-team half-PPR and 12-team full PPR — with scoring and starters already
-correct. Both are still `real: false`, because two values are unknown:
-`draft_date` and `draft_slot`. Fill those in and flip the flag; nothing else
-needs to move.
+12-team half-PPR and 12-team full PPR — with scoring, starters and team counts
+correct, and both marked real.
 
 One profile per league, not one per scoring system. Replacement level is
 `teams × starters`, so two leagues with the same scoring and different team
@@ -262,6 +320,7 @@ asserts the capture list covers it — over *every* profile, not just the real
 ones, since discovering a gap on draft week means the missing days are already
 gone (§84).
 
+
 ## Data sources and attribution
 
 * **nflverse** (`nflverse-data`), CC-BY-4.0 — statistics, rosters, depth
@@ -271,7 +330,8 @@ gone (§84).
 * **nflverse/nfldata** — schedules and bye weeks.
 * **Fantasy Football Calculator** — ADP, free for personal and commercial use
   with attribution requested.
-* **FantasyPros** — projections, key-gated and not yet configured (§11).
+* **FantasyPros** — projections, key-gated and configured; first capture
+  2026-08-13 (§11).
 
 Full registry with purposes and licenses: `config/sources.yaml` (§46). This is
 a technical registry, not legal advice.
@@ -288,8 +348,11 @@ found and regenerated if a real distribution ever arrives, and rows where the
 normal puts probability on picks that have never happened carry a note saying
 so.
 
-**`fantasypros_projection_shape` — open.** See *Two values away from a real
-sheet* above; the first archived payload from a runner call answers it.
+**`fantasypros_projection_shape` — resolved 2026-08-13, and the guess was wrong
+in four ways.** Stats are nested under `stats`; `rec` is `rec_rec`; `fpts` is
+`points`; targets and games played are not published at all. All four were YAML
+edits, which is what putting the shape in configuration bought. Details under
+*What the payload actually looked like* above.
 
 Note that fantasyfootballcalculator.com, Sleeper and the FantasyPros API are
 **not reachable** from the Claude Code sandbox this was developed in (403 at

@@ -150,15 +150,43 @@ def test_survival_shows_a_probability_and_a_dash_where_there_is_none():
     assert "Normal approximation" in page
 
 
-def test_an_undrawn_slot_does_not_silently_pick_one():
+def _many_slots() -> dict:
+    """A survival artifact covering all twelve seats -- the undrawn state."""
     artifacts = dict(FULL)
     many = json.loads(json.dumps(SURVIVAL_ARTIFACT))
     many["primary_results"]["by_slot"] = [
-        {"slot": s, "held_picks": [s], "picks": []} for s in range(1, 13)
+        {"slot": s, "held_picks": [s, 25 - s], "picks": []} for s in range(1, 13)
     ]
     artifacts[f"{survival_mod.METHOD_ID}__fixture_12"] = many
-    page = sheet.render("test", profile=PROFILE, artifacts=artifacts)
-    assert "Draft slot undrawn" in page
+    return artifacts
+
+
+def test_an_undrawn_slot_does_not_silently_pick_one():
+    """No seat is guessed. But the page does not go blank either.
+
+    This drafter's order is drawn about an hour before the draft, so undrawn is
+    the expected state, and a sheet that says BLOCKED in its expected state is the
+    blank space somebody fills in from memory at pick 43.
+    """
+    page = sheet.render("test", profile=PROFILE, artifacts=_many_slots())
+    assert "Draft order undrawn" in page
+    assert "slot&lt;NN&gt;" in page          # says which file to open
+    for seat in range(1, 13):
+        assert f">{seat}</td>" in page       # and shows every seat's picks
+
+
+def test_a_slot_renders_only_that_slot():
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=_many_slots())
+    assert "Slot 7 holds 7, 18" in page
+    assert "slot 7" in page                  # in the title too
+    assert "Draft order undrawn" not in page
+    assert "Slot 12 holds" not in page
+
+
+def test_a_slot_the_artifact_does_not_cover_is_blocked_not_invented():
+    page = sheet.render("test", profile=PROFILE, slot=44, artifacts=_many_slots())
+    assert "BLOCKED" in page
+    assert "slot 44 is not in the survival artifact" in page
 
 
 def test_with_no_real_profile_the_sheet_says_it_is_not_a_league_sheet():
@@ -166,7 +194,7 @@ def test_with_no_real_profile_the_sheet_says_it_is_not_a_league_sheet():
     profile-independent one, labelled as such."""
     page = sheet.render("test", profile=None, artifacts=FULL)
     assert "This is not a league sheet" in page
-    assert "draft_date" in page
+    assert "real: true" in page
 
 
 def test_the_page_is_self_contained():
@@ -176,15 +204,61 @@ def test_the_page_is_self_contained():
         assert token not in page.lower()
 
 
-def test_write_produces_one_file_per_real_profile(tmp_path, monkeypatch):
-    monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE, {**PROFILE, "id": "other"}])
+def _seed(tmp_path) -> None:
     directory = tmp_path / "ed" / "methods"
     directory.mkdir(parents=True)
     for name, artifact in FULL.items():
         (directory / f"{name}.json").write_text(json.dumps(artifact))
-    paths = sheet.write("ed", root=tmp_path)
-    assert [p.name for p in paths] == ["fixture_12.html", "other.html"]
-    assert "Bijan Robinson" in paths[0].read_text()
+
+
+def test_write_produces_a_sheet_per_seat_when_the_order_is_undrawn(tmp_path, monkeypatch):
+    """The draw happens an hour before the draft; the rendering happens now."""
+    monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE])
+    _seed(tmp_path)
+    names = [p.name for p in sheet.write("ed", root=tmp_path)]
+    assert names == (
+        [f"fixture_12__slot{s:02d}.html" for s in range(1, 13)]
+        + ["fixture_12.html", "index.html"]
+    )
+    assert "Bijan Robinson" in (tmp_path / "ed" / "sheets" / "fixture_12__slot01.html").read_text()
+
+
+def test_a_configured_slot_produces_one_sheet_named_for_the_league(tmp_path, monkeypatch):
+    monkeypatch.setattr(sheet, "real_profiles", lambda: [{**PROFILE, "draft_slot": 7}])
+    _seed(tmp_path)
+    names = [p.name for p in sheet.write("ed", root=tmp_path)]
+    assert names == ["fixture_12.html", "index.html"]
+    assert "slot 7" in (tmp_path / "ed" / "sheets" / "fixture_12.html").read_text()
+
+
+def test_writing_one_slot_leaves_the_pre_rendered_set_alone(tmp_path, monkeypatch):
+    """The draft-hour path: refresh one seat, do not rebuild twelve."""
+    monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE])
+    _seed(tmp_path)
+    sheet.write("ed", root=tmp_path)
+    names = [p.name for p in sheet.write("ed", root=tmp_path, slot=7)]
+    assert names == ["fixture_12__slot07.html", "index.html"]
+    assert (tmp_path / "ed" / "sheets" / "fixture_12__slot01.html").exists()
+
+
+def test_the_index_lists_every_seat_and_needs_no_network(tmp_path, monkeypatch):
+    """S8: opened on a phone at a draft table, possibly with no signal."""
+    monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE])
+    _seed(tmp_path)
+    sheet.write("ed", root=tmp_path)
+    index = (tmp_path / "ed" / "sheets" / "index.html").read_text()
+    for seat in range(1, 13):
+        assert f'href="fixture_12__slot{seat:02d}.html"' in index
+    for token in ("http://", "https://", "<script", "<link", "<img"):
+        assert token not in index
+    sheet.assert_sheet_constraints(index)
+
+
+def test_an_unknown_profile_id_is_an_error_not_an_empty_run(tmp_path, monkeypatch):
+    monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE])
+    _seed(tmp_path)
+    with pytest.raises(ValueError, match="no real league profile"):
+        sheet.write("ed", root=tmp_path, profile_id="nope")
 
 
 def test_write_falls_back_to_one_profile_independent_sheet(tmp_path, monkeypatch):
@@ -263,7 +337,7 @@ def test_end_to_end_from_a_projection_archive_to_a_finished_sheet(tmp_path, monk
     paths = sheet.write("ed", root=edition)
     page = paths[0].read_text()
 
-    assert paths[0].name == "e2e_12.html"
+    assert paths[0].name == "e2e_12.html"   # slot 7 is configured, so one sheet
     assert "BLOCKED" not in page          # every gated section filled in
     assert "RB1" in page                  # tiers
     assert "Pick 18" in page              # survival at the real held picks
