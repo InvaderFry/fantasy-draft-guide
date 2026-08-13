@@ -96,6 +96,27 @@ ADP_HISTORY_COLUMNS = (
     "n_drafts", "match_method", "match_confidence",
 )
 
+# S13 projection_snapshot (S11 canonical schema).
+# `projected_fantasy_points` and `projected_games` carry the prefix S11 does not:
+# the bare names are in OUTCOME_COLUMNS above, where they mean what a player
+# actually scored and actually played. Two columns with one name on two different
+# meanings is the target_share bug this repo already shipped once.
+PROJECTION_SNAPSHOT_COLUMNS = (
+    "season", "snapshot_date", "as_of", "source_as_of", "value_type",
+    "source", "provider_id", "transport",
+    "player_id", "source_player_id", "source_player_name", "position", "team",
+    # Stat names are player_week's, not S11's (`pass_yards`, `rush_yards`, ...).
+    # Two reasons: pipeline/scoring.py already reads these, so a projection is
+    # scored by the same code and the same profile as a realized season with no
+    # second mapping to drift; and S66's backtest compares a projection against
+    # the outcome, which is only a join if the columns line up.
+    "pass_attempts", "pass_completions", "passing_yards", "passing_tds", "interceptions",
+    "carries", "rushing_yards", "rushing_tds",
+    "targets", "receptions", "receiving_yards", "receiving_tds",
+    "projected_fantasy_points", "projected_games",
+    "match_method", "match_confidence",
+)
+
 
 def outcome_columns_in(columns) -> list[str]:
     return sorted(set(columns) & OUTCOME_COLUMNS)

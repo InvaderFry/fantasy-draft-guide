@@ -1,4 +1,4 @@
-.PHONY: setup ingest ids tables research validate test lint snapshot all
+.PHONY: setup ingest ids tables research sheet validate test lint snapshot all
 
 SEASONS ?= 2012-2025
 
@@ -23,6 +23,11 @@ snapshot:
 research:
 	uv run research run-research
 
+# S83. The one-page decision aid, generated per real league profile from the
+# S16 artifacts `make research` just wrote. S78 acceptance criterion.
+sheet:
+	uv run research sheet
+
 validate:
 	uv run research validate
 
@@ -32,4 +37,4 @@ test:
 lint:
 	uv run ruff check .
 
-all: setup ingest ids tables research validate test
+all: setup ingest ids tables research sheet validate test

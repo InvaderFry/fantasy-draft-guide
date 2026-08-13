@@ -192,6 +192,75 @@ questions:
       config/sources.yaml has an empty projection_providers map with the
       FantasyPros API deferred. Encoding a league profile alone will not
       unblock it. research/foundations/tiers.py reports both and refuses to run.
+    kill_rule_outcome_2026_08_14: >
+      STILL BLOCKED, and by the same two things -- but the machinery below them
+      is now built and tested, so clearing the gates is the whole remaining
+      change rather than the start of one.
+      research/foundations/tiers.py implements S19.3's metric
+      (projected_points - replacement_points), S19.4's per-profile replacement
+      level including flex allocation, and adjacent-gap tier breaks at a
+      multiple committed in code. research/foundations/survival.py implements
+      S31.2 on S19.4's labelled normal approximation. research/sheet.py renders
+      the S83 sheet from the artifacts. All three run against fixtures in the
+      test suite; none can run on real data yet.
+      A defect was fixed in the process: blockers() read projection_providers
+      off config.sources(), which returns the `sources:` sub-map, while the key
+      is a top-level sibling of it. The projection blocker was therefore
+      unclearable -- it would have kept firing after someone did exactly what it
+      asked. config.projection_providers() is now the single accessor and a test
+      reproduces the old behaviour.
+    remaining_to_unblock: >
+      (1) config/league_profiles.yaml: draft_date and draft_slot on either
+      profile, then real: true. draft_slot may be `unknown`; survival then
+      reports every slot instead of one. (2) A projection source: either
+      FANTASYPROS_API_KEY as a repository secret (S11 option 1, adapter built
+      and wired into the archive workflow) or a manual export declared under
+      projection_providers (S11 option 1B).
     status: blocked_week2
     claim_type_permitted: DESCRIPTIVE
     first_edition: null
+
+  - id: fantasypros_projection_shape
+    question: >
+      What does the FantasyPros public API actually return for season
+      projections -- which path, which response envelope, and which column names
+      -- and does the configured mapping in config/sources.yaml match it?
+    type: source_resolution           # not a statistical question
+    blocks:
+      - S19.3 tiers and value over replacement
+      - S19.4 opportunity cost
+      - S83 draft-day sheet
+    decision_change: >
+      Nothing downstream chooses differently on the answer; the mapping either
+      matches the payload or the adapter raises and names the keys it saw. It is
+      registered because it is the one remaining unverified assumption between a
+      configured key and a working tier board, and S31.1 showed what an
+      unverified source assumption costs when it is discovered late.
+    resolution_method: >
+      Inspect the first archived payload from a runner call with the secret set:
+      data/snapshots/<date>/fantasypros_projections_*.json. The adapter persists
+      the raw bytes unmodified and records the row keys it observed in the
+      snapshot manifest, so the answer comes from the archive rather than from a
+      re-fetch that may return a different shape.
+    status: UNRESOLVED
+    why_unresolved: >
+      api.fantasypros.com answers 403 at CONNECT from the development sandbox --
+      the same wall that put the ADP capture on a GitHub runner (S84) -- and the
+      API requires a key that is not configured. So the adapter could not be
+      written against an observed payload the way pipeline/ingest/ffc_adp.py
+      was.
+    mitigation: >
+      Every shape-dependent value is configuration, not a literal in Python:
+      projections_path, container_key, id/name/team/position columns and the
+      stat_map all live in config/sources.yaml. A wrong guess is corrected in
+      YAML. parse() raises and names the keys actually present rather than
+      emitting a frame of nulls, which would be indistinguishable from a
+      provider with no projections.
+    note: >
+      S11's canonical schema names two columns this repository deliberately
+      spells differently. `pass_yards`/`rush_yards` are mapped to player_week's
+      `passing_yards`/`rushing_yards` so pipeline/scoring.py prices a projection
+      with the same code and profile it prices a real season with; and
+      `fantasy_points`/`games` are mapped to `projected_fantasy_points`/
+      `projected_games` because the bare names are outcome columns meaning what
+      actually happened.

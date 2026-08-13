@@ -18,14 +18,14 @@ import io
 from pathlib import Path
 from typing import Any
 
-from pipeline.config import CONFIG_DIR, PROJECT_ROOT, load_yaml
+from pipeline.config import PROJECT_ROOT, projection_providers
 from pipeline.ingest.base import Fetched
 
 SOURCE_NAME = "projection_csv"
 
 
 def configured_providers() -> dict[str, Any]:
-    return load_yaml(CONFIG_DIR / "sources.yaml").get("projection_providers") or {}
+    return projection_providers()
 
 
 class ProjectionCsvAdapter:
@@ -82,17 +82,26 @@ def parse(
             "season": season,
             "snapshot_date": snapshot_date,
             "as_of": snapshot_date,
+            "source_as_of": snapshot_date,
             "source": SOURCE_NAME,
             "provider_id": provider_id,
+            "transport": "manual_csv",   # S11 asks the edition manifest to record it
+            "source_player_id": _as_str(raw.get(spec.get("id_col", "player_id"))),
             "source_player_name": raw.get(spec.get("name_col", "player_name")),
             "team": raw.get(spec.get("team_col", "team")),
             "position": raw.get(spec.get("position_col", "position")),
-            "value_type": "observed",
+            # A projection is a model output, not an observation. S37 has a word
+            # for that and it is not `observed`.
+            "value_type": "derived",
         }
         for src_col, dest_col in stat_map.items():
             row[dest_col] = _as_float(raw.get(src_col))
         rows.append(row)
     return rows
+
+
+def _as_str(v: Any) -> str | None:
+    return None if v in (None, "") else str(v)
 
 
 def _as_float(v: Any) -> float | None:

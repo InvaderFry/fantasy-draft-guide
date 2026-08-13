@@ -78,15 +78,66 @@ sources:
       undefined. Also blocked from the sandbox. Not ingested.
 
   fantasypros_api:
-    url: https://www.fantasypros.com/
+    url: https://www.fantasypros.com/api-data/
+    docs: https://support.fantasypros.com/hc/en-us/articles/49749297704475
+    api_base: https://api.fantasypros.com/public/v2/json
+    endpoint_family: public_v2
     purpose:
-      - expert_consensus_rankings
       - projections
-    status: deferred
+      - expert_consensus_rankings
+    license: provider_specific
+    attribution_required: true
+    status: key_required        # adapter built; no FANTASYPROS_API_KEY configured yet
     notes: >
-      Requires FANTASYPROS_API_KEY; blocked from the sandbox. When added:
-      read the key from the environment, never log or persist it, persist raw
-      payloads, record endpoint metadata, fail cleanly to projection_csv.
+      S11 option 1, the preferred projection path. The key is read from
+      FANTASYPROS_API_KEY on every fetch, travels in a header, and is never
+      written into a snapshot URL or manifest -- this repository is public and a
+      key in a manifest is a key in the git history. No key means a skip, not a
+      failure: unlike ADP (S84), a projection missed today is fetchable
+      tomorrow. Fallback is projection_csv below.
+
+      EVERYTHING BELOW IS UNVERIFIED. api.fantasypros.com answers 403 at CONNECT
+      from the development sandbox, so this adapter could not be written against
+      an observed payload the way fantasy_football_calculator was. The path,
+      envelope and column names are configuration precisely so the first
+      successful runner call corrects them here rather than in Python. The
+      adapter persists the raw payload unmodified and records the row keys it
+      actually saw; see `fantasypros_projection_shape` in research/questions.yaml.
+
+    # {season} and {position} are substituted by the adapter.
+    projections_path: "nfl/{season}/projections"
+    positions: [QB, RB, WR, TE]
+    key_header: x-api-key
+    params:
+      week: 0                   # 0 = full-season / draft projections
+    container_key: players      # where the row list lives in the response
+    id_col: fpid
+    name_col: name
+    team_col: team_id
+    position_col: position_id
+    # Provider column -> the repository's stat names. Deliberately player_week's
+    # spelling rather than S11's, so pipeline/scoring.py scores a projection with
+    # the same code and the same league profile it scores a real season with.
+    stat_map:
+      pass_att: pass_attempts
+      pass_cmp: pass_completions
+      pass_yds: passing_yards
+      pass_tds: passing_tds
+      pass_ints: interceptions
+      rush_att: carries
+      rush_yds: rushing_yards
+      rush_tds: rushing_tds
+      rec_tgt: targets
+      rec: receptions
+      rec_yds: receiving_yards
+      rec_tds: receiving_tds
+      # S11's canonical schema calls these `fantasy_points` and `games`. Both
+      # names are already taken by OUTCOME_COLUMNS, where they mean what a player
+      # actually scored and actually played. A projection column sharing a name
+      # with an outcome column is the bug this repo already shipped once with
+      # target_share, so the projection side is prefixed.
+      fpts: projected_fantasy_points
+      games: projected_games
 
 # Column mappings for manual projection imports (S11 option 1B).
 # Add one block per provider export you actually drop in data/raw/projections/.

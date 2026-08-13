@@ -19,7 +19,7 @@ from typing import Annotated
 import typer
 
 from pipeline import config, snapshot
-from pipeline.ingest import ffc_adp, nflverse, projections_csv
+from pipeline.ingest import fantasypros, ffc_adp, nflverse, projections_csv
 
 app = typer.Typer(add_completion=False, help="Fantasy draft research guide pipeline.")
 
@@ -56,16 +56,16 @@ def snapshot_(
     snap = snapshot.Snapshot(snap_date)
     wanted = [s.strip() for s in sources.split(",") if s.strip()]
     written = 0
+    skipped: list[str] = []
 
     for name in wanted:
         if name == "ffc":
             payloads = ffc_adp.FFCAdapter(year=year).fetch()
         elif name == "projections":
-            adapter = projections_csv.ProjectionCsvAdapter()
-            if not adapter.providers:
-                typer.echo("projections: no providers configured in config/sources.yaml, skipping")
+            payloads = _fetch_projections(year)
+            if payloads is None:
+                skipped.append("projections")
                 continue
-            payloads = adapter.fetch()
         elif name == "nflverse-static":
             payloads = nflverse.NflverseAdapter(
                 seasons=[year], datasets=list(nflverse.STATIC_DATASETS)
@@ -91,12 +91,43 @@ def snapshot_(
             typer.echo(f"wrote {path} ({len(f.data):,} bytes) -- {f.notes or ''}")
 
     if written == 0:
+        # A source that skipped for a stated reason is not the same failure. S84's
+        # rule is about ADP, whose missed day is unrecoverable; a projection with
+        # no key configured is fetchable tomorrow and must not red the archive job,
+        # which runs `snapshot` and then commits the ADP captured seconds earlier.
+        if skipped and set(skipped) == set(wanted):
+            reason = ", ".join(skipped)
+            typer.echo(f"snapshot {snap_date.isoformat()}: nothing to capture ({reason})")
+            return
         typer.echo(
             "no payloads written. Treating as failure: a capture day cannot be recovered (S84).",
             err=True,
         )
         raise typer.Exit(code=1)
     typer.echo(f"snapshot {snap_date.isoformat()}: {written} file(s)")
+
+
+def _fetch_projections(season: int) -> list | None:
+    """S11's fallback order: FantasyPros API -> manual CSV -> skip.
+
+    Returns None when no projection path is configured. That is a reportable
+    skip rather than an error: S11 names the manual export as the supported
+    fallback, and neither path being present is a state the repository is
+    currently in by design (S19.3 reports it as a blocker).
+    """
+    try:
+        return fantasypros.FantasyProsAdapter(season=season).fetch()
+    except fantasypros.MissingKeyError as exc:
+        typer.echo(f"projections: {exc}")
+
+    adapter = projections_csv.ProjectionCsvAdapter()
+    if not adapter.providers:
+        typer.echo(
+            "projections: no manual providers in config/sources.yaml either -- skipping. "
+            "S19.3 tiers stay blocked until one of the two paths is configured (S11)."
+        )
+        return None
+    return adapter.fetch()
 
 
 app.command("snapshot")(snapshot_)
@@ -154,41 +185,64 @@ def run_research(
     blocked module is a finding rather than a failure.
     """
     from research import method as method_mod
-    from research.foundations import tiers
+    from research.foundations import survival, tiers
     from research.running_back import dead_zone
     from research.teams import team_scoring_regression
 
-    runnable = {
+    modules_by_id = {
         team_scoring_regression.METHOD_ID: team_scoring_regression.run,
         dead_zone.METHOD_ID: dead_zone.run,
+        # Gated by S14 and S11. A gate that is shut is a finding, not a failure:
+        # these report why and the run continues.
+        tiers.METHOD_ID: tiers.run,
+        survival.METHOD_ID: survival.run,
     }
-    blocked = {tiers.METHOD_ID: tiers.run}
+    gated = (tiers.BlockedError, survival.BlockedError)
 
-    wanted = [m.strip() for m in modules.split(",") if m.strip()] or [*runnable, *blocked]
-    unknown = [m for m in wanted if m not in runnable and m not in blocked]
+    wanted = [m.strip() for m in modules.split(",") if m.strip()] or list(modules_by_id)
+    unknown = [m for m in wanted if m not in modules_by_id]
     if unknown:
         raise typer.BadParameter(f"unknown module(s) {unknown}")
 
     edition_name = edition or method_mod.default_edition()
     failures = 0
     for name in wanted:
-        if name in blocked:
-            try:
-                blocked[name]()
-            except Exception as exc:  # noqa: BLE001 - reported, not raised
-                typer.echo(f"{name}: BLOCKED\n  {exc}")
-            continue
         try:
-            _results, artifact = runnable[name]()
+            outcome = modules_by_id[name]()
+        except gated as exc:
+            typer.echo(f"{name}: BLOCKED\n  {exc}")
+            continue
         except Exception as exc:  # noqa: BLE001 - one module must not stop the rest
             failures += 1
             typer.echo(f"{name}: FAILED -- {exc}", err=True)
             continue
-        path = artifact.write(edition_name)
-        typer.echo(f"{name}: n={artifact.sample_size} -> {path}")
+        # A per-profile module returns one result per league profile (S83
+        # generates the sheet per profile for the same reason).
+        for _results, artifact in outcome if isinstance(outcome, list) else [outcome]:
+            path = artifact.write(edition_name)
+            typer.echo(f"{artifact.method_id}: n={artifact.sample_size} -> {path}")
 
     if failures:
         raise typer.Exit(code=1)
+
+
+@app.command()
+def sheet(
+    edition: Annotated[str, typer.Option(help="artifact edition, default today")] = "",
+) -> None:
+    """Render the S83 draft-day sheet, one per real league profile.
+
+    S78 makes this an acceptance criterion and S88 makes it the deliverable that
+    survives if the schedule collapses. It formats the S16 artifacts and computes
+    nothing, so it is only ever as complete as the research behind it -- sections
+    with no artifact say so on the page.
+    """
+    from research import method as method_mod
+    from research import sheet as sheet_mod
+
+    edition_name = edition or method_mod.default_edition()
+    for path in sheet_mod.write(edition_name):
+        typer.echo(f"wrote {path}")
 
 
 @app.command()

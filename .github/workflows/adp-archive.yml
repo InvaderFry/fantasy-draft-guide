@@ -53,6 +53,13 @@ jobs:
       - name: Capture ADP and projection snapshots
         # Non-zero exit on an empty capture is deliberate: a silent no-op day
         # looks like success and costs a day of price movement.
+        #
+        # FANTASYPROS_API_KEY is optional and currently unset. The `projections`
+        # source falls back API -> manual CSV -> skip (S11), so an absent secret
+        # reports itself and leaves the ADP capture -- the part whose value
+        # expires -- unaffected.
+        env:
+          FANTASYPROS_API_KEY: ${{ secrets.FANTASYPROS_API_KEY }}
         run: |
           uv run research snapshot \
             --sources ffc,projections \
