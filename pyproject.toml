@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fantasy-draft-guide"
+version = "0.1.0"
+description = "Static fantasy football draft research guide - data foundation"
+requires-python = ">=3.11"
+dependencies = [
+    "polars>=1.0",
+    "pyarrow>=15.0",
+    "duckdb>=1.0",
+    "requests>=2.31",
+    "pyyaml>=6.0",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+nflreadpy = ["nflreadpy>=0.1.5"]
+
+[project.scripts]
+research = "pipeline.cli:app"
+
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["pipeline", "research"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

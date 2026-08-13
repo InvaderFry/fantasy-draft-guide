@@ -1,0 +1,26 @@
+# Decision dates (S6.1).
+#
+# One draft date per season: the point the research is pretending to stand at.
+# Every feature row's `as_of` must precede its season's decision date, and the
+# feature builder asserts this rather than leaving it to review.
+#
+# Convention: last week of August. State the choice on every methodology page --
+# a feature knowable on August 30 is not knowable on August 10, and the ADP
+# snapshot differs materially between them.
+
+decision_dates:
+  2012: 2012-08-25
+  2013: 2013-08-24
+  2014: 2014-08-23
+  2015: 2015-08-29
+  2016: 2016-08-27
+  2017: 2017-08-26
+  2018: 2018-08-25
+  2019: 2019-08-24
+  2020: 2020-08-29
+  2021: 2021-08-28
+  2022: 2022-08-27
+  2023: 2023-08-26
+  2024: 2024-08-24
+  2025: 2025-08-23
+  2026: 2026-08-29

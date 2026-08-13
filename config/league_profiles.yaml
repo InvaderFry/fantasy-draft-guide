@@ -1,0 +1,79 @@
+# League scoring profiles (S14).
+#
+# Never hard-code one scoring system into the raw data. Every downstream
+# conclusion is conditional on scoring and roster structure.
+#
+# RULE: research runs ONLY for profiles marked `real: true`. Generic profiles
+# are for illustration and are excluded from Targets, Avoids, and the
+# draft-day sheet (S83). Both profiles below are placeholders -- replace the
+# TODO values with the leagues actually being drafted, then flip `real: true`.
+# `pipeline.config.require_real_profiles()` raises until at least one is real.
+
+active_profiles:
+  - id: home_league_half_ppr_12
+    real: false                 # TODO: set true once the values below are real
+    label: "PLACEHOLDER - half PPR, 12 team, 1QB"
+    teams: 12
+    draft_date: "TODO"          # e.g. 2026-08-24 -- gates S31.2 survival + S36.2
+    draft_slot: "TODO"          # e.g. 7, or `unknown`
+    scoring:
+      pass_td: 4
+      pass_yd: 0.04
+      interception: -2
+      fumble_lost: -2
+      rush_yd: 0.10
+      rush_td: 6
+      reception: 0.5
+      receiving_yd: 0.10
+      receiving_td: 6
+      two_point_conversion: 2
+      special_teams_td: 6
+    starters:
+      QB: 1
+      RB: 2
+      WR: 3
+      TE: 1
+      FLEX: 1
+    flex_eligible: [RB, WR, TE]
+    bench: 6
+
+  - id: work_league_superflex_10
+    real: false                 # TODO
+    label: "PLACEHOLDER - full PPR, 10 team, superflex"
+    teams: 10
+    draft_date: "TODO"
+    draft_slot: "TODO"
+    scoring:
+      pass_td: 4
+      pass_yd: 0.04
+      interception: -2
+      fumble_lost: -2
+      rush_yd: 0.10
+      rush_td: 6
+      reception: 1.0
+      receiving_yd: 0.10
+      receiving_td: 6
+      two_point_conversion: 2
+      special_teams_td: 6
+    starters:
+      QB: 1
+      RB: 2
+      WR: 2
+      TE: 1
+      FLEX: 1
+      SUPERFLEX: 1
+    flex_eligible: [RB, WR, TE]
+    superflex_eligible: [QB, RB, WR, TE]
+    bench: 6
+
+# ADP capture formats (S84). Deliberately a SUPERSET of the profiles above:
+# the archival job's value expires daily, so it captures every plausible
+# format now rather than waiting for the real profiles to be encoded.
+# Narrow this once `active_profiles` is real if the request volume matters.
+adp_capture:
+  - {format: standard, teams: 12}
+  - {format: half-ppr, teams: 12}
+  - {format: ppr, teams: 12}
+  - {format: half-ppr, teams: 10}
+  - {format: ppr, teams: 10}
+  - {format: 2qb, teams: 12}

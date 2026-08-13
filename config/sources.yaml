@@ -1,0 +1,102 @@
+# Source / license registry (S46).
+# Technical registry, not legal advice. Review current source terms before
+# any public or commercial distribution.
+
+sources:
+  nflverse:
+    url: https://github.com/nflverse/nflverse-data
+    docs: https://nflreadpy.nflverse.com/
+    asset_base: https://github.com/nflverse/nflverse-data/releases/download
+    purpose:
+      - player_week
+      - player_season
+      - team_season
+      - rosters
+      - snap_counts
+      - depth_charts
+      - injuries
+      - draft_picks
+      - player_id_crosswalk
+    license: CC-BY-4.0
+    attribution_required: true
+    attribution: "Data from nflverse (nflverse-data), CC-BY-4.0."
+    notes: >
+      Component datasets carry their own terms. Participation data 2023+ comes
+      from FTN Data and carries CC-BY-SA attribution requirements -- it is NOT
+      ingested in this chunk. Full routes-run history is NOT available here;
+      use target share / snap share / air-yard share instead (S10A).
+
+  nfldata_schedules:
+    url: https://github.com/nflverse/nfldata
+    asset: https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv
+    purpose:
+      - schedules
+      - bye_weeks
+    license: CC-BY-4.0
+    attribution_required: true
+
+  fantasy_football_calculator:
+    url: https://help.fantasyfootballcalculator.com/article/42-adp-rest-api
+    api_base: https://fantasyfootballcalculator.com/api/v1/adp
+    purpose:
+      - historical_adp
+      - current_adp
+      - intra_summer_adp_archive
+    license: free_personal_and_commercial_with_attribution
+    attribution_required: true
+    attribution: "ADP data courtesy of Fantasy Football Calculator."
+    update_frequency: daily
+    notes: >
+      ADP represents the FFC mock-draft population, not the whole market.
+      UNRESOLVED (S31.1): whether the response exposes a pick distribution
+      (stdev / percentiles / n_drafts) or only a mean. The archival job stores
+      the raw payload unmodified so this is answered from data, not guesswork.
+      NOT REACHABLE from the Claude Code sandbox (403 at CONNECT) -- the
+      capture runs on a GitHub Actions runner.
+
+  projection_csv:
+    url: manual
+    purpose:
+      - current_season_projections
+    license: provider_specific
+    attribution_required: true
+    notes: >
+      S11 option 1B manual-import fallback. Drop a provider export in
+      data/raw/projections/ and declare its column mapping under
+      `projection_providers` below. One row per provider per player -- never
+      average providers, cross-provider dispersion is the only available proxy
+      for projection uncertainty (S38.1).
+
+  sleeper:
+    url: https://docs.sleeper.com/
+    purpose:
+      - optional_raw_draft_picks
+    commercial_use: contact_provider
+    status: deferred
+    notes: >
+      S10D. Corpus-acquisition problem unsolved and permitted-access path
+      undefined. Also blocked from the sandbox. Not ingested.
+
+  fantasypros_api:
+    url: https://www.fantasypros.com/
+    purpose:
+      - expert_consensus_rankings
+      - projections
+    status: deferred
+    notes: >
+      Requires FANTASYPROS_API_KEY; blocked from the sandbox. When added:
+      read the key from the environment, never log or persist it, persist raw
+      payloads, record endpoint metadata, fail cleanly to projection_csv.
+
+# Column mappings for manual projection imports (S11 option 1B).
+# Add one block per provider export you actually drop in data/raw/projections/.
+projection_providers: {}
+#   fantasypros_2026_08:
+#     provider_id: fantasypros
+#     file: data/raw/projections/fp_2026_week0.csv
+#     name_col: player_name
+#     team_col: team
+#     position_col: position
+#     stat_map:
+#       pass_yds: passing_yards
+#       pass_td: passing_tds

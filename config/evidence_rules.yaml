@@ -1,0 +1,58 @@
+# Evidence grading rules (S3.1).
+#
+# Grades are assigned BY CODE from these thresholds. No manual grade
+# assignment anywhere in the codebase. No post-hoc threshold adjustment --
+# changing a threshold requires a new methodology_version and an update-tracker
+# entry (S26) stating that the rule changed and why.
+#
+# This file is committed BEFORE any analysis exists. That is its entire
+# purpose: the researcher must not be able to set thresholds while looking at
+# results. Nothing reads it yet; the grading engine arrives in the offseason
+# build (S79 Step 4).
+#
+# Expected distribution for a mature edition: roughly one to three Grade-A
+# signals, a handful of B, and a long tail of C/D/F/U. Six or more Grade-A
+# signals should be treated as evidence of a bug in the grading code or a
+# threshold loosened after seeing results.
+
+evidence_rules:
+  version: 1.0.0
+  committed: 2026-08-13
+
+  A:
+    min_analysis_n: 150
+    min_holdout_n: 40
+    fdr_q_max: 0.05                  # after S5.2 correction
+    holdout_ci_excludes_null: true
+    min_absolute_effect_pp: 5.0      # binary outcomes
+    min_standardized_effect: 0.15    # continuous outcomes
+    definition_stability: 3_of_4     # S22.1 outcome-definition variants
+    adp_incremental: positive_out_of_sample   # S36
+
+  B:
+    min_analysis_n: 100
+    min_holdout_n: 25
+    fdr_q_max: 0.10
+    holdout_direction_retained: true  # CI may include null
+    min_absolute_effect_pp: 3.0
+    min_standardized_effect: 0.10
+    definition_stability: 3_of_4
+    adp_incremental: non_negative_out_of_sample
+
+  C:
+    min_analysis_n: 50
+    nominal_p_max: 0.05              # pre-correction
+    holdout_direction_retained_or_untestable: true
+    definition_stability: 2_of_4
+
+  D:
+    requires: exploratory_only
+    note: fails holdout, or never tested prospectively, or secondary outcome (S5.2)
+
+  F:
+    requires: adequately_powered_null_or_sign_reversal
+    note: preserve permanently in the failed-signal archive (S31.7)
+
+  U:
+    requires: mde_exceeds_plausible_effect   # S5.1
+    note: never assigned a results-based grade

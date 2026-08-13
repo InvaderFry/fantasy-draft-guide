@@ -1,0 +1,118 @@
+# Research question registry (S68).
+#
+# A question is not researched until every field below is filled in. Two gates
+# are load-bearing:
+#   - decision-value gate (S2.3): if `decision_change` cannot be written in one
+#     concrete sentence, the question is not built, no matter how interesting.
+#   - power gate (S5.1): if mde_pp > plausible_effect_pp, mark UNANSWERABLE and
+#     do not build the chapter.
+# Every question carries a `kill_rule`. Without one an underpowered chapter
+# absorbs unbounded time and then gets graded C rather than abandoned.
+#
+# STATUS OF THIS FILE: seeded with the three S88 Week 2 analyses only, plus the
+# S31.1 source question that must be resolved in Week 1. The full registry and
+# the feasibility pass belong to the September-February build (S79 Step 0).
+# Power fields read TBD because the feasibility pass has not run; under S88
+# these three are DESCRIPTIVE ONLY and carry no evidence grade.
+
+questions:
+  - id: ffc_pick_distribution_available
+    question: >
+      Does the Fantasy Football Calculator ADP API expose an underlying pick
+      distribution (stdev, percentiles, n_drafts), or only a mean ADP per
+      player per snapshot? And is historical ADP retrievable as intra-summer
+      snapshots or only a single end-of-preseason value per season?
+    type: source_resolution           # not a statistical question
+    blocks:
+      - S19.4 opportunity cost
+      - S31.1 ADP uncertainty
+      - S31.2 survival probability
+      - S31.3 recency-weighted ADP
+      - S36.2 draft simulator
+      - S83 draft-day sheet
+    decision_change: >
+      Whether survival probability at each held pick is computed empirically
+      from the distribution or from the labelled normal approximation (S19.4).
+    resolution_method: >
+      Inspect the raw archived payload from the first adp-archive workflow run:
+      data/snapshots/<date>/ffc_adp_*.json. The adapter records which
+      distribution fields were present in the snapshot manifest notes.
+    status: OPEN                      # resolve in Week 1 -- answer goes here
+    answer: null
+
+  - id: team_scoring_regression
+    question: >
+      Do team touchdown totals regress toward a yardage/opportunity-implied
+      expectation from one season to the next, and by how much?
+    spec_section: S25
+    primary_outcome: next_season_offensive_tds
+    secondary_outcomes: []
+    family_size_expected: 1
+    decision_change: >
+      Fade the pass catchers and backs of teams whose prior-season TD total
+      badly exceeded their yardage-implied expectation; prefer the players on
+      teams below it, at equal ADP.
+    decision_frequency_est: 3.0       # picks per draft
+    decision_magnitude_est: 1.2       # points per affected pick
+    decision_value: HIGH
+    n_analysis_est: 448               # team-seasons 2012-2025
+    n_holdout_est: 128
+    plausible_effect_pp: TBD
+    mde_pp: TBD
+    power_status: EXPECTED_ANSWERABLE # best sample-to-effect ratio in the spec
+    effort_hours_est: 6
+    kill_rule: >
+      Stop if the prior-season TD residual explains under 2% of next-season
+      variance with the full 448 team-seasons.
+    status: scheduled_week2
+    claim_type_permitted: DESCRIPTIVE   # S88: no prescriptive claim from a two-week analysis
+    first_edition: null
+
+  - id: rb_dead_zone_bucket_rates
+    question: >
+      What were the observed high-end hit rates for running backs by ADP
+      bucket, and is there an ADP band where the rate falls below the rate for
+      wide receivers priced alongside them?
+    spec_section: S21.1
+    primary_outcome: rb_high_end
+    secondary_outcomes: []
+    family_size_expected: 1
+    decision_change: >
+      Whether to take the RB or the WR at picks inside the flagged band, when
+      both are on the board at similar ADP.
+    decision_frequency_est: 2.0
+    decision_magnitude_est: 1.0
+    decision_value: HIGH
+    n_analysis_est: 175               # RB, ADP 37-72, 2012-2025 (S5.1 estimate)
+    n_holdout_est: 52
+    plausible_effect_pp: TBD
+    mde_pp: TBD
+    power_status: LOW_POWER           # detects only large effects (S5.1)
+    effort_hours_est: 5
+    kill_rule: >
+      Observed rates by bucket only. No modelling, no evidence grade, no
+      exception research -- the sample will not support it in this window (S88).
+    status: scheduled_week2
+    claim_type_permitted: DESCRIPTIVE
+    first_edition: null
+
+  - id: tiers_and_replacement_level
+    question: >
+      Where do the tier breaks fall on the current board, and what is value
+      over replacement by position for the real league profiles?
+    spec_section: S19.3, S19.4
+    primary_outcome: null             # construction, not a hypothesis test
+    decision_change: >
+      Which position to take at each held pick, by comparing the drop to the
+      next tier at every position rather than raw projected points.
+    decision_frequency_est: 16.0      # every pick in the draft
+    decision_magnitude_est: 0.8
+    decision_value: HIGH
+    power_status: NOT_APPLICABLE
+    effort_hours_est: 8
+    kill_rule: >
+      Blocked, not killed, if no league profile is marked real: true --
+      replacement level is undefined without teams and starter counts (S14).
+    status: scheduled_week2
+    claim_type_permitted: DESCRIPTIVE
+    first_edition: null
