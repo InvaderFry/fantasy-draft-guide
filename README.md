@@ -23,9 +23,11 @@ Built here:
 | Snapshots | §65 | dated, hashed, immutable |
 | Tests | §51 | data, leakage, grading-config and snapshot checks |
 
-**Not** built here: research modules, evidence grading, the draft simulator,
-the draft-day sheet, and any publication layer. Those are §88 Weeks 2–3 and
-§79 Steps 4+.
+| Research modules | §88 Week 2 | §25 team scoring regression, §21.1 dead-zone bucket rates — both DESCRIPTIVE |
+
+**Not** built here: evidence grading, the draft simulator, the draft-day sheet,
+and any publication layer. Those are §88 Week 3 and §79 Steps 4+. §19.3 tiers is
+scaffolded and blocked; see below.
 
 ## Quick start
 
@@ -79,6 +81,50 @@ the renamed columns, so a 14-season build spans both shapes. Depth charts
 changed format too — the 2025+ files carry real publication timestamps, which
 is why preseason depth-chart rank is available for 2025 and null for earlier
 seasons, where the first chart is dated week 1 and postdates the draft.
+
+## What the two Week 2 analyses found
+
+Both are **DESCRIPTIVE** (§2.2). No evidence grades — §88 forbids them here and
+the grading engine is §79 Step 4. Run with `make research`; each writes an §16
+artifact to `artifacts/<edition>/methods/`.
+
+**§25 team scoring / TD regression — kill rule triggered, and the finding stands
+anyway.** Over 416 consecutive-season pairs, an opportunity model (plays,
+yards/play, red-zone trips, pass rate — deliberately *not* red-zone TD rate,
+which would absorb the residual) explains 78% of offensive touchdowns. Its
+residual explains **0.29%** of next-season TD totals, against the registry's 2%
+threshold, so the kill rule fires and is recorded as fired. But the same data
+shows the regression the decision actually rests on: Spearman **−0.52** between a
+team's offensive-TD z-score and its next-season change, teams at z ≥ +2 losing
+**17.7** touchdowns (n=10, all ten moved toward the mean). All nine §25 metrics
+regress, Spearman −0.50 to −0.62. The kill rule measures whether last year's luck
+predicts next year's *total*, which is mostly next year's opportunity — arguably
+the wrong quantity. Amending it after seeing the result is what §80 prohibits, so
+it is left triggered and the amendment is a decision for the registry.
+
+**§21.1 RB dead zone — the zone is there, and it opens earlier than the spec
+guessed.** Half-PPR 12-team, 2018–2025, 1,285 drafted player-seasons. Top-12 hit
+rate for running backs against the receivers priced alongside them:
+
+| ADP | RB | WR | difference | risk ratio |
+|---|---:|---:|---:|---:|
+| 1–12 | 0.63 | 0.81 | −17.1 pp | 0.79 |
+| 13–24 | 0.51 | 0.61 | −9.7 pp | 0.84 |
+| 25–36 | 0.23 | 0.40 | −17.4 pp | 0.57 |
+| **37–48** | **0.12** | **0.42** | **−30.5 pp** | **0.28** |
+| 49–60 | 0.09 | 0.23 | −13.1 pp | 0.42 |
+| 61–72 | 0.15 | 0.22 | −6.8 pp | 0.69 |
+
+The spec hypothesised ADP 37–72; the gap opens around pick 25 and is widest at
+37–48. Two limits worth carrying: n in the 37–72 band is **93**, not the 175 §5.1
+estimated, because FFC serves historical ADP only from **2018** and not from 2007
+as §10B states — 2015 and 2017 come back empty. And ~3% of drafted players carry
+no ID match and leave the denominator, skewing fringe, so each rate is a slight
+upper bound. The artifact carries both.
+
+**§19.3 tiers — blocked twice.** No league profile is marked `real: true`, *and*
+there is no projection source, so §19.3's `projected_points − replacement_points`
+has no left-hand side. Filling in a league profile alone will not unblock it.
 
 ## Three rules the code enforces rather than documents
 

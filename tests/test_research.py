@@ -140,3 +140,136 @@ def test_tiers_reports_both_blockers_rather_than_the_first():
 def test_tiers_refuses_to_run_while_blocked():
     with pytest.raises(tiers.BlockedError, match="blocked, not killed"):
         tiers.run()
+
+
+def _priced_frame() -> pl.DataFrame:
+    """Two RBs and two WRs per bucket across two seasons, with known outcomes."""
+    rows = []
+    for season in (2023, 2024):
+        for pick, position in enumerate(["RB", "RB", "WR", "WR"] * 3, start=1):
+            rows.append(
+                {
+                    "season": season,
+                    "player_id": f"{season}-{pick:03d}",
+                    "adp": float(pick),
+                    "position": position,
+                    "games": 17,
+                    # a clean gradient so positional rank is unambiguous
+                    "fantasy_points_ppr": float(400 - 10 * pick),
+                }
+            )
+    return pl.DataFrame(rows)
+
+
+def test_adp_buckets_are_twelve_picks_wide():
+    from research.running_back import dead_zone
+
+    assert dead_zone.BUCKET_SIZE == 12
+
+
+def test_kickers_and_defences_are_excluded_by_name_not_lost_in_a_join():
+    """They have an ADP and no scoring rules; dropping them silently reads as attrition."""
+    from research.running_back import dead_zone
+
+    assert "PK" in dead_zone.ADP_POSITIONS_OUT_OF_SCOPE
+    assert "DEF" in dead_zone.ADP_POSITIONS_OUT_OF_SCOPE
+
+
+def test_the_results_are_observed_rates_and_nothing_modelled():
+    """S88 forbids modelling here: no dead_zone_score, no fitted anything."""
+    from research.running_back import dead_zone
+
+    frame = pl.DataFrame(
+        {
+            "season": [2024] * 4,
+            "bucket": [1] * 4,
+            "bucket_label": ["1-12"] * 4,
+            "position": ["RB", "RB", "WR", "WR"],
+            "rb_high_end": [True, False, None, None],
+            "rb_usable": [True, True, None, None],
+            "wr_high_end": [None, None, True, False],
+            "wr_usable": [None, None, True, True],
+            "te_high_end": [None] * 4,
+            "fantasy_ppg_active": [12.0] * 4,
+            "games": [17] * 4,
+            "_priced_in_scope": [4] * 4,
+            "_unmatched_id": [0] * 4,
+            "_no_outcome_row": [0] * 4,
+        }
+    )
+    results = dead_zone.compute(frame)
+    assert set(results) == {
+        "n", "seasons", "season_list", "bucket_size", "coverage", "buckets", "rb_vs_wr"
+    }
+    assert results["buckets"][0]["rb_high_end"]["rate"] == 0.5
+
+
+def test_coverage_states_what_the_denominator_lost():
+    """Silent attrition biases every hit rate upward, so it is reported."""
+    from research.running_back import dead_zone
+
+    frame = pl.DataFrame(
+        {
+            "season": [2024] * 2,
+            "bucket": [1, 1],
+            "bucket_label": ["1-12"] * 2,
+            "position": ["RB", "RB"],
+            "rb_high_end": [True, False],
+            "rb_usable": [True, True],
+            "wr_high_end": [None] * 2,
+            "wr_usable": [None] * 2,
+            "te_high_end": [None] * 2,
+            "fantasy_ppg_active": [12.0] * 2,
+            "games": [17] * 2,
+            "_priced_in_scope": [10] * 2,
+            "_unmatched_id": [3] * 2,
+            "_no_outcome_row": [5] * 2,
+        }
+    )
+    coverage = dead_zone.compute(frame)["coverage"]
+    assert coverage["drafted_players_in_scope"] == 10
+    assert coverage["dropped_no_id_match"] == 3
+    assert coverage["analysed"] == 2
+    assert coverage["retained_share"] == 0.2
+
+
+def test_odds_ratio_is_none_when_neither_group_hit():
+    """A continuity correction would otherwise report an association off denominators."""
+    from research.running_back import dead_zone
+
+    frame = pl.DataFrame(
+        {
+            "bucket": [1] * 4,
+            "bucket_label": ["1-12"] * 4,
+            "position": ["RB", "RB", "WR", "WR"],
+            "rb_high_end": [False, False, None, None],
+            "wr_high_end": [None, None, False, False],
+            "fantasy_ppg_active": [5.0] * 4,
+            "games": [17] * 4,
+        }
+    )
+    result = dead_zone._compare(frame, 1)
+    assert result["odds_ratio"] is None
+    assert result["absolute_difference_pp"] == 0.0
+
+
+def test_a_rate_comparison_reports_every_field_s4_requires():
+    from research.running_back import dead_zone
+
+    frame = pl.DataFrame(
+        {
+            "bucket": [1] * 4,
+            "bucket_label": ["1-12"] * 4,
+            "position": ["RB", "RB", "WR", "WR"],
+            "rb_high_end": [True, False, None, None],
+            "wr_high_end": [None, None, True, True],
+            "fantasy_ppg_active": [10.0] * 4,
+            "games": [17] * 4,
+        }
+    )
+    result = dead_zone._compare(frame, 1)
+    for field_name in (
+        "rb_high_end_rate", "wr_high_end_rate", "absolute_difference_pp",
+        "risk_ratio", "odds_ratio", "rb_ci", "wr_ci", "n_rb", "n_wr",
+    ):
+        assert field_name in result, field_name

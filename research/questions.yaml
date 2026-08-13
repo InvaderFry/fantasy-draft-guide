@@ -97,7 +97,25 @@ questions:
     kill_rule: >
       Stop if the prior-season TD residual explains under 2% of next-season
       variance with the full 448 team-seasons.
-    status: scheduled_week2
+    kill_rule_outcome: >
+      TRIGGERED on 2026-08-13. 416 consecutive-season pairs. The opportunity
+      model explains 78% of offensive TDs, but its residual explains 0.29% of
+      next-season TD totals and 0.23% of next season's residual -- touchdown
+      overperformance does not persist at all.
+      The same data shows strong regression to the mean, which is what
+      decision_change actually turns on: Spearman -0.52 between a team's
+      offensive-TD z-score and its next-season change; teams at z >= +2 lost
+      17.7 TDs (n=10, all ten moved toward the mean), z +1..+2 lost 5.9, and
+      z -2..-1 gained 8.4. All nine S25 metrics regress, Spearman -0.50..-0.62.
+      Reading these together: the kill rule as written measures whether last
+      year's luck predicts next year's TOTAL, which is dominated by next year's
+      opportunity. It is arguably the wrong quantity for the decision. Changing
+      it now would be post-hoc, which S80 prohibits, so it is recorded as
+      triggered and the amendment is left as a decision requiring a new
+      methodology_version and a stated reason (S3.1, S26).
+    status: completed_week2
+    completed_on: 2026-08-13
+    artifact: artifacts/2026.08.13-r1/methods/team_scoring_regression.json
     claim_type_permitted: DESCRIPTIVE   # S88: no prescriptive claim from a two-week analysis
     first_edition: null
 
@@ -125,7 +143,28 @@ questions:
     kill_rule: >
       Observed rates by bucket only. No modelling, no evidence grade, no
       exception research -- the sample will not support it in this window (S88).
-    status: scheduled_week2
+    kill_rule_outcome: >
+      HONOURED. Observed rates only: no dead_zone_score, no robustness sweep,
+      no exception research, no grade.
+    n_analysis_actual: 93
+    n_analysis_note: >
+      93 RB seasons in the 37-72 band, against the 175 S5.1 estimated. The
+      shortfall is not a filtering mistake: Fantasy Football Calculator serves
+      historical ADP only from 2018, not from 2007 as S10B states, so the window
+      is 8 seasons rather than 14. Every bucket is correspondingly smaller than
+      the power note assumed.
+    finding: >
+      DESCRIPTIVE. Half-PPR 12-team, 2018-2025, 1,285 drafted player-seasons.
+      RB high-end (top-12) hit rate by ADP bucket against the WRs priced
+      alongside them: picks 1-12 RB 0.63 / WR 0.81; 13-24 0.51 / 0.61; 25-36
+      0.23 / 0.40; 37-48 0.12 / 0.42; 49-60 0.09 / 0.23; 61-72 0.15 / 0.22.
+      The widest gap is picks 37-48, where the RB rate is 30.5 points lower and
+      the risk ratio is 0.28. The zone the spec hypothesised at ADP 37-72 shows
+      up in the observed rates, and it opens earlier than that -- from about
+      pick 25. No prescriptive claim is made from this (S2.2, S88).
+    status: completed_week2
+    completed_on: 2026-08-13
+    artifact: artifacts/2026.08.13-r1/methods/rb_dead_zone_bucket_rates.json
     claim_type_permitted: DESCRIPTIVE
     first_edition: null
 
@@ -146,6 +185,13 @@ questions:
     kill_rule: >
       Blocked, not killed, if no league profile is marked real: true --
       replacement level is undefined without teams and starter counts (S14).
-    status: scheduled_week2
+    kill_rule_outcome: >
+      BLOCKED, and by two things rather than one. No profile is marked
+      real: true, and there is no projection source at all -- S19.3's tier
+      metric is projected_points - replacement_points and
+      config/sources.yaml has an empty projection_providers map with the
+      FantasyPros API deferred. Encoding a league profile alone will not
+      unblock it. research/foundations/tiers.py reports both and refuses to run.
+    status: blocked_week2
     claim_type_permitted: DESCRIPTIVE
     first_edition: null
