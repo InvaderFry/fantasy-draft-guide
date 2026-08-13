@@ -86,7 +86,8 @@ TEAM_SEASON_COLUMNS = (
 
 # S13 adp_history
 ADP_HISTORY_COLUMNS = (
-    "season", "snapshot_date", "as_of", "source_as_of", "value_type",
+    "season", "snapshot_date", "as_of", "source_as_of",
+    "window_start", "window_end", "total_drafts", "value_type",
     "source", "format", "teams",
     "player_id", "source_player_id", "source_player_name", "position", "team",
     "bye", "adp", "position_adp", "sample_size_if_available",

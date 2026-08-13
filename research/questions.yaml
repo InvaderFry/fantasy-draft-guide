@@ -37,15 +37,41 @@ questions:
       Inspect the raw archived payload from the first adp-archive workflow run:
       data/snapshots/<date>/ffc_adp_*.json. The adapter records which
       distribution fields were present in the snapshot manifest notes.
-    status: OPEN                      # resolve in Week 1 -- answer goes here
-    answer: null
+    status: RESOLVED
+    resolved_on: 2026-08-13
+    answer: >
+      A mean and a spread, no percentiles. Every payload carries per player:
+      adp, stdev, high, low and times_drafted. There are no pick percentiles
+      and no per-pick histogram, so P(player available at pick N) cannot be
+      computed empirically. S19.4's labelled fallback applies --
+      P_available = 1 - Phi((next_pick - adp) / stdev) -- and every page built
+      on it must show that it is an approximation and record
+      opportunity_cost_method: normal_approximation in its S16 artifact.
+    answer_evidence: >
+      data/snapshots/2026-08-13/, 18 payloads across 6 formats and 3 seasons.
+      adp_history.distribution_availability() reports the fields per capture.
+    historical_availability: >
+      The year parameter works, but not back to 2007 as S10B states. 2025, 2020
+      and 2026 return all six configured formats; 2015 returns an empty player
+      list for half-ppr/12team. The usable window is bounded below somewhere
+      between 2015 and 2020 and is being bracketed.
+    intra_summer_history: >
+      Not retrievable. A historical season returns a single final-preseason
+      window -- 2025 comes back as 2025-08-25..2025-09-01, 2020 as
+      2020-08-30..2020-09-01 -- not a series across the summer. S31.3 recency
+      weighting is therefore only possible for seasons captured live, starting
+      with 2026.
+    window_semantics: >
+      An ADP figure is a rolling average, not a daily value, and the window
+      length varies with format volume: on 2026-08-13, ppr/12team covered 7
+      days and 3,577-draft 2qb/12team covered 30. adp_history carries
+      window_start, window_end and total_drafts so a weighting scheme can see
+      how stale a figure is.
     archive_gap: >
       The adp-archive workflow shipped pinned to a feature branch that was
-      subsequently merged, so it captured nothing before 2026-08-13. Those days
-      of intra-summer price movement do not exist and are not purchasable
-      retroactively (S84). The series starts at the first successful run; any
-      recency weighting (S31.3) must treat the archive as beginning then rather
-      than at the start of the summer.
+      subsequently merged. Its first successful capture is 2026-08-13; there is
+      no live capture before that date and those days of intra-summer price
+      movement are not purchasable retroactively (S84).
 
   - id: team_scoring_regression
     question: >

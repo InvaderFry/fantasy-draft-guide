@@ -72,8 +72,14 @@ def build(root: Path = SNAPSHOT_DIR, *, crosswalk: pl.DataFrame | None = None) -
     xwalk = crosswalk if crosswalk is not None else load_player_ids()
     frame = match_external(frame, crosswalk=xwalk).rename({"gsis_id": "player_id"})
     frame = frame.with_columns(
-        pl.col("adp").rank("ordinal").over(["snapshot_date", "format", "teams", "position"])
-        .cast(pl.Int64).alias("position_adp")
+        # `season` belongs in the partition: a backfill captures many seasons on
+        # one snapshot_date, and without it 2015 and 2025 interleave into a
+        # single positional ranking.
+        pl.col("adp")
+        .rank("ordinal")
+        .over(["season", "snapshot_date", "format", "teams", "position"])
+        .cast(pl.Int64)
+        .alias("position_adp")
     )
     assert_as_of_present(frame, "adp_history")
     return frame
@@ -93,7 +99,8 @@ def distribution_availability(root: Path = SNAPSHOT_DIR) -> dict[str, list[str]]
 def _empty_schema() -> dict[str, pl.DataType]:
     return {
         "season": pl.Int64, "snapshot_date": pl.Date, "as_of": pl.Date,
-        "source_as_of": pl.Date, "source": pl.String,
+        "source_as_of": pl.Date, "window_start": pl.Date, "window_end": pl.Date,
+        "total_drafts": pl.Int64, "source": pl.String,
         "format": pl.String, "teams": pl.Int64, "player_id": pl.String,
         "source_player_id": pl.String, "source_player_name": pl.String,
         "position": pl.String, "team": pl.String, "bye": pl.Int64, "adp": pl.Float64,
