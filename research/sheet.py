@@ -323,6 +323,27 @@ def _undrawn_orientation(results: dict[str, Any], profile: dict[str, Any]) -> st
     )
 
 
+def adp_capture_date(artifacts: dict[str, Any], profile: dict[str, Any] | None) -> str | None:
+    """The date of the ADP capture this sheet is priced from (S84).
+
+    The one date on the page that can go stale. `generated` cannot: it is written
+    by the run that writes the page, so it stays reassuringly current even when
+    the pipeline has broken upstream of it and the board underneath is weeks old.
+    A drafter reading a sheet at the table has no other way to tell.
+
+    Read off the survival artifact, which already records it
+    (research/foundations/survival.py). None when there is no survival artifact
+    to read it from, which the header renders as unknown rather than as today.
+    """
+    if profile is None:
+        return None
+    art = artifacts.get(f"{survival_mod.METHOD_ID}__{profile['id']}")
+    if art is None:
+        return None
+    captured = (art.get("primary_results") or {}).get("adp_snapshot_date")
+    return str(captured) if captured else None
+
+
 SECTIONS = (
     ("TIERS", "S19.3"),
     ("TARGETS", "S27"),
@@ -356,6 +377,14 @@ def render(
     title = profile["label"] if profile else "no league profile encoded"
     if profile and slot is not None:
         title = f"{title} \u00b7 slot {slot}"
+    generated = dt.datetime.now(dt.UTC).date().isoformat()
+    captured = adp_capture_date(arts, profile)
+    priced = (
+        "ADP not priced"
+        if captured is None
+        else f"priced from the ADP capture of <strong>{html.escape(captured)}</strong>"
+        + ("" if captured == generated else " &mdash; not today&rsquo;s")
+    )
     header_note = (
         ""
         if profile
@@ -375,7 +404,8 @@ def render(
     page = _PAGE.format(
         title=html.escape(title),
         edition=html.escape(edition),
-        generated=dt.datetime.now(dt.UTC).date().isoformat(),
+        generated=generated,
+        priced=priced,
         header_note=header_note,
         sections=sections_html,
     )
@@ -524,9 +554,30 @@ def write_index(
             )
         blocks.append(f"<section><h3>{label}</h3>{body}</section>")
 
+    generated = dt.datetime.now(dt.UTC).date().isoformat()
+    arts = load_artifacts(edition, directory.parent.parent)
+    captured = next(
+        (d for d in (adp_capture_date(arts, p) for p in profiles) if d), None
+    )
+    priced = (
+        "ADP not priced"
+        if captured is None
+        else f"priced from the ADP capture of <strong>{html.escape(captured)}</strong>"
+    )
+    stale = (
+        ""
+        if captured in (None, generated)
+        else (
+            '<p class="stale">These sheets are priced from an older capture than '
+            "today. The daily refresh has not run, so the board below is not the "
+            "board the market is on.</p>"
+        )
+    )
     page = _INDEX.format(
         edition=html.escape(edition),
-        generated=dt.datetime.now(dt.UTC).date().isoformat(),
+        generated=generated,
+        priced=priced,
+        stale=stale,
         blocks="".join(blocks),
     )
     assert_sheet_constraints(page)
@@ -567,8 +618,8 @@ _PAGE = """<!doctype html>
             border-top: 1px solid #ddd; padding-top: 3px; }}
 </style>
 <h1>Draft sheet <span class="sub">-- {title}</span></h1>
-<p class="sub">Edition {edition} &middot; generated {generated} &middot; generated from the
-S16 method artifacts, never edited by hand (S83).</p>
+<p class="sub">Edition {edition} &middot; generated {generated} &middot; {priced}.
+Generated from the S16 method artifacts, never edited by hand (S83).</p>
 {header_note}
 {sections}
 <footer>
@@ -598,11 +649,14 @@ _INDEX = """<!doctype html>
             border: 1.5px solid #111; border-radius: 6px; text-decoration: none;
             color: #111; font-weight: 700; font-size: 17px; }}
   a.slot.wide {{ width: 100%; }}
+  p.stale {{ border: 1.5px solid #a11; color: #a11; border-radius: 6px;
+             padding: 8px 10px; font-weight: 600; }}
   footer {{ margin-top: 22px; color: #888; font-size: 12px;
             border-top: 1px solid #ddd; padding-top: 6px; }}
 </style>
 <h1>Draft sheets</h1>
-<p class="sub">Edition {edition} &middot; generated {generated}</p>
+<p class="sub">Edition {edition} &middot; generated {generated} &middot; {priced}</p>
+{stale}
 <p>The draft order is drawn about an hour before the draft. Every seat already has
 its own complete sheet, so there is nothing to run when it is: open yours.</p>
 {blocks}

@@ -16,7 +16,7 @@ Built here:
 | Piece | Spec | Notes |
 |---|---|---|
 | Config gates | §14, §6.1, §46, §15, §3.1, §68 | league profiles, decision dates, sources, outcomes, evidence rules, question registry |
-| ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires |
+| ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires — followed by a second job that re-renders the sheets from it |
 | nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play, schedules |
 | ID normalization | §12 | `gsis_id` canonical, crosswalk + labelled name matching |
 | Canonical tables | §13 | `player_week`, `player_season` (+ outcomes), `team_season`, `adp_history`, `projection_snapshot` |
@@ -224,8 +224,11 @@ confident sheets.
 
 ### What to do at the draft
 
+**`artifacts/2026-draft/sheets/index.html`** — that is the whole procedure. Open
+it, tap the seat you drew, print or read that page.
+
 ```
-artifacts/<edition>/sheets/
+artifacts/2026-draft/sheets/
   index.html                  <- open this
   half_ppr_12__slot01.html    <- ...it links to these
   half_ppr_12__slot02.html
@@ -235,13 +238,22 @@ artifacts/<edition>/sheets/
   ...
 ```
 
-Open `index.html`, tap the seat you drew, print or read that page. Nothing is
-rebuilt, nothing needs a network, and nothing needs the laptop to be working —
-§8 requires the output to work offline, and an hour before a draft is exactly
-when a build step fails. `artifacts/` is committed, so the sheets are reachable
+Nothing is rebuilt, nothing needs a network, and nothing needs the laptop to be
+working — §8 requires the output to work offline, and an hour before a draft is
+exactly when a build step fails. `artifacts/` is committed, so the sheets open
 from a phone through GitHub with no local checkout at all.
 
-If a machine *is* to hand and you want the freshest ADP capture behind one seat:
+`2026-draft` is a **fixed edition, regenerated in place**, so that address never
+changes and can be bookmarked. The dated editions (`2026.08.13-r1`, ...) are the
+archival scheme and are untouched by the refresh.
+
+**The sheets refresh themselves.** The archive workflow's second job rebuilds the
+market-dependent research and re-renders all 26 sheets after every capture, so
+what is committed is never more than a day behind the board. Nothing needs to be
+run by hand at any point, which matters precisely because the draft dates are
+unknown — there is no date on which anyone would remember to.
+
+If a machine *is* to hand and you want one seat re-rendered immediately:
 
 ```bash
 make sheet SLOT=7            # rewrites that seat only, leaves the other 11 alone
@@ -249,6 +261,19 @@ make sheet SLOT=7            # rewrites that seat only, leaves the other 11 alon
 
 Set `draft_slot: 7` in the profile instead if the order is drawn well in advance:
 the league then gets a single `half_ppr_12.html` and no per-slot fan-out.
+
+### The date to look at on the sheet
+
+Every page carries two dates, and they are not the same thing:
+
+> Edition 2026-draft · generated 2026-08-14 · priced from the ADP capture of **2026-08-14**.
+
+`generated` is written by the run that writes the page, so it stays reassuringly
+current even if the pipeline broke upstream and the board underneath is weeks
+old. **The capture date is the one worth reading.** When the two differ the sheet
+says `— not today's`, and `index.html` prints a red banner saying the daily
+refresh has not run. A sheet that says `ADP not priced` was rendered with no
+survival artifact behind it at all.
 
 ### Checking it is still one page
 
@@ -259,7 +284,7 @@ printed on two. `MAX_TIER_PLAYERS` in `research/sheet.py` is now 16, measured
 rather than guessed. Re-measure before raising it:
 
 ```bash
-for f in artifacts/<edition>/sheets/*.html; do
+for f in artifacts/2026-draft/sheets/*.html; do
   chromium --headless --no-pdf-header-footer --print-to-pdf="/tmp/$(basename $f).pdf" "file://$PWD/$f"
 done   # every PDF must be 1 page
 ```
@@ -367,6 +392,7 @@ data/snapshots/  dated immutable captures with hashes (COMMITTED — the archive
 data/processed/  canonical parquet tables (gitignored, rebuildable)
 pipeline/    ingest, normalize, features, scoring, snapshot, cli
 research/    questions.yaml, method contract, foundations/ teams/ running_back/, sheet.py
-artifacts/   dated editions: methods/*.json (S16) and sheets/*.html (S83)
+artifacts/   dated editions: methods/*.json (S16) and sheets/*.html (S83),
+             plus 2026-draft/ -- the live board, refreshed daily in place
 tests/       data, leakage, config and snapshot tests
 ```

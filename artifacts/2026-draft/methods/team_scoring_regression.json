@@ -1,0 +1,1018 @@
+{
+  "method_id": "team_scoring_regression",
+  "title": "Team scoring and touchdown regression",
+  "version": "1.0.0",
+  "claim_type": "DESCRIPTIVE",
+  "spec_sections": [
+    "S25",
+    "S19.1",
+    "S24"
+  ],
+  "generated_on": "2026-08-13",
+  "population": {
+    "table": "team_season",
+    "seasons": [
+      2012,
+      2025
+    ],
+    "team_seasons": 448,
+    "consecutive_season_pairs": 416
+  },
+  "outcome": "next_season_offensive_tds",
+  "sample_size": 416,
+  "primary_results": {
+    "td_residual": {
+      "n": 416,
+      "expectation_model_r2": 0.7805,
+      "r2_residual_to_next_season_tds": 0.0029,
+      "r2_residual_to_next_season_residual": 0.0023,
+      "spearman_residual_to_next_change": -0.3569,
+      "mean_td_change_after_overperformance": {
+        "mean": -2.882,
+        "ci_low": -4.382,
+        "ci_high": -1.382,
+        "n": 203
+      },
+      "kill_rule": "stop if the prior-season TD residual explains under 2% of next-season variance",
+      "kill_rule_triggered": true
+    },
+    "regression_to_mean": [
+      {
+        "metric": "offensive_tds",
+        "n": 416,
+        "spearman_z_to_change": -0.5176,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 1,
+            "mean_next_change": 24.0,
+            "ci_low": NaN,
+            "ci_high": NaN,
+            "share_moving_toward_mean": 1.0
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 70,
+            "mean_next_change": 8.4,
+            "ci_low": 6.3541,
+            "ci_high": 10.4459,
+            "share_moving_toward_mean": 0.8143
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 67,
+            "mean_next_change": 3.8806,
+            "ci_low": 1.8533,
+            "ci_high": 5.9079,
+            "share_moving_toward_mean": 0.6119
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 154,
+            "mean_next_change": 0.7792,
+            "ci_low": -0.6688,
+            "ci_high": 2.2272,
+            "share_moving_toward_mean": 0.6169
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 51,
+            "mean_next_change": -5.4902,
+            "ci_low": -8.0673,
+            "ci_high": -2.9131,
+            "share_moving_toward_mean": 0.7451
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 63,
+            "mean_next_change": -5.9048,
+            "ci_low": -8.6336,
+            "ci_high": -3.176,
+            "share_moving_toward_mean": 0.7302
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 10,
+            "mean_next_change": -17.7,
+            "ci_low": -21.0828,
+            "ci_high": -14.3172,
+            "share_moving_toward_mean": 1.0
+          }
+        ]
+      },
+      {
+        "metric": "pass_td_share",
+        "n": 416,
+        "spearman_z_to_change": -0.6037,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 8,
+            "mean_next_change": 0.1831,
+            "ci_low": 0.106,
+            "ci_high": 0.2602,
+            "share_moving_toward_mean": 0.875
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 57,
+            "mean_next_change": 0.1088,
+            "ci_low": 0.0823,
+            "ci_high": 0.1352,
+            "share_moving_toward_mean": 0.8772
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 72,
+            "mean_next_change": 0.0381,
+            "ci_low": 0.0141,
+            "ci_high": 0.062,
+            "share_moving_toward_mean": 0.6111
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 145,
+            "mean_next_change": 0.005,
+            "ci_low": -0.0116,
+            "ci_high": 0.0217,
+            "share_moving_toward_mean": 0.5793
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 57,
+            "mean_next_change": -0.0678,
+            "ci_low": -0.0912,
+            "ci_high": -0.0443,
+            "share_moving_toward_mean": 0.7719
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 73,
+            "mean_next_change": -0.1014,
+            "ci_low": -0.1211,
+            "ci_high": -0.0817,
+            "share_moving_toward_mean": 0.9452
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 4,
+            "mean_next_change": -0.2155,
+            "ci_low": -0.38,
+            "ci_high": -0.0511,
+            "share_moving_toward_mean": 1.0
+          }
+        ]
+      },
+      {
+        "metric": "rush_td_share",
+        "n": 416,
+        "spearman_z_to_change": -0.6038,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 4,
+            "mean_next_change": 0.2155,
+            "ci_low": 0.0511,
+            "ci_high": 0.38,
+            "share_moving_toward_mean": 1.0
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 73,
+            "mean_next_change": 0.1014,
+            "ci_low": 0.0817,
+            "ci_high": 0.1211,
+            "share_moving_toward_mean": 0.9452
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 57,
+            "mean_next_change": 0.0678,
+            "ci_low": 0.0443,
+            "ci_high": 0.0912,
+            "share_moving_toward_mean": 0.7719
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 145,
+            "mean_next_change": -0.005,
+            "ci_low": -0.0217,
+            "ci_high": 0.0116,
+            "share_moving_toward_mean": 0.5793
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 72,
+            "mean_next_change": -0.0381,
+            "ci_low": -0.062,
+            "ci_high": -0.0141,
+            "share_moving_toward_mean": 0.6111
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 57,
+            "mean_next_change": -0.1088,
+            "ci_low": -0.1352,
+            "ci_high": -0.0823,
+            "share_moving_toward_mean": 0.8772
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 8,
+            "mean_next_change": -0.1831,
+            "ci_low": -0.2602,
+            "ci_high": -0.106,
+            "share_moving_toward_mean": 0.875
+          }
+        ]
+      },
+      {
+        "metric": "plays_per_game",
+        "n": 416,
+        "spearman_z_to_change": -0.5713,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 9,
+            "mean_next_change": 4.8693,
+            "ci_low": 2.6603,
+            "ci_high": 7.0783,
+            "share_moving_toward_mean": 1.0
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 57,
+            "mean_next_change": 2.223,
+            "ci_low": 1.5354,
+            "ci_high": 2.9106,
+            "share_moving_toward_mean": 0.8246
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 59,
+            "mean_next_change": 1.5257,
+            "ci_low": 0.8415,
+            "ci_high": 2.21,
+            "share_moving_toward_mean": 0.678
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 163,
+            "mean_next_change": -0.1926,
+            "ci_low": -0.6318,
+            "ci_high": 0.2466,
+            "share_moving_toward_mean": 0.6074
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 57,
+            "mean_next_change": -1.6463,
+            "ci_low": -2.463,
+            "ci_high": -0.8297,
+            "share_moving_toward_mean": 0.6842
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 62,
+            "mean_next_change": -3.0366,
+            "ci_low": -3.7634,
+            "ci_high": -2.3099,
+            "share_moving_toward_mean": 0.8548
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 9,
+            "mean_next_change": -4.1924,
+            "ci_low": -5.3852,
+            "ci_high": -2.9996,
+            "share_moving_toward_mean": 1.0
+          }
+        ]
+      },
+      {
+        "metric": "pass_rate",
+        "n": 416,
+        "spearman_z_to_change": -0.5664,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 15,
+            "mean_next_change": 0.0454,
+            "ci_low": 0.0242,
+            "ci_high": 0.0665,
+            "share_moving_toward_mean": 0.9333
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 55,
+            "mean_next_change": 0.0429,
+            "ci_low": 0.0321,
+            "ci_high": 0.0537,
+            "share_moving_toward_mean": 0.8545
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 41,
+            "mean_next_change": 0.0222,
+            "ci_low": 0.0081,
+            "ci_high": 0.0362,
+            "share_moving_toward_mean": 0.6341
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 177,
+            "mean_next_change": 0.0018,
+            "ci_low": -0.0045,
+            "ci_high": 0.008,
+            "share_moving_toward_mean": 0.6384
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 62,
+            "mean_next_change": -0.0343,
+            "ci_low": -0.0458,
+            "ci_high": -0.0229,
+            "share_moving_toward_mean": 0.7581
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 64,
+            "mean_next_change": -0.0381,
+            "ci_low": -0.049,
+            "ci_high": -0.0271,
+            "share_moving_toward_mean": 0.8125
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 2,
+            "mean_next_change": -0.0654,
+            "ci_low": -0.2071,
+            "ci_high": 0.0764,
+            "share_moving_toward_mean": 0.5
+          }
+        ]
+      },
+      {
+        "metric": "neutral_pass_rate",
+        "n": 416,
+        "spearman_z_to_change": -0.5139,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 11,
+            "mean_next_change": 0.0917,
+            "ci_low": 0.0605,
+            "ci_high": 0.123,
+            "share_moving_toward_mean": 0.9091
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 55,
+            "mean_next_change": 0.0399,
+            "ci_low": 0.0274,
+            "ci_high": 0.0523,
+            "share_moving_toward_mean": 0.8364
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 59,
+            "mean_next_change": 0.0104,
+            "ci_low": -0.001,
+            "ci_high": 0.0218,
+            "share_moving_toward_mean": 0.6102
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 151,
+            "mean_next_change": -0.0025,
+            "ci_low": -0.0088,
+            "ci_high": 0.0037,
+            "share_moving_toward_mean": 0.5364
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 78,
+            "mean_next_change": -0.0201,
+            "ci_low": -0.0302,
+            "ci_high": -0.01,
+            "share_moving_toward_mean": 0.6538
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 57,
+            "mean_next_change": -0.0338,
+            "ci_low": -0.0447,
+            "ci_high": -0.0229,
+            "share_moving_toward_mean": 0.807
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 5,
+            "mean_next_change": -0.0773,
+            "ci_low": -0.1213,
+            "ci_high": -0.0333,
+            "share_moving_toward_mean": 1.0
+          }
+        ]
+      },
+      {
+        "metric": "red_zone_td_rate",
+        "n": 416,
+        "spearman_z_to_change": -0.6006,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 10,
+            "mean_next_change": 0.2,
+            "ci_low": 0.1445,
+            "ci_high": 0.2555,
+            "share_moving_toward_mean": 1.0
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 48,
+            "mean_next_change": 0.0873,
+            "ci_low": 0.0629,
+            "ci_high": 0.1118,
+            "share_moving_toward_mean": 0.8333
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 67,
+            "mean_next_change": 0.0466,
+            "ci_low": 0.0293,
+            "ci_high": 0.0638,
+            "share_moving_toward_mean": 0.7463
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 167,
+            "mean_next_change": 0.0058,
+            "ci_low": -0.0059,
+            "ci_high": 0.0174,
+            "share_moving_toward_mean": 0.6228
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 57,
+            "mean_next_change": -0.0343,
+            "ci_low": -0.0572,
+            "ci_high": -0.0114,
+            "share_moving_toward_mean": 0.7018
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 58,
+            "mean_next_change": -0.095,
+            "ci_low": -0.1187,
+            "ci_high": -0.0713,
+            "share_moving_toward_mean": 0.8621
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 9,
+            "mean_next_change": -0.168,
+            "ci_low": -0.2212,
+            "ci_high": -0.1149,
+            "share_moving_toward_mean": 0.8889
+          }
+        ]
+      },
+      {
+        "metric": "turnover_rate",
+        "n": 416,
+        "spearman_z_to_change": -0.6213,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 2,
+            "mean_next_change": 0.0057,
+            "ci_low": -0.0015,
+            "ci_high": 0.0128,
+            "share_moving_toward_mean": 1.0
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 62,
+            "mean_next_change": 0.0057,
+            "ci_low": 0.0045,
+            "ci_high": 0.0068,
+            "share_moving_toward_mean": 0.871
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 76,
+            "mean_next_change": 0.0032,
+            "ci_low": 0.0019,
+            "ci_high": 0.0045,
+            "share_moving_toward_mean": 0.6711
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 154,
+            "mean_next_change": 0.0005,
+            "ci_low": -0.0004,
+            "ci_high": 0.0013,
+            "share_moving_toward_mean": 0.4805
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 53,
+            "mean_next_change": -0.0048,
+            "ci_low": -0.0064,
+            "ci_high": -0.0033,
+            "share_moving_toward_mean": 0.8113
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 60,
+            "mean_next_change": -0.0076,
+            "ci_low": -0.0089,
+            "ci_high": -0.0063,
+            "share_moving_toward_mean": 0.9667
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 9,
+            "mean_next_change": -0.0146,
+            "ci_low": -0.0193,
+            "ci_high": -0.0099,
+            "share_moving_toward_mean": 0.8889
+          }
+        ]
+      },
+      {
+        "metric": "yards_per_play",
+        "n": 416,
+        "spearman_z_to_change": -0.5,
+        "buckets": [
+          {
+            "z_from": -99.0,
+            "z_to": -2.0,
+            "n": 5,
+            "mean_next_change": 1.1,
+            "ci_low": 0.8777,
+            "ci_high": 1.3222,
+            "share_moving_toward_mean": 1.0
+          },
+          {
+            "z_from": -2.0,
+            "z_to": -1.0,
+            "n": 61,
+            "mean_next_change": 0.3876,
+            "ci_low": 0.2748,
+            "ci_high": 0.5004,
+            "share_moving_toward_mean": 0.7869
+          },
+          {
+            "z_from": -1.0,
+            "z_to": -0.5,
+            "n": 75,
+            "mean_next_change": 0.136,
+            "ci_low": 0.039,
+            "ci_high": 0.233,
+            "share_moving_toward_mean": 0.5733
+          },
+          {
+            "z_from": -0.5,
+            "z_to": 0.5,
+            "n": 144,
+            "mean_next_change": -0.0006,
+            "ci_low": -0.0791,
+            "ci_high": 0.0778,
+            "share_moving_toward_mean": 0.5972
+          },
+          {
+            "z_from": 0.5,
+            "z_to": 1.0,
+            "n": 60,
+            "mean_next_change": -0.2588,
+            "ci_low": -0.3645,
+            "ci_high": -0.1532,
+            "share_moving_toward_mean": 0.75
+          },
+          {
+            "z_from": 1.0,
+            "z_to": 2.0,
+            "n": 59,
+            "mean_next_change": -0.3029,
+            "ci_low": -0.4406,
+            "ci_high": -0.1652,
+            "share_moving_toward_mean": 0.6949
+          },
+          {
+            "z_from": 2.0,
+            "z_to": 99.0,
+            "n": 12,
+            "mean_next_change": -0.723,
+            "ci_low": -0.9185,
+            "ci_high": -0.5275,
+            "share_moving_toward_mean": 1.0
+          }
+        ]
+      }
+    ],
+    "current_extremes": {
+      "season": 2025,
+      "abs_z_at_least_1.5": [
+        {
+          "team": "NYJ",
+          "metric": "neutral_pass_rate",
+          "value": 0.4531,
+          "z": -2.563,
+          "direction": "below league"
+        },
+        {
+          "team": "ARI",
+          "metric": "pass_rate",
+          "value": 0.6596,
+          "z": 2.38,
+          "direction": "above league"
+        },
+        {
+          "team": "MIN",
+          "metric": "turnover_rate",
+          "value": 0.0303,
+          "z": 2.359,
+          "direction": "above league"
+        },
+        {
+          "team": "LA",
+          "metric": "offensive_tds",
+          "value": 63.0,
+          "z": 2.177,
+          "direction": "above league"
+        },
+        {
+          "team": "LV",
+          "metric": "pass_td_share",
+          "value": 0.8,
+          "z": 2.053,
+          "direction": "above league"
+        },
+        {
+          "team": "LV",
+          "metric": "rush_td_share",
+          "value": 0.2,
+          "z": -2.053,
+          "direction": "below league"
+        },
+        {
+          "team": "BAL",
+          "metric": "pass_rate",
+          "value": 0.4805,
+          "z": -2.002,
+          "direction": "below league"
+        },
+        {
+          "team": "CLE",
+          "metric": "yards_per_play",
+          "value": 4.3114,
+          "z": -1.985,
+          "direction": "below league"
+        },
+        {
+          "team": "NYJ",
+          "metric": "red_zone_td_rate",
+          "value": 0.4048,
+          "z": -1.95,
+          "direction": "below league"
+        },
+        {
+          "team": "LV",
+          "metric": "plays_per_game",
+          "value": 55.9412,
+          "z": -1.932,
+          "direction": "below league"
+        },
+        {
+          "team": "ARI",
+          "metric": "neutral_pass_rate",
+          "value": 0.6232,
+          "z": 1.921,
+          "direction": "above league"
+        },
+        {
+          "team": "MIA",
+          "metric": "plays_per_game",
+          "value": 56.0,
+          "z": -1.911,
+          "direction": "below league"
+        },
+        {
+          "team": "CIN",
+          "metric": "pass_rate",
+          "value": 0.6403,
+          "z": 1.908,
+          "direction": "above league"
+        },
+        {
+          "team": "CHI",
+          "metric": "turnover_rate",
+          "value": 0.0099,
+          "z": -1.864,
+          "direction": "below league"
+        },
+        {
+          "team": "LV",
+          "metric": "yards_per_play",
+          "value": 4.3849,
+          "z": -1.838,
+          "direction": "below league"
+        },
+        {
+          "team": "TEN",
+          "metric": "yards_per_play",
+          "value": 4.3954,
+          "z": -1.817,
+          "direction": "below league"
+        },
+        {
+          "team": "NYJ",
+          "metric": "yards_per_play",
+          "value": 4.3969,
+          "z": -1.815,
+          "direction": "below league"
+        },
+        {
+          "team": "NO",
+          "metric": "red_zone_td_rate",
+          "value": 0.4167,
+          "z": -1.791,
+          "direction": "below league"
+        },
+        {
+          "team": "MIN",
+          "metric": "plays_per_game",
+          "value": 56.3529,
+          "z": -1.789,
+          "direction": "below league"
+        },
+        {
+          "team": "BUF",
+          "metric": "offensive_tds",
+          "value": 59.0,
+          "z": 1.776,
+          "direction": "above league"
+        },
+        {
+          "team": "LA",
+          "metric": "yards_per_play",
+          "value": 6.1777,
+          "z": 1.734,
+          "direction": "above league"
+        },
+        {
+          "team": "TEN",
+          "metric": "offensive_tds",
+          "value": 24.0,
+          "z": -1.732,
+          "direction": "below league"
+        },
+        {
+          "team": "NE",
+          "metric": "yards_per_play",
+          "value": 6.1652,
+          "z": 1.709,
+          "direction": "above league"
+        },
+        {
+          "team": "CIN",
+          "metric": "pass_td_share",
+          "value": 0.766,
+          "z": 1.667,
+          "direction": "above league"
+        },
+        {
+          "team": "CIN",
+          "metric": "rush_td_share",
+          "value": 0.234,
+          "z": -1.667,
+          "direction": "below league"
+        },
+        {
+          "team": "PHI",
+          "metric": "red_zone_td_rate",
+          "value": 0.6739,
+          "z": 1.646,
+          "direction": "above league"
+        },
+        {
+          "team": "ARI",
+          "metric": "pass_td_share",
+          "value": 0.7632,
+          "z": 1.635,
+          "direction": "above league"
+        },
+        {
+          "team": "ARI",
+          "metric": "rush_td_share",
+          "value": 0.2368,
+          "z": -1.635,
+          "direction": "below league"
+        },
+        {
+          "team": "LV",
+          "metric": "offensive_tds",
+          "value": 25.0,
+          "z": -1.632,
+          "direction": "below league"
+        },
+        {
+          "team": "BAL",
+          "metric": "neutral_pass_rate",
+          "value": 0.4885,
+          "z": -1.629,
+          "direction": "below league"
+        },
+        {
+          "team": "HOU",
+          "metric": "red_zone_td_rate",
+          "value": 0.431,
+          "z": -1.599,
+          "direction": "below league"
+        },
+        {
+          "team": "DAL",
+          "metric": "plays_per_game",
+          "value": 66.0588,
+          "z": 1.585,
+          "direction": "above league"
+        },
+        {
+          "team": "CIN",
+          "metric": "neutral_pass_rate",
+          "value": 0.6102,
+          "z": 1.58,
+          "direction": "above league"
+        },
+        {
+          "team": "IND",
+          "metric": "pass_td_share",
+          "value": 0.4808,
+          "z": -1.566,
+          "direction": "below league"
+        },
+        {
+          "team": "IND",
+          "metric": "rush_td_share",
+          "value": 0.5192,
+          "z": 1.566,
+          "direction": "above league"
+        },
+        {
+          "team": "BUF",
+          "metric": "pass_rate",
+          "value": 0.4986,
+          "z": -1.559,
+          "direction": "below league"
+        },
+        {
+          "team": "CLE",
+          "metric": "offensive_tds",
+          "value": 26.0,
+          "z": -1.532,
+          "direction": "below league"
+        },
+        {
+          "team": "NYJ",
+          "metric": "offensive_tds",
+          "value": 26.0,
+          "z": -1.532,
+          "direction": "below league"
+        },
+        {
+          "team": "MIA",
+          "metric": "turnover_rate",
+          "value": 0.0263,
+          "z": 1.527,
+          "direction": "above league"
+        },
+        {
+          "team": "SEA",
+          "metric": "pass_rate",
+          "value": 0.501,
+          "z": -1.502,
+          "direction": "below league"
+        }
+      ],
+      "abs_z_at_least_2.0": [
+        {
+          "team": "NYJ",
+          "metric": "neutral_pass_rate",
+          "value": 0.4531,
+          "z": -2.563,
+          "direction": "below league"
+        },
+        {
+          "team": "ARI",
+          "metric": "pass_rate",
+          "value": 0.6596,
+          "z": 2.38,
+          "direction": "above league"
+        },
+        {
+          "team": "MIN",
+          "metric": "turnover_rate",
+          "value": 0.0303,
+          "z": 2.359,
+          "direction": "above league"
+        },
+        {
+          "team": "LA",
+          "metric": "offensive_tds",
+          "value": 63.0,
+          "z": 2.177,
+          "direction": "above league"
+        },
+        {
+          "team": "LV",
+          "metric": "pass_td_share",
+          "value": 0.8,
+          "z": 2.053,
+          "direction": "above league"
+        },
+        {
+          "team": "LV",
+          "metric": "rush_td_share",
+          "value": 0.2,
+          "z": -2.053,
+          "direction": "below league"
+        },
+        {
+          "team": "BAL",
+          "metric": "pass_rate",
+          "value": 0.4805,
+          "z": -2.002,
+          "direction": "below league"
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "DESCRIPTIVE only (S88). No evidence grade, no out-of-sample validation, and no prescriptive claim is made from it.",
+    "The opportunity model excludes red_zone_td_rate by construction: trips x conversion is approximately the touchdown count, so including it would absorb the residual being measured.",
+    "z-scores are computed within season, so a team is extreme relative to its own league year rather than to a 14-year mean.",
+    "2022 Buffalo and Cincinnati played 16 games after a cancelled game; per-game metrics account for it, season totals do not."
+  ],
+  "sources": [
+    "nflverse play_by_play",
+    "nflverse/nfldata schedules"
+  ]
+}

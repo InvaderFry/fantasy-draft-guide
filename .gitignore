@@ -14,3 +14,13 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 dist/
+
+# The live draft board (S83). Its sheets are the deliverable and are committed --
+# they have to be openable from a phone at a draft table with no checkout. Its
+# method artifacts are not: the two market-dependent ones are regenerated from
+# scratch on every refresh, and the snapshots they are built from are already in
+# the archive above, which is the whole reason that archive is committed. The two
+# that are NOT regenerated daily are carried forward and so must survive.
+artifacts/2026-draft/methods/**
+!artifacts/2026-draft/methods/team_scoring_regression.json
+!artifacts/2026-draft/methods/rb_dead_zone_bucket_rates.json
