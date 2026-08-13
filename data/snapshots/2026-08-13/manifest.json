@@ -80,6 +80,26 @@
       "url": "https://fantasyfootballcalculator.com/api/v1/adp/2qb?teams=12&year=2022&position=all",
       "year": 2022
     },
+    "ffc_adp_2qb_12team_2023.json": {
+      "attribution": "ADP data courtesy of Fantasy Football Calculator.",
+      "bytes": 36488,
+      "distribution_fields_present": [
+        "high",
+        "low",
+        "stdev",
+        "times_drafted"
+      ],
+      "format": "2qb",
+      "license": "free_personal_and_commercial_with_attribution",
+      "notes": "193 players. S31.1 distribution fields present: ['high', 'low', 'stdev', 'times_drafted']",
+      "player_count": 193,
+      "retrieved_at": "2026-08-13T12:49:15+00:00",
+      "sha256": "63ab54c0a9417a2b38ad8f29557e5260ed1e6305620974536fff3ca35ec04f68",
+      "source": "fantasy_football_calculator",
+      "teams": 12,
+      "url": "https://fantasyfootballcalculator.com/api/v1/adp/2qb?teams=12&year=2023&position=all",
+      "year": 2023
+    },
     "ffc_adp_2qb_12team_2024.json": {
       "attribution": "ADP data courtesy of Fantasy Football Calculator.",
       "bytes": 40120,
@@ -199,6 +219,26 @@
       "teams": 10,
       "url": "https://fantasyfootballcalculator.com/api/v1/adp/half-ppr?teams=10&year=2022&position=all",
       "year": 2022
+    },
+    "ffc_adp_half-ppr_10team_2023.json": {
+      "attribution": "ADP data courtesy of Fantasy Football Calculator.",
+      "bytes": 37771,
+      "distribution_fields_present": [
+        "high",
+        "low",
+        "stdev",
+        "times_drafted"
+      ],
+      "format": "half-ppr",
+      "license": "free_personal_and_commercial_with_attribution",
+      "notes": "199 players. S31.1 distribution fields present: ['high', 'low', 'stdev', 'times_drafted']",
+      "player_count": 199,
+      "retrieved_at": "2026-08-13T12:49:15+00:00",
+      "sha256": "21edbccf887b0728d1dfd78582e89d456f7b1a785f34362ac30d34fa78c76ec6",
+      "source": "fantasy_football_calculator",
+      "teams": 10,
+      "url": "https://fantasyfootballcalculator.com/api/v1/adp/half-ppr?teams=10&year=2023&position=all",
+      "year": 2023
     },
     "ffc_adp_half-ppr_10team_2024.json": {
       "attribution": "ADP data courtesy of Fantasy Football Calculator.",
@@ -320,6 +360,26 @@
       "url": "https://fantasyfootballcalculator.com/api/v1/adp/half-ppr?teams=12&year=2022&position=all",
       "year": 2022
     },
+    "ffc_adp_half-ppr_12team_2023.json": {
+      "attribution": "ADP data courtesy of Fantasy Football Calculator.",
+      "bytes": 37752,
+      "distribution_fields_present": [
+        "high",
+        "low",
+        "stdev",
+        "times_drafted"
+      ],
+      "format": "half-ppr",
+      "license": "free_personal_and_commercial_with_attribution",
+      "notes": "199 players. S31.1 distribution fields present: ['high', 'low', 'stdev', 'times_drafted']",
+      "player_count": 199,
+      "retrieved_at": "2026-08-13T12:49:15+00:00",
+      "sha256": "5d612c74cfb4e4280625cca53d8faf82b33a025e377692fb1afa8752d91aa0ff",
+      "source": "fantasy_football_calculator",
+      "teams": 12,
+      "url": "https://fantasyfootballcalculator.com/api/v1/adp/half-ppr?teams=12&year=2023&position=all",
+      "year": 2023
+    },
     "ffc_adp_half-ppr_12team_2024.json": {
       "attribution": "ADP data courtesy of Fantasy Football Calculator.",
       "bytes": 33520,
@@ -439,6 +499,26 @@
       "teams": 10,
       "url": "https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=10&year=2022&position=all",
       "year": 2022
+    },
+    "ffc_adp_ppr_10team_2023.json": {
+      "attribution": "ADP data courtesy of Fantasy Football Calculator.",
+      "bytes": 38305,
+      "distribution_fields_present": [
+        "high",
+        "low",
+        "stdev",
+        "times_drafted"
+      ],
+      "format": "ppr",
+      "license": "free_personal_and_commercial_with_attribution",
+      "notes": "202 players. S31.1 distribution fields present: ['high', 'low', 'stdev', 'times_drafted']",
+      "player_count": 202,
+      "retrieved_at": "2026-08-13T12:49:15+00:00",
+      "sha256": "a5a0252ef21a3f842720536eea1f2a5464258622f66fae406cf1a67d8f20ac7b",
+      "source": "fantasy_football_calculator",
+      "teams": 10,
+      "url": "https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=10&year=2023&position=all",
+      "year": 2023
     },
     "ffc_adp_ppr_10team_2024.json": {
       "attribution": "ADP data courtesy of Fantasy Football Calculator.",
@@ -560,6 +640,26 @@
       "url": "https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=12&year=2022&position=all",
       "year": 2022
     },
+    "ffc_adp_ppr_12team_2023.json": {
+      "attribution": "ADP data courtesy of Fantasy Football Calculator.",
+      "bytes": 38286,
+      "distribution_fields_present": [
+        "high",
+        "low",
+        "stdev",
+        "times_drafted"
+      ],
+      "format": "ppr",
+      "license": "free_personal_and_commercial_with_attribution",
+      "notes": "202 players. S31.1 distribution fields present: ['high', 'low', 'stdev', 'times_drafted']",
+      "player_count": 202,
+      "retrieved_at": "2026-08-13T12:49:15+00:00",
+      "sha256": "b886ec4c13a36f1ee3e41b228d745a98445e733eda47c256d452ff8c2f5c2f09",
+      "source": "fantasy_football_calculator",
+      "teams": 12,
+      "url": "https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=12&year=2023&position=all",
+      "year": 2023
+    },
     "ffc_adp_ppr_12team_2024.json": {
       "attribution": "ADP data courtesy of Fantasy Football Calculator.",
       "bytes": 38723,
@@ -679,6 +779,26 @@
       "teams": 12,
       "url": "https://fantasyfootballcalculator.com/api/v1/adp/standard?teams=12&year=2022&position=all",
       "year": 2022
+    },
+    "ffc_adp_standard_12team_2023.json": {
+      "attribution": "ADP data courtesy of Fantasy Football Calculator.",
+      "bytes": 36264,
+      "distribution_fields_present": [
+        "high",
+        "low",
+        "stdev",
+        "times_drafted"
+      ],
+      "format": "standard",
+      "license": "free_personal_and_commercial_with_attribution",
+      "notes": "192 players. S31.1 distribution fields present: ['high', 'low', 'stdev', 'times_drafted']",
+      "player_count": 192,
+      "retrieved_at": "2026-08-13T12:49:15+00:00",
+      "sha256": "5834479cf498321a93f97136a1147062869b31bb527aa8c6092cd91d23468637",
+      "source": "fantasy_football_calculator",
+      "teams": 12,
+      "url": "https://fantasyfootballcalculator.com/api/v1/adp/standard?teams=12&year=2023&position=all",
+      "year": 2023
     },
     "ffc_adp_standard_12team_2024.json": {
       "attribution": "ADP data courtesy of Fantasy Football Calculator.",
