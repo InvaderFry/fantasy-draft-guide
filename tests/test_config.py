@@ -30,15 +30,53 @@ def test_every_profile_declares_scoring_and_starters():
         assert "teams" in profile, f"{profile['id']} has no team count"
 
 
-def test_adp_capture_covers_the_real_profiles():
-    """S84 captures a superset; it must never be narrower than what is played."""
+def test_adp_capture_covers_every_encoded_profile():
+    """S84 captures a superset; it must never be narrower than what is played.
+
+    Over every profile, not only the `real: true` ones. The failure being
+    defended against is flipping a league to real on draft week and finding it
+    has no price history -- and by then the days are unrecoverable, so a check
+    that waits for `real: true` arrives after it could have helped.
+
+    Matching on (format, teams) rather than team count alone: a 12-team
+    superflex league shares a team count with 12-team PPR and needs an entirely
+    different board.
+    """
     captured = {(c["format"], c["teams"]) for c in config.adp_capture_formats()}
     assert captured, "no ADP capture formats configured"
-    for profile in config.real_profiles():
-        teams = profile["teams"]
-        assert any(t == teams for _fmt, t in captured), (
-            f"profile {profile['id']} plays {teams}-team leagues but no capture format matches"
+    profiles = config.league_profiles()
+    assert profiles, "no league profiles encoded"
+    for profile in profiles:
+        wanted = (config.profile_adp_format(profile), profile["teams"])
+        assert wanted in captured, (
+            f"profile {profile['id']} needs {wanted[0]}/{wanted[1]}team ADP, which "
+            f"config/league_profiles.yaml does not capture. Add it to `adp_capture` "
+            f"now -- every day it is missing is a day of price movement that cannot "
+            f"be bought back (S84). Captured: {sorted(captured)}"
         )
+
+
+@pytest.mark.parametrize(
+    ("scoring", "starters", "expected"),
+    [
+        ({"reception": 0}, {"QB": 1}, "standard"),
+        ({"reception": 0.5}, {"QB": 1}, "half-ppr"),
+        ({"reception": 1.0}, {"QB": 1}, "ppr"),
+        # a second quarterback changes the board regardless of the reception value
+        ({"reception": 1.0}, {"QB": 1, "SUPERFLEX": 1}, "2qb"),
+        ({"reception": 0.5}, {"QB": 2}, "2qb"),
+    ],
+)
+def test_a_profiles_adp_format_follows_from_its_scoring(scoring, starters, expected):
+    profile = {"id": "x", "scoring": scoring, "starters": starters}
+    assert config.profile_adp_format(profile) == expected
+
+
+def test_a_scoring_system_with_no_published_adp_is_named_not_guessed():
+    """A quarter-point reception has no FFC board; silently picking one would lie."""
+    profile = {"id": "x", "scoring": {"reception": 0.25}, "starters": {"QB": 1}}
+    with pytest.raises(config.UnknownFormatError, match="0.25"):
+        config.profile_adp_format(profile)
 
 
 def test_evidence_rules_are_committed_and_dated():

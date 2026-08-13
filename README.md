@@ -151,12 +151,23 @@ look like a failure.
 
 ## Before running research
 
-`config/league_profiles.yaml` ships two **placeholder** profiles, both
-`real: false`. Every downstream conclusion is conditional on scoring, team
-count and draft slot, so `require_real_profiles()` blocks research entry points
-until the leagues actually being drafted are encoded. Fill in the `TODO`
-values — teams, scoring, starters, draft date, draft slot — and set
-`real: true`.
+`config/league_profiles.yaml` holds the two leagues actually being drafted —
+12-team half-PPR and 12-team full PPR — with scoring and starters already
+correct. Both are still `real: false`, because two values are unknown:
+`draft_date` and `draft_slot`. Fill those in and flip the flag; nothing else
+needs to move.
+
+One profile per league, not one per scoring system. Replacement level is
+`teams × starters`, so two leagues with the same scoring and different team
+counts have different tier breaks, and draft date and slot are per-league inputs
+to survival probability (§31.2) and the simulator (§36.2). §83 generates the
+draft-day sheet per profile for the same reason.
+
+Both formats are already in `adp_capture`, so their price history is being
+archived daily. A test derives each profile's ADP format from its scoring and
+asserts the capture list covers it — over *every* profile, not just the real
+ones, since discovering a gap on draft week means the missing days are already
+gone (§84).
 
 ## Data sources and attribution
 
