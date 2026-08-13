@@ -48,6 +48,7 @@ def http_get(
     url: str,
     *,
     params: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
     timeout: int = DEFAULT_TIMEOUT,
     retries: int = 4,
     session: requests.Session | None = None,
@@ -57,6 +58,10 @@ def http_get(
     Network flakiness must not be indistinguishable from a source returning
     nothing: a genuine empty response is a lost capture day (S84) and has to
     surface as an error, so this raises rather than returning b"".
+
+    ``headers`` carries per-source authentication. It is deliberately not
+    echoed into the FetchError below: a key in an exception message is a key in
+    a CI log (S11).
     """
     sess = session or requests.Session()
     delay = 2.0
@@ -67,7 +72,7 @@ def http_get(
                 url,
                 params=params,
                 timeout=timeout,
-                headers={"User-Agent": USER_AGENT},
+                headers={"User-Agent": USER_AGENT, **(headers or {})},
             )
             resp.raise_for_status()
             if not resp.content:

@@ -24,6 +24,7 @@ def run_all(processed_dir: Path = PROCESSED_DIR) -> list[tuple[str, bool]]:
         ("player_season_outcomes", _check_availability_coverage),
         ("team_season", _check_team_season),
         ("adp_history", _check_adp_history),
+        ("projection_snapshot", _check_projection_snapshot),
     ):
         path = processed_dir / f"{name}.parquet"
         if not path.exists():
@@ -160,6 +161,64 @@ def _check_adp_history(frame: pl.DataFrame) -> list[tuple[str, bool]]:
         if share < 0.15
         else _fail(
             f"adp_history: {unmatched} unmatched rows ({share:.1%}) -- triage into "
+            "config/manual_id_overrides.yaml (S12)"
+        )
+    )
+    return out
+
+
+def _check_projection_snapshot(frame: pl.DataFrame) -> list[tuple[str, bool]]:
+    """S13, S38.1. The empty case is the current state and is not a failure.
+
+    Neither projection path is configured -- no FANTASYPROS_API_KEY and no manual
+    export -- so this table is empty by design, and S19.3 reports it as a blocker
+    rather than this check reporting it as a fault.
+    """
+    if frame.height == 0:
+        return [
+            _ok(
+                "projection_snapshot: empty -- no projection source configured (S11). "
+                "S19.3 tiers are blocked on it."
+            )
+        ]
+    out = _season_check(frame, "projection_snapshot") + _value_type_check(
+        frame, "projection_snapshot"
+    )
+
+    # S38.1: one row per provider per player. A duplicate means the same provider
+    # was stacked twice for one snapshot date, which would double its weight in
+    # any dispersion measure taken across providers.
+    keys = ["provider_id", "snapshot_date", "source_player_name", "position"]
+    if all(k in frame.columns for k in keys):
+        duplicated = frame.height - frame.unique(subset=keys).height
+        out.append(
+            _ok("projection_snapshot: one row per provider per player per capture")
+            if duplicated == 0
+            else _fail(
+                f"projection_snapshot: {duplicated} duplicate provider/player rows -- "
+                "providers must never be averaged or stacked twice (S38.1)"
+            )
+        )
+
+    # A projection is `derived`, never `observed` (S37). Getting this wrong would
+    # let a projection pass for a measurement downstream.
+    non_derived = frame.filter(pl.col("value_type") != "derived").height
+    out.append(
+        _ok("projection_snapshot: value_type is derived throughout (S37)")
+        if non_derived == 0
+        else _fail(
+            f"projection_snapshot: {non_derived} rows are not `derived` -- a projection "
+            "is a model output, not an observation (S37)"
+        )
+    )
+
+    unmatched = frame.filter(pl.col("match_method") == "unmatched").height
+    share = unmatched / frame.height
+    out.append(
+        _ok(f"projection_snapshot: {unmatched} unmatched rows ({share:.1%})")
+        if share < 0.15
+        else _fail(
+            f"projection_snapshot: {unmatched} unmatched rows ({share:.1%}) -- triage into "
             "config/manual_id_overrides.yaml (S12)"
         )
     )

@@ -97,6 +97,11 @@ def proportion_ci(hits: int, n: int, confidence: float = 0.95) -> tuple[float, f
     return p, max(0.0, centre - margin), min(1.0, centre + margin)
 
 
+def normal_cdf(x: float) -> float:
+    """Phi. Public because S19.4's survival fallback is written in terms of it."""
+    return _normal_cdf(x)
+
+
 def _z_for(confidence: float) -> float:
     # Inverse normal CDF via bisection: adequate here and avoids a scipy dependency
     # for a single number.

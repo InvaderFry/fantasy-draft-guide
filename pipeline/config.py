@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import datetime as dt
 import functools
+import os
 from pathlib import Path
 from typing import Any
 
@@ -139,6 +140,36 @@ def decision_date(season: int) -> dt.date:
 @functools.cache
 def sources() -> dict[str, Any]:
     return load_yaml(CONFIG_DIR / "sources.yaml").get("sources", {})
+
+
+@functools.cache
+def projection_providers() -> dict[str, Any]:
+    """Manual projection exports declared for import (S11 option 1B).
+
+    Top-level in sources.yaml, a sibling of `sources:` rather than a member of
+    it. Reading it off `sources()` returns None whatever is configured, which
+    is how research/foundations/tiers.py came to report its projection blocker
+    permanently -- including once a provider was configured. One accessor now,
+    used by both the adapter and the blocker.
+    """
+    return load_yaml(CONFIG_DIR / "sources.yaml").get("projection_providers") or {}
+
+
+def fantasypros_config() -> dict[str, Any]:
+    """The FantasyPros API block (S11 option 1).
+
+    Endpoint, envelope and column names live here rather than in the adapter:
+    the API is unreachable from the development sandbox, so the response shape
+    is unverified and a wrong guess has to be correctable in YAML.
+    """
+    return sources().get("fantasypros_api") or {}
+
+
+def projection_source_available() -> bool:
+    """Whether any projection path is configured at all (S11, S19.3)."""
+    if os.environ.get("FANTASYPROS_API_KEY", "").strip() and fantasypros_config().get("api_base"):
+        return True
+    return bool(projection_providers())
 
 
 def source(name: str) -> dict[str, Any]:

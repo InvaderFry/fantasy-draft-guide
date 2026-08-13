@@ -19,6 +19,14 @@
 # `draft_slot`. Filling those in and flipping the flag is the whole remaining
 # change; scoring and starters are already correct.
 #
+# Everything downstream of this gate is now built and tested: S19.3 tiers and
+# replacement level, S31.2 survival at held picks, and the S83 draft-day sheet.
+# They run against fixtures and refuse to run against these profiles. So the two
+# TODOs below are not a note to self -- they are the only thing between the
+# repository and a real draft-day sheet. `draft_slot` may be set to `unknown`
+# if the order is undrawn; survival then reports every slot rather than one, and
+# the tier board is unaffected.
+#
 # Both formats are covered by `adp_capture` below, so their price history is
 # being archived daily already (S84).
 

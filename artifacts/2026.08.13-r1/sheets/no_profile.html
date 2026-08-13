@@ -1,0 +1,40 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Draft sheet -- no league profile encoded</title>
+<style>
+  /* One page, printable, legible at arm's length (S83). Inline and offline (S8). */
+  @page { size: letter portrait; margin: 0.35in; }
+  * { box-sizing: border-box; }
+  body { font: 9pt/1.25 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+         color: #111; background: #fff; margin: 0; padding: 10px 14px; }
+  h1 { font-size: 14pt; margin: 0; }
+  h1 .sub { font-weight: 400; color: #555; font-size: 9pt; }
+  h3 { font-size: 9.5pt; letter-spacing: .09em; margin: 9px 0 3px;
+        border-bottom: 1.5px solid #111; padding-bottom: 1px; }
+  h3 .spec { float: right; font-weight: 400; color: #888; letter-spacing: 0; }
+  h4 { font-size: 8.5pt; margin: 0 0 2px; }
+  h4 .sub, p.sub { font-weight: 400; color: #666; font-size: 7.5pt; }
+  p { margin: 2px 0 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 8pt; }
+  th { text-align: left; color: #666; font-weight: 600; border-bottom: 1px solid #bbb; }
+  td, th { padding: 0.5px 3px 0.5px 0; }
+  tr.tier-start td { border-top: 1px solid #ddd; }
+  .cols { display: flex; gap: 12px; align-items: flex-start; }
+  .pos { flex: 1; min-width: 0; }
+  .tag { font-weight: 700; font-size: 7pt; }
+  .fade { color: #a11; } .buy { color: #161; }
+  .missing { color: #777; font-size: 7.5pt; font-style: italic; }
+  ul.missing { margin: 2px 0 4px; padding-left: 14px; }
+  code { font-size: 7.5pt; }
+  footer { margin-top: 8px; color: #888; font-size: 7pt;
+            border-top: 1px solid #ddd; padding-top: 3px; }
+</style>
+<h1>Draft sheet <span class="sub">-- no league profile encoded</span></h1>
+<p class="sub">Edition 2026.08.13-r1 &middot; generated 2026-08-13 &middot; generated from the
+S16 method artifacts, never edited by hand (S83).</p>
+<p class="missing"><strong>This is not a league sheet.</strong> S14 excludes profiles that are not marked <code>real: true</code> from the draft-day sheet, because tiers, replacement level and survival are all conditional on scoring, team count and draft slot. Only the sections that do not depend on a league are filled in below. Set <code>draft_date</code> and <code>draft_slot</code> in config/league_profiles.yaml to generate the real thing.</p>
+<section><h3>TIERS <span class="spec">S19.3</span></h3><p class="missing"><strong>BLOCKED.</strong></p><ul class="missing"><li>no league profile is marked `real: true` in config/league_profiles.yaml -- replacement level is undefined without teams and starter counts (S14, S19.4). Fill in draft_date and draft_slot.</li><li>no projection source is configured -- S19.3&#x27;s tier metric is projected_points - replacement_points, and there are no projected points. Set FANTASYPROS_API_KEY (S11 option 1) or declare a manual export under `projection_providers` in config/sources.yaml (S11 option 1B).</li></ul></section><section><h3>TARGETS <span class="spec">S27</span></h3><p class="missing"><strong>NOT BUILT.</strong> Targets is a research section (S27) requiring graded evidence, which is not in the S88 compressed build. Scheduled for the September-February build (S79).</p></section><section><h3>AVOIDS <span class="spec">S28</span></h3><p class="missing"><strong>NOT BUILT.</strong> Avoids is a research section (S28) requiring graded evidence, which is not in the S88 compressed build. Scheduled for the September-February build (S79).</p></section><section><h3>REGRESSION <span class="spec">S25</span></h3><p class="sub">2025 offensive touchdowns against the league. Expected move is what teams at this distance have done the following year.</p><table><thead><tr><th></th><th>Team</th><th>Last yr</th><th>z</th><th>Expected move</th></tr></thead><tbody><tr><td class="tag fade">FADE</td><td>LA</td><td>63 TD</td><td>+2.2z</td><td>-18 TD</td></tr><tr><td class="tag fade">FADE</td><td>BUF</td><td>59 TD</td><td>+1.8z</td><td>-6 TD</td></tr><tr><td class="tag buy">BUY</td><td>TEN</td><td>24 TD</td><td>-1.7z</td><td>+8 TD</td></tr><tr><td class="tag buy">BUY</td><td>LV</td><td>25 TD</td><td>-1.6z</td><td>+8 TD</td></tr><tr><td class="tag buy">BUY</td><td>CLE</td><td>26 TD</td><td>-1.5z</td><td>+8 TD</td></tr><tr><td class="tag buy">BUY</td><td>NYJ</td><td>26 TD</td><td>-1.5z</td><td>+8 TD</td></tr></tbody></table></section><section><h3>DARTS <span class="spec">S29</span></h3><p class="missing"><strong>NOT BUILT.</strong> Dart throws is a research section (S29), which is not in the S88 compressed build. Scheduled for the September-February build (S79).</p></section><section><h3>SURVIVAL <span class="spec">S31.2</span></h3><p class="missing"><strong>BLOCKED.</strong></p><ul class="missing"><li>no league profile is marked `real: true` in config/league_profiles.yaml -- held picks depend on team count and draft slot (S14, S31.2)</li></ul></section><section><h3>FALSE FRIENDS <span class="spec">S34</span></h3><p class="missing"><strong>NOT BUILT.</strong> False friends is the current-player matching engine (S32, S34), which is not in the S88 compressed build. Scheduled for the September-February build (S79).</p></section>
+<footer>
+  Descriptive only (S2.2, S88). Nothing here is a prescriptive recommendation.
+  ADP data courtesy of Fantasy Football Calculator. Statistics from nflverse (CC-BY-4.0).
+</footer>
