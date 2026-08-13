@@ -62,6 +62,45 @@ def require_real_profiles() -> list[dict[str, Any]]:
     return profiles
 
 
+class UnknownFormatError(ConfigError):
+    """A profile's scoring does not map onto any ADP format we can capture."""
+
+
+# Fantasy Football Calculator's format names, as used by `adp_capture` below and
+# by pipeline/ingest/ffc_adp.py.
+RECEPTION_TO_FORMAT = {0.0: "standard", 0.5: "half-ppr", 1.0: "ppr"}
+SUPERFLEX_FORMAT = "2qb"
+
+
+def profile_adp_format(profile: dict[str, Any]) -> str:
+    """Which ADP format a league profile needs priced (S14, S84).
+
+    Profiles declare scoring; `adp_capture` declares formats; nothing related
+    the two, so a league could be encoded whose price history was never being
+    archived -- and by the time anyone noticed, the days would be gone (S84).
+
+    A second quarterback slot dominates the scoring question: superflex ADP is a
+    different board, not a PPR board with a tweak.
+    """
+    starters = profile.get("starters") or {}
+    if "SUPERFLEX" in starters or (starters.get("QB") or 0) > 1:
+        return SUPERFLEX_FORMAT
+    reception = (profile.get("scoring") or {}).get("reception")
+    if reception is None:
+        raise UnknownFormatError(
+            f"profile {profile.get('id')!r} declares no `reception` value, so its ADP "
+            "format cannot be derived (S14)"
+        )
+    try:
+        return RECEPTION_TO_FORMAT[float(reception)]
+    except KeyError:
+        raise UnknownFormatError(
+            f"profile {profile.get('id')!r} scores a reception at {reception}, which is "
+            f"not one of {sorted(RECEPTION_TO_FORMAT)}. Fantasy Football Calculator "
+            "publishes no ADP for it, so the league cannot be priced (S84)."
+        ) from None
+
+
 @functools.cache
 def adp_capture_formats() -> list[dict[str, Any]]:
     """Formats the archival job captures (S84).
