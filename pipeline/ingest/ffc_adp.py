@@ -132,6 +132,9 @@ def parse(
                 "season": year,
                 "snapshot_date": snapshot_date,
                 "as_of": snapshot_date,  # an ADP snapshot is knowable the day it is published
+                # FFC recomputes once a day and publishes no revision date, so
+                # the day it was served is the day it was published (S6.1).
+                "source_as_of": snapshot_date,
                 "source": SOURCE_NAME,
                 "format": fmt,
                 "teams": teams,

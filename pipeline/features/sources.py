@@ -69,7 +69,8 @@ def schedule() -> pl.DataFrame:
     """Game calendar with parsed dates."""
     if not SCHEDULE_FILE.exists():
         raise MissingRawData(
-            f"{SCHEDULE_FILE} not found. Run `research ingest --datasets schedules` (S85.1)."
+            f"{SCHEDULE_FILE} not found. Run `research ingest` -- it fetches the game "
+            "calendar alongside the release assets (S85.1)."
         )
     return pl.read_csv(SCHEDULE_FILE, infer_schema_length=20000).with_columns(
         pl.col("gameday").str.to_date(strict=False).alias("gameday")

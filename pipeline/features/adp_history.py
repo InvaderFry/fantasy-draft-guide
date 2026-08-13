@@ -48,7 +48,7 @@ def snapshot_files(root: Path = SNAPSHOT_DIR) -> list[tuple[dt.date, Path, dict[
     return found
 
 
-def build(root: Path = SNAPSHOT_DIR) -> pl.DataFrame:
+def build(root: Path = SNAPSHOT_DIR, *, crosswalk: pl.DataFrame | None = None) -> pl.DataFrame:
     rows: list[dict] = []
     for date, path, meta in snapshot_files(root):
         rows.extend(
@@ -60,11 +60,17 @@ def build(root: Path = SNAPSHOT_DIR) -> pl.DataFrame:
                 year=int(meta["year"]),
             )
         )
+    # The empty frame is asserted too. Returning it unchecked is what let the
+    # schema drift away from AS_OF_COLUMNS while the archive was still empty:
+    # the first real capture would have been the first failing build.
     if not rows:
-        return pl.DataFrame(schema=_empty_schema())
+        frame = pl.DataFrame(schema=_empty_schema())
+        assert_as_of_present(frame, "adp_history")
+        return frame
 
     frame = pl.DataFrame(rows)
-    frame = match_external(frame, crosswalk=load_player_ids()).rename({"gsis_id": "player_id"})
+    xwalk = crosswalk if crosswalk is not None else load_player_ids()
+    frame = match_external(frame, crosswalk=xwalk).rename({"gsis_id": "player_id"})
     frame = frame.with_columns(
         pl.col("adp").rank("ordinal").over(["snapshot_date", "format", "teams", "position"])
         .cast(pl.Int64).alias("position_adp")
@@ -86,12 +92,14 @@ def distribution_availability(root: Path = SNAPSHOT_DIR) -> dict[str, list[str]]
 
 def _empty_schema() -> dict[str, pl.DataType]:
     return {
-        "season": pl.Int64, "snapshot_date": pl.Date, "as_of": pl.Date, "source": pl.String,
+        "season": pl.Int64, "snapshot_date": pl.Date, "as_of": pl.Date,
+        "source_as_of": pl.Date, "source": pl.String,
         "format": pl.String, "teams": pl.Int64, "player_id": pl.String,
         "source_player_id": pl.String, "source_player_name": pl.String,
-        "position": pl.String, "team": pl.String, "adp": pl.Float64,
+        "position": pl.String, "team": pl.String, "bye": pl.Int64, "adp": pl.Float64,
         "position_adp": pl.Int64, "sample_size_if_available": pl.Int64,
-        "adp_stdev": pl.Float64, "pick_p10": pl.Float64, "pick_p25": pl.Float64,
+        "adp_stdev": pl.Float64, "pick_high": pl.Float64, "pick_low": pl.Float64,
+        "pick_p10": pl.Float64, "pick_p25": pl.Float64,
         "pick_p50": pl.Float64, "pick_p75": pl.Float64, "pick_p90": pl.Float64,
         "n_drafts": pl.Int64, "match_method": pl.String, "match_confidence": pl.Float64,
         "value_type": pl.String,

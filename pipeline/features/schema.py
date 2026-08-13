@@ -47,7 +47,7 @@ PLAYER_WEEK_COLUMNS = (
     "passing_yards", "passing_tds", "interceptions", "fumbles_lost",
     "offensive_snaps", "snap_share",
     "red_zone_targets", "red_zone_carries", "goal_line_carries",
-    "team_pass_attempts", "team_rush_attempts", "team_points",
+    "team_pass_attempts", "team_rush_attempts", "team_air_yards", "team_points",
     "target_share", "air_yard_share",
 )
 
@@ -68,7 +68,7 @@ PLAYER_SEASON_COLUMNS = (
 PLAYER_SEASON_OUTCOME_COLUMNS = (
     "season", "player_id", "position", "team",
     "as_of", "source_as_of", "value_type", "is_outcome",
-    "games", "games_missed", "games_missed_injury",
+    "games", "rostered_weeks", "games_missed", "games_missed_injury",
     "fantasy_points_standard", "fantasy_points_half_ppr", "fantasy_points_ppr",
     "fantasy_ppg", "fantasy_ppg_active",
 )
@@ -85,11 +85,13 @@ TEAM_SEASON_COLUMNS = (
 
 # S13 adp_history
 ADP_HISTORY_COLUMNS = (
-    "season", "snapshot_date", "as_of", "source", "format", "teams",
+    "season", "snapshot_date", "as_of", "source_as_of", "value_type",
+    "source", "format", "teams",
     "player_id", "source_player_id", "source_player_name", "position", "team",
-    "adp", "position_adp", "sample_size_if_available",
-    "adp_stdev", "pick_p10", "pick_p25", "pick_p50", "pick_p75", "pick_p90",
-    "n_drafts", "match_method", "match_confidence", "value_type",
+    "bye", "adp", "position_adp", "sample_size_if_available",
+    "adp_stdev", "pick_high", "pick_low",
+    "pick_p10", "pick_p25", "pick_p50", "pick_p75", "pick_p90",
+    "n_drafts", "match_method", "match_confidence",
 )
 
 

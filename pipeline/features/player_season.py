@@ -31,18 +31,25 @@ from pipeline.features import sources
 from pipeline.features.assertions import assert_as_of_present, assert_no_outcome_columns
 from pipeline.normalize.player_ids import load_player_ids
 
-ROSTERED_STATUSES = ("ACT", "INA", "RES")
-
 
 def build(season: int, weekly: pl.DataFrame | None = None) -> tuple[pl.DataFrame, pl.DataFrame]:
     """Return (features, outcomes) for one season."""
     weekly = weekly if weekly is not None else pw.build(season)
     as_of = sources.season_end_date(season)
 
-    per_player = weekly.group_by(["season", "player_id"]).agg(
+    # player_week is the roster population, so a row is a week on the roster and
+    # `games_active` says whether it was played. Availability falls out of the
+    # same aggregation as production rather than being re-derived from the raw
+    # roster and injury files a second time.
+    active = pl.col("games_active") == 1
+    per_player = weekly.sort(["season", "player_id", "week"]).group_by(
+        ["season", "player_id"]
+    ).agg(
         pl.col("position").drop_nulls().first().alias("position"),
         pl.col("team").drop_nulls().last().alias("team"),
-        pl.len().alias("games"),
+        pl.len().alias("rostered_weeks"),
+        pl.col("games_active").sum().alias("games"),
+        _injury_absences().alias("games_missed_injury"),
         pl.col("targets").sum().alias("targets"),
         pl.col("receptions").sum().alias("receptions"),
         pl.col("receiving_yards").sum().alias("receiving_yards"),
@@ -52,24 +59,29 @@ def build(season: int, weekly: pl.DataFrame | None = None) -> tuple[pl.DataFrame
         pl.col("red_zone_carries").sum().alias("red_zone_carries"),
         pl.col("goal_line_carries").sum().alias("goal_line_carries"),
         pl.col("offensive_snaps").sum().alias("offensive_snaps"),
-        pl.col("snap_share").mean().alias("snap_share"),
+        pl.col("snap_share").filter(active).mean().alias("snap_share"),
         # denominators cover only the weeks the player was active, so these are
         # shares of team opportunity while playing, not season-wide shares
-        pl.col("team_pass_attempts").sum().alias("_team_pass_attempts_active"),
-        pl.col("team_rush_attempts").sum().alias("_team_rush_attempts_active"),
+        pl.col("team_pass_attempts").filter(active).sum().alias("_team_pass_attempts_active"),
+        pl.col("team_rush_attempts").filter(active).sum().alias("_team_rush_attempts_active"),
+        pl.col("team_air_yards").filter(active).sum().alias("_team_air_yards_active"),
         pl.col("fantasy_points_standard").sum().alias("fantasy_points_standard"),
         pl.col("fantasy_points_half_ppr").sum().alias("fantasy_points_half_ppr"),
         pl.col("fantasy_points_ppr").sum().alias("fantasy_points_ppr"),
+    ).with_columns(
+        (pl.col("rostered_weeks") - pl.col("games")).cast(pl.Int64).alias("games_missed")
     )
+    per_player = _blank_availability_without_roster_data(per_player, weekly)
 
-    team_air_yards = (
-        weekly.group_by(["season", "team"]).agg(pl.col("air_yards").sum().alias("team_air_yards"))
-    )
-
-    per_player = per_player.join(team_air_yards, on=["season", "team"], how="left").with_columns(
+    # All three shares use the same denominator convention: team opportunity
+    # over the weeks the player was active. air_yard_share previously divided a
+    # player's full-season air yards by the full-season total of whichever team
+    # they finished on, which understated every player who missed time and was
+    # simply wrong for anyone traded mid-season.
+    per_player = per_player.with_columns(
         (pl.col("targets") / pl.col("_team_pass_attempts_active")).alias("target_share"),
         (pl.col("carries") / pl.col("_team_rush_attempts_active")).alias("rush_share"),
-        (pl.col("air_yards") / pl.col("team_air_yards")).alias("air_yard_share"),
+        (pl.col("air_yards") / pl.col("_team_air_yards_active")).alias("air_yard_share"),
     )
 
     bio = _biographical(season)
@@ -120,8 +132,7 @@ def build(season: int, weekly: pl.DataFrame | None = None) -> tuple[pl.DataFrame
 
 def _outcomes(season: int, per_player: pl.DataFrame, as_of: dt.date) -> pl.DataFrame:
     """Availability and production, reported separately (S15.1)."""
-    availability = _availability(season)
-    frame = per_player.join(availability, on=["season", "player_id"], how="left").with_columns(
+    frame = per_player.with_columns(
         pl.lit(as_of).alias("as_of"),
         pl.lit(as_of).alias("source_as_of"),
         pl.lit("derived").alias("value_type"),
@@ -131,6 +142,7 @@ def _outcomes(season: int, per_player: pl.DataFrame, as_of: dt.date) -> pl.DataF
         (pl.col("fantasy_points_ppr") / pl.col("rostered_weeks")).alias("fantasy_ppg"),
         (pl.col("fantasy_points_ppr") / pl.col("games")).alias("fantasy_ppg_active"),
     )
+    _assert_absences_add_up(frame, season)
     return frame.select(
         "season", "player_id", "position", "team",
         "as_of", "source_as_of", "value_type", "is_outcome",
@@ -140,70 +152,51 @@ def _outcomes(season: int, per_player: pl.DataFrame, as_of: dt.date) -> pl.DataF
     )
 
 
-def _availability(season: int) -> pl.DataFrame:
-    """Weeks rostered vs weeks played, and how many absences were injuries.
+def _injury_absences() -> pl.Expr:
+    """Weeks on the roster, not played, for a health reason (S15.1).
 
-    S15.1 is explicit that injury history predicts future injury only weakly.
-    The purpose of these columns is to remove injury noise from per-game
-    production so the signals under test can be measured cleanly.
+    Counting injury-report rows with ``report_status == "Out"`` -- the previous
+    definition -- misses the absences that matter most. A player placed on IR or
+    PUP stops appearing on the weekly injury report altogether, so a season
+    ending in week 2 contributed one injury-related absence and a dozen
+    unexplained ones. player_week classifies from the reserve list first and the
+    injury report second, which is why this is now a count of its labels.
     """
-    try:
-        weekly_roster = sources.load(f"roster_weekly_{season}.parquet")
-    except sources.MissingRawData:
-        return pl.DataFrame(
-            schema={
-                "season": pl.Int32, "player_id": pl.String, "rostered_weeks": pl.Int64,
-                "games_missed": pl.Int64, "games_missed_injury": pl.Int64,
-            }
-        )
-
-    reg_weeks = sources.week_end_dates(season)["week"].to_list()
-    rostered = (
-        weekly_roster.filter(
-            pl.col("status").is_in(ROSTERED_STATUSES) & pl.col("week").is_in(reg_weeks)
-        )
-        .group_by(["season", pl.col("gsis_id").alias("player_id")])
-        .agg(pl.col("week").n_unique().alias("rostered_weeks"))
-        .drop_nulls("player_id")
-    )
-
-    played = (
-        pl.read_parquet(sources.raw_path(f"player_stats_{season}.parquet"))
-        .filter(pl.col("season_type") == "REG")
-        .group_by(["season", "player_id"])
-        .agg(pl.col("week").n_unique().alias("_played"))
-    )
-
-    injured_out = (
-        sources.load(f"injuries_{season}.parquet")
-        .filter((pl.col("game_type") == "REG") & (pl.col("report_status") == "Out"))
-        .group_by(["season", pl.col("gsis_id").alias("player_id")])
-        .agg(pl.col("week").n_unique().alias("_weeks_out"))
-        .drop_nulls("player_id")
-    )
-
     return (
-        rostered.join(played, on=["season", "player_id"], how="left")
-        .join(injured_out, on=["season", "player_id"], how="left")
-        .with_columns(
-            # Counts arrive as unsigned; subtracting them without a cast wraps a
-            # negative difference to ~4.3 billion instead of failing.
-            pl.col("rostered_weeks").cast(pl.Int64),
-            pl.col("_played").fill_null(0).cast(pl.Int64),
-            pl.col("_weeks_out").fill_null(0).cast(pl.Int64),
-        )
-        .with_columns(
-            # A player who appeared in a game was rostered that week, whatever
-            # the weekly roster file says -- practice-squad elevations show up
-            # as DEV and would otherwise report more games than weeks.
-            pl.max_horizontal("rostered_weeks", "_played").alias("rostered_weeks")
-        )
-        .with_columns(
-            (pl.col("rostered_weeks") - pl.col("_played")).alias("games_missed"),
-            pl.col("_weeks_out").alias("games_missed_injury"),
-        )
-        .select("season", "player_id", "rostered_weeks", "games_missed", "games_missed_injury")
+        ((pl.col("games_active") == 0) & (pl.col("inactive_reason") == "injury"))
+        .sum()
+        .cast(pl.Int64)
     )
+
+
+AVAILABILITY_COLUMNS = ("rostered_weeks", "games_missed", "games_missed_injury")
+
+
+def _blank_availability_without_roster_data(
+    per_player: pl.DataFrame, weekly: pl.DataFrame
+) -> pl.DataFrame:
+    """Null, not zero, when the season has no weekly roster file.
+
+    Without it player_week falls back to the stat sheet, where every row is a
+    game played. Reporting `games_missed = 0` for such a season would assert
+    that nobody missed a game, which is a stronger claim than the data supports.
+    """
+    if weekly.height and weekly["active_status"].null_count() < weekly.height:
+        return per_player
+    return per_player.with_columns(
+        pl.lit(None, dtype=pl.Int64).alias(col) for col in AVAILABILITY_COLUMNS
+    )
+
+
+def _assert_absences_add_up(frame: pl.DataFrame, season: int) -> None:
+    """An injury-related absence is an absence (S15.1)."""
+    bad = frame.filter(pl.col("games_missed_injury") > pl.col("games_missed"))
+    if bad.height:
+        raise AssertionError(
+            f"player_season_outcomes[{season}]: {bad.height} player(s) with more "
+            f"injury absences than absences:\n"
+            f"{bad.select('player_id', 'games', 'games_missed', 'games_missed_injury').head(5)}"
+        )
 
 
 def _biographical(season: int) -> pl.DataFrame:

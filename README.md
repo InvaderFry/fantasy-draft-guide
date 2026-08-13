@@ -17,7 +17,7 @@ Built here:
 |---|---|---|
 | Config gates | §14, §6.1, §46, §15, §3.1, §68 | league profiles, decision dates, sources, outcomes, evidence rules, question registry |
 | ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires |
-| nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play |
+| nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play, schedules |
 | ID normalization | §12 | `gsis_id` canonical, crosswalk + labelled name matching |
 | Canonical tables | §13 | `player_week`, `player_season` (+ outcomes), `team_season`, `adp_history` |
 | Snapshots | §65 | dated, hashed, immutable |
@@ -38,17 +38,41 @@ make validate                   # hashes, schema, leakage, data checks
 make test
 ```
 
-The full research window is `SEASONS=2012-2025` (~300 MB of raw play-by-play,
-streamed and reduced during the table build). It produces:
+`make ingest` pulls play-by-play too — it is the largest piece (~19 MB per
+season) and both `team_season` and `player_week` are built from it, so the
+quick-start needs it on disk. The builders scan it lazily and reduce it
+immediately, so the memory cost is small even though the disk cost is not.
+
+The full research window is `SEASONS=2012-2025` (~300 MB of raw play-by-play).
+It produces:
 
 | Table | Rows (2012–2025) |
 |---|---|
-| `player_week` | 72,859 |
-| `player_season` / `player_season_outcomes` | 7,971 each |
+| `player_week` | 133,624 — 93,114 active, 7,985 ir, 15,186 inactive, 17,339 dnp |
+| `player_season` / `player_season_outcomes` | 9,934 each |
 | `team_season` | 448 — the population §25 runs on |
 | `adp_history` | grows daily from the archival job |
 
-One upstream wrinkle worth knowing: nflverse moved weekly player stats to a new
+### One thing to check before pooling seasons
+
+`games_missed_injury` is only as good as the roster file behind it. nflverse
+carries reserve-list transaction codes (`R01` Reserve/Injured, `R04` PUP and so
+on) from **2020**; before that the file records that a player was on a reserve
+list but not why, and 2012–2015 do not mark game-day inactives at all. The
+share of missed games classified injury-related therefore steps from ~17% in
+2017 to ~60% in 2021, which is a change in the source and not in the sport:
+
+| Seasons | Injury-classified share of `games_missed` |
+|---|---|
+| 2012–2019 | 14–25% — reserve reason unavailable upstream |
+| 2020 | 38% — codes exist, but Reserve/COVID-19 and Reserve/Opt-out are absences that are not injuries |
+| 2021–2025 | ~60% |
+
+`make validate` prints this breakdown every run. An availability model (§15.1)
+fitted across the whole window would read the 2020 step as a finding; fit it on
+2021+ or carry a coverage term.
+
+Another upstream wrinkle: nflverse moved weekly player stats to a new
 release (`stats_player`) with renamed columns, and **only the new location
 carries 2025**. The adapter tries locations in order and the builder normalizes
 the renamed columns, so a 14-season build spans both shapes. Depth charts
@@ -56,7 +80,16 @@ changed format too — the 2025+ files carry real publication timestamps, which
 is why preseason depth-chart rank is available for 2025 and null for earlier
 seasons, where the first chart is dated week 1 and postdates the draft.
 
-## Two rules the code enforces rather than documents
+## Three rules the code enforces rather than documents
+
+**The population is the roster, not the stat sheet (§13, §15.1).**
+`player_week` starts from weekly rosters and left-joins production onto them,
+so a week on IR is a row with `active_status = ir` rather than a missing row.
+Building it the other way round makes `active_status` a constant — every row
+describes a player who played — and leaves `games_missed_injury` counting only
+the injury-report designations that players on reserve stop receiving. Season
+availability is then a count of `player_week`'s own labels rather than a second,
+independent pass over the roster and injury files.
 
 **As-of discipline (§6.1).** Every feature row carries `as_of`, `source_as_of`
 and `value_type`. `assert_knowable(frame, season)` raises `LeakageError` if any
