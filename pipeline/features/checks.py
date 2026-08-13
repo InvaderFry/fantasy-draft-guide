@@ -183,6 +183,19 @@ PANDEMIC_SEASON = 2020
 EXPECTED_INJURY_SHARE = 0.45
 
 
+def _share_text(share: float | None) -> str:
+    """Render an injury share, including the case where there is nothing to divide.
+
+    A season in which nobody missed a game has a null share rather than a zero
+    one, and formatting that null with `:.0%` raised TypeError out of
+    `research validate`. That matters more than a report bug: the ADP archive
+    workflow runs capture, then validate, then commit, so anything that raises
+    in validate loses the payloads captured seconds earlier -- the one thing
+    S84 says cannot be bought back.
+    """
+    return "no absences" if share is None else f"{share:.0%}"
+
+
 def _check_availability_coverage(frame: pl.DataFrame) -> list[tuple[str, bool]]:
     """How much of `games_missed` can be explained, season by season (S15.1).
 
@@ -229,15 +242,15 @@ def _check_availability_coverage(frame: pl.DataFrame) -> list[tuple[str, bool]]:
         out.append(
             _ok(
                 f"player_season_outcomes: {PANDEMIC_SEASON} at "
-                f"{pandemic['share'][0]:.0%} -- Reserve/COVID-19 and Reserve/Opt-out "
-                "are absences, not injuries, and are counted as neither"
+                f"{_share_text(pandemic['share'][0])} -- Reserve/COVID-19 and "
+                "Reserve/Opt-out are absences, not injuries, and are counted as neither"
             )
         )
 
     legacy = by_season.filter(pl.col("season") < FIRST_SEASON_WITH_RESERVE_CODES)
     if legacy.height:
         shares = ", ".join(
-            f"{row['season']}: {row['share']:.0%}" for row in legacy.to_dicts()
+            f"{row['season']}: {_share_text(row['share'])}" for row in legacy.to_dicts()
         )
         out.append(
             _ok(

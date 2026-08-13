@@ -94,3 +94,35 @@ def test_every_table_carries_as_of():
     for name in TABLES:
         frame = _load(name)
         assert frame["as_of"].null_count() == 0, f"{name} has null as_of (S6.1)"
+
+
+def test_the_coverage_check_survives_a_season_with_no_absences():
+    """A null share formatted with :.0% raised TypeError out of `research validate`.
+
+    The archive workflow runs capture, then validate, then commit, so anything
+    that raises in validate discards the payloads captured seconds earlier --
+    the one thing S84 says cannot be bought back.
+    """
+    frame = pl.DataFrame(
+        {
+            "season": [2019, 2019, 2020, 2021],
+            "games_missed": [0, 0, 0, 3],
+            "games_missed_injury": [0, 0, 0, 2],
+        }
+    )
+    messages = [message for message, _ok in checks._check_availability_coverage(frame)]
+    assert any("2019: no absences" in message for message in messages)
+    assert any("2020 at no absences" in message for message in messages)
+
+
+def test_the_coverage_check_still_reports_a_real_share():
+    frame = pl.DataFrame(
+        {
+            "season": [2018, 2018, 2020],
+            "games_missed": [10, 10, 10],
+            "games_missed_injury": [2, 2, 6],
+        }
+    )
+    messages = [message for message, _ok in checks._check_availability_coverage(frame)]
+    assert any("2018: 20%" in message for message in messages)
+    assert any("2020 at 60%" in message for message in messages)
