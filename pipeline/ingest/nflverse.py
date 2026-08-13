@@ -117,9 +117,13 @@ DATASETS: dict[str, Dataset] = {
 }
 
 # Datasets needed before the S88 Week 2 analyses can run. pbp is the expensive
-# one (~19MB/season) and is streamed and aggregated rather than retained.
+# one (~19MB/season) but it is not optional: team_season is built entirely from
+# it and player_week takes its red-zone and goal-line opportunity from it. The
+# builders scan it lazily and reduce immediately, which is what "not retained"
+# means -- it still has to be on disk for `research build-tables` to run.
 CORE_DATASETS = (
     "player_stats",
+    "pbp",
     "snap_counts",
     "rosters",
     "weekly_rosters",
@@ -215,6 +219,21 @@ class NflverseAdapter:
                 )
             )
         return out
+
+
+def download_schedules(*, force: bool = False) -> Path:
+    """Write games.csv alongside the release assets.
+
+    Part of `research ingest` rather than a separate step: every builder dates
+    its rows from the game calendar (S6.1), so a raw directory without it
+    cannot produce a table.
+    """
+    path = RAW_DIR / "nflverse" / "games.csv"
+    if path.exists() and not force:
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(fetch_schedules().data)
+    return path
 
 
 def fetch_schedules() -> Fetched:

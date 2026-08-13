@@ -112,6 +112,9 @@ def ingest(
     names = [d.strip() for d in datasets.split(",") if d.strip()] or None
     adapter = nflverse.NflverseAdapter(seasons=_parse_seasons(seasons), datasets=names)
     paths = adapter.download(force=force)
+    # The game calendar dates every row the builders write (S6.1), so it is part
+    # of an ingest rather than a step someone has to remember.
+    paths.append(nflverse.download_schedules(force=force))
     total = sum(p.stat().st_size for p in paths)
     typer.echo(f"ingested {len(paths)} file(s), {total / 1e6:.1f} MB in {adapter.raw_dir()}")
 

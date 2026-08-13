@@ -7,9 +7,6 @@ setup:
 
 ingest:
 	uv run research ingest --seasons $(SEASONS)
-	uv run python -c "from pipeline.ingest.nflverse import fetch_schedules; \
-	from pipeline.config import RAW_DIR; f = fetch_schedules(); \
-	(RAW_DIR/'nflverse'/f.filename).write_bytes(f.data); print('schedules ok')"
 
 ids:
 	uv run research normalize-ids
