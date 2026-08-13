@@ -85,11 +85,13 @@ TEAM_SEASON_COLUMNS = (
 
 # S13 adp_history
 ADP_HISTORY_COLUMNS = (
-    "season", "snapshot_date", "as_of", "source", "format", "teams",
+    "season", "snapshot_date", "as_of", "source_as_of", "value_type",
+    "source", "format", "teams",
     "player_id", "source_player_id", "source_player_name", "position", "team",
-    "adp", "position_adp", "sample_size_if_available",
-    "adp_stdev", "pick_p10", "pick_p25", "pick_p50", "pick_p75", "pick_p90",
-    "n_drafts", "match_method", "match_confidence", "value_type",
+    "bye", "adp", "position_adp", "sample_size_if_available",
+    "adp_stdev", "pick_high", "pick_low",
+    "pick_p10", "pick_p25", "pick_p50", "pick_p75", "pick_p90",
+    "n_drafts", "match_method", "match_confidence",
 )
 
 

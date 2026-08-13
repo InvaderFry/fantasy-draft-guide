@@ -56,3 +56,12 @@ def test_published_distribution_fields_are_carried_through():
     assert row["n_drafts"] == 412
     assert row["as_of"] == dt.date(2026, 8, 13)
     assert row["value_type"] == "observed"
+
+
+def test_parsed_rows_carry_source_as_of():
+    """S6.1: source_as_of is required on every feature row, adp_history included."""
+    row = parse(
+        json.dumps(MEAN_ONLY).encode(),
+        snapshot_date=dt.date(2026, 8, 13), fmt="half-ppr", teams=12, year=2026,
+    )[0]
+    assert row["source_as_of"] == dt.date(2026, 8, 13)
