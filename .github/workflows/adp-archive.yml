@@ -92,3 +92,66 @@ jobs:
             sleep $((2 ** attempt))
           done
           exit 1
+
+  # The capture is only half the job. S84 archives the price; nothing rebuilt
+  # anything downstream of it, so the S83 sheets stayed frozen at whatever board
+  # they were last generated from -- and with the draft dates unknown there is no
+  # date on which somebody would think to re-run them by hand.
+  #
+  # Separate job, not extra steps above, and deliberately so: an uncaptured day
+  # of ADP movement is gone permanently (S84) while a sheet can always be
+  # re-rendered. The two must not share a failure. By the time this runs the
+  # capture has already committed and pushed.
+  sheets:
+    needs: capture
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main          # fetches the snapshot the capture job just pushed
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install project
+        run: uv sync
+
+      # Only what the market-dependent modules need. S12's crosswalk wants
+      # players.parquet plus recent rosters for the platform IDs -- about 7 MB.
+      # The full 2012-2025 play-by-play pull is ~300 MB and feeds S25 and S21.1,
+      # which describe completed seasons and would recompute an identical answer
+      # every morning; their artifacts are committed and carried forward instead.
+      - name: Build the crosswalk and the market tables
+        run: |
+          uv run research ingest --datasets players,rosters --seasons 2024-2025
+          uv run research normalize-ids
+          uv run research build-tables --tables adp_history,projection_snapshot
+
+      # A fixed edition, regenerated in place. The dated editions are the
+      # archival scheme (S9, S78); this is the one live board, and it keeps a
+      # stable address because the thing that opens it on draft day is a
+      # bookmark on a phone.
+      - name: Refresh the draft board
+        run: |
+          uv run research run-research \
+            --edition 2026-draft \
+            --modules tiers_and_replacement_level,survival_probability
+          uv run research sheet --edition 2026-draft
+
+      - name: Commit the refreshed sheets
+        run: |
+          if [ -z "$(git status --porcelain artifacts/2026-draft)" ]; then
+            echo "sheets unchanged - nothing to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/2026-draft
+          git commit -m "Draft sheets: $(date -u +%Y-%m-%d) [skip ci]"
+          for attempt in 1 2 3 4; do
+            git pull --rebase origin main && git push origin main && exit 0
+            sleep $((2 ** attempt))
+          done
+          exit 1

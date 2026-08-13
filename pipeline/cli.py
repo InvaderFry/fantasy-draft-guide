@@ -4,17 +4,19 @@
     research ingest        pull nflverse history (S10A)
     research normalize-ids build the player ID crosswalk (S12)
     research build-tables  build the canonical tables (S13)
+    research run-research  run the S16 method modules (S47 stage 8)
+    research sheet         render the S83 draft-day sheets
     research validate      re-hash snapshots and run the data/leakage checks
 
-Later stages -- research modules, evidence grading, artifact export, the site --
-are not implemented in this chunk. See S88 Weeks 2-3 and S79 Steps 4+.
+Later stages -- evidence grading and the site -- are not implemented in this
+chunk. See S79 Steps 4+.
 """
 
 from __future__ import annotations
 
 import datetime as dt
 import sys
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
@@ -173,6 +175,35 @@ def build_tables(
         typer.echo(f"{name}: {path}")
 
 
+# Which modules `run-research` knows about, keyed by the METHOD_ID that names
+# their artifacts. A function rather than a module-level dict because the imports
+# are deliberately lazy -- and a function the daily refresh workflow can be tested
+# against, so a renamed METHOD_ID fails a test here rather than a scheduled run at
+# 11:00 UTC that nobody reads until draft day.
+MARKET_DEPENDENT_MODULES = ("tiers_and_replacement_level", "survival_probability")
+"""The modules whose answers move with the market, and so refresh daily.
+
+S25 team regression and S21.1 dead-zone rates describe completed seasons: their
+inputs do not change between drafts, and re-running them daily would mean pulling
+the whole play-by-play archive into CI to recompute an identical number.
+"""
+
+
+def research_modules() -> dict[str, Any]:
+    from research.foundations import survival, tiers
+    from research.running_back import dead_zone
+    from research.teams import team_scoring_regression
+
+    return {
+        team_scoring_regression.METHOD_ID: team_scoring_regression.run,
+        dead_zone.METHOD_ID: dead_zone.run,
+        # Gated by S14 and S11. A gate that is shut is a finding, not a failure:
+        # these report why and the run continues.
+        tiers.METHOD_ID: tiers.run,
+        survival.METHOD_ID: survival.run,
+    }
+
+
 @app.command("run-research")
 def run_research(
     modules: Annotated[str, typer.Option(help="comma list, default all runnable")] = "",
@@ -186,17 +217,8 @@ def run_research(
     """
     from research import method as method_mod
     from research.foundations import survival, tiers
-    from research.running_back import dead_zone
-    from research.teams import team_scoring_regression
 
-    modules_by_id = {
-        team_scoring_regression.METHOD_ID: team_scoring_regression.run,
-        dead_zone.METHOD_ID: dead_zone.run,
-        # Gated by S14 and S11. A gate that is shut is a finding, not a failure:
-        # these report why and the run continues.
-        tiers.METHOD_ID: tiers.run,
-        survival.METHOD_ID: survival.run,
-    }
+    modules_by_id = research_modules()
     gated = (tiers.BlockedError, survival.BlockedError)
 
     wanted = [m.strip() for m in modules.split(",") if m.strip()] or list(modules_by_id)

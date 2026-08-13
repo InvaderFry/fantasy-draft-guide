@@ -65,6 +65,10 @@ SURVIVAL_ARTIFACT = {
     "method_id": f"{survival_mod.METHOD_ID}__fixture_12",
     "primary_results": {
         "teams": 12,
+        # Deliberately not today: the sheet has to distinguish the capture it was
+        # priced from at the generation date, and a fixture where they coincide
+        # cannot tell whether the page is reading one or the other.
+        "adp_snapshot_date": "2026-08-01",
         "by_slot": [
             {
                 "slot": 7,
@@ -344,3 +348,40 @@ def test_end_to_end_from_a_projection_archive_to_a_finished_sheet(tmp_path, monk
     assert "FADE" in page                 # regression
     assert page.count("NOT BUILT") == 4   # and only the genuinely unbuilt ones
     assert isinstance(pl.DataFrame(), pl.DataFrame) and dt.date.today()
+
+
+# -- the one date on the page that can go stale (S84) -----------------------
+
+
+def test_the_sheet_says_which_adp_capture_it_is_priced_from():
+    """`generated` is written by the run that writes the page, so it is current
+    even when the board underneath is weeks old. The capture date is the one a
+    drafter at the table can actually check."""
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=FULL)
+    captured = SURVIVAL_ARTIFACT["primary_results"]["adp_snapshot_date"]
+    assert f"priced from the ADP capture of <strong>{captured}</strong>" in page
+    sheet.assert_sheet_constraints(page)
+
+
+def test_a_capture_older_than_today_is_called_out_rather_than_shown_quietly():
+    """The failure this exists for is the refresh silently stopping."""
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=FULL)
+    assert "not today" in page
+
+
+def test_no_survival_artifact_means_unpriced_not_today():
+    """Absent provenance must not render as fresh provenance."""
+    artifacts = {k: v for k, v in FULL.items() if not k.startswith(survival_mod.METHOD_ID)}
+    page = sheet.render("test", profile=PROFILE, artifacts=artifacts)
+    assert "ADP not priced" in page
+    assert "priced from the ADP capture" not in page
+
+
+def test_the_index_carries_the_capture_date_and_flags_a_stale_one(tmp_path, monkeypatch):
+    monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE])
+    _seed(tmp_path)
+    sheet.write("ed", root=tmp_path)
+    index = (tmp_path / "ed" / "sheets" / "index.html").read_text()
+    captured = SURVIVAL_ARTIFACT["primary_results"]["adp_snapshot_date"]
+    assert captured in index
+    assert "daily refresh has not run" in index
