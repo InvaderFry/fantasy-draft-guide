@@ -14,9 +14,9 @@ from pathlib import Path
 
 import polars as pl
 
-from pipeline.config import PROCESSED_DIR
+from pipeline.config import PROCESSED_DIR, ConfigError
 from pipeline.features import adp_history, player_season, player_week, team_season
-from pipeline.features.assertions import LeakageError, assert_knowable
+from pipeline.features.assertions import assert_knowable
 
 TABLES = ("player_week", "player_season", "team_season", "adp_history")
 
@@ -81,9 +81,11 @@ def _assert_usable_next_season(frame: pl.DataFrame, season: int, name: str) -> N
     """A season-Y aggregate is a feature for season Y+1, and must be knowable then."""
     try:
         assert_knowable(frame, season + 1, f"{name}[{season}] used for {season + 1}")
-    except LeakageError:
-        raise
-    except Exception:  # no decision date configured for season+1 yet
+    except ConfigError:
+        # No decision date configured for season+1 yet. Every other exception
+        # propagates: a bare `except Exception` here turned a dtype drift in
+        # `as_of` -- the exact failure mode this repo has already hit -- into a
+        # silently skipped leakage check on the whole build.
         return
 
 

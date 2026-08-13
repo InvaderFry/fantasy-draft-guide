@@ -25,14 +25,22 @@ def build(season: int) -> pl.DataFrame:
         .filter((pl.col("season_type") == "REG") & pl.col("posteam").is_not_null())
     )
 
+    # `plays` and `yards` have to be counted over the same set or the ratio is
+    # meaningless. `play == 1` includes 2,701 penalty-nullified snaps in 2024
+    # that gain nothing, while `yards_gained` was summed over every row
+    # including kneel-downs that `play` excludes -- yards_per_play came out at
+    # 5.08 against a real scrimmage figure of 5.41. Both now use the scrimmage
+    # set, which is also the denominator pass_rate is built from.
+    scrimmage = (pl.col("pass_attempt").fill_null(0) + pl.col("rush_attempt").fill_null(0)) > 0
+
     base = (
         lf.group_by("posteam")
         .agg(
             pl.col("game_id").n_unique().alias("games"),
-            (pl.col("play") == 1).sum().alias("plays"),
+            scrimmage.sum().alias("plays"),
             pl.col("pass_attempt").fill_null(0).sum().alias("pass_attempts"),
             pl.col("rush_attempt").fill_null(0).sum().alias("rush_attempts"),
-            pl.col("yards_gained").fill_null(0).sum().alias("yards"),
+            pl.col("yards_gained").fill_null(0).filter(scrimmage).sum().alias("yards"),
             pl.col("pass_touchdown").fill_null(0).sum().alias("passing_tds"),
             pl.col("rush_touchdown").fill_null(0).sum().alias("rushing_tds"),
             pl.col("interception").fill_null(0).sum().alias("interceptions"),
@@ -57,10 +65,30 @@ def build(season: int) -> pl.DataFrame:
         .rename({"posteam": "team"})
     )
 
+    # Two corrections to what counts as a red-zone trip.
+    #
+    # Extra points are snapped from the 15 and two-point tries from the 2, and
+    # nflverse assigns them to the drive that scored. A drive that scored from
+    # 60 yards out therefore has no scrimmage play inside the 20 but does have
+    # its extra point there, so it was being counted as a red-zone trip that
+    # failed to reach the end zone. In 2024 that was 365 of 2,195 trips, all
+    # scored as no-TD, dragging the league red-zone TD rate from 0.561 to 0.467.
+    #
+    # And `touchdown` is set on any score, including one by the defence: a
+    # red-zone pick-six would otherwise be credited to the offence's conversion
+    # rate. Four of 2024's 1,026 red-zone touchdown plays.
     red_zone = (
-        lf.filter(pl.col("yardline_100") <= RED_ZONE_YARDLINE)
+        lf.filter(
+            (pl.col("yardline_100") <= RED_ZONE_YARDLINE)
+            & (pl.col("extra_point_attempt").fill_null(0) == 0)
+            & (pl.col("two_point_attempt").fill_null(0) == 0)
+        )
         .group_by(["posteam", "game_id", "fixed_drive"])
-        .agg(pl.col("touchdown").fill_null(0).max().alias("_drive_td"))
+        .agg(
+            (pl.col("touchdown").fill_null(0) * (pl.col("td_team") == pl.col("posteam")))
+            .max()
+            .alias("_drive_td")
+        )
         .group_by("posteam")
         .agg(
             pl.len().alias("red_zone_trips"),

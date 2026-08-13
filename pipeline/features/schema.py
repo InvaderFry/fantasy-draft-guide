@@ -47,7 +47,8 @@ PLAYER_WEEK_COLUMNS = (
     "passing_yards", "passing_tds", "interceptions", "fumbles_lost",
     "offensive_snaps", "snap_share",
     "red_zone_targets", "red_zone_carries", "goal_line_carries",
-    "team_pass_attempts", "team_rush_attempts", "team_air_yards", "team_points",
+    "team_pass_attempts", "team_rush_attempts", "team_targets", "team_air_yards",
+    "team_points",
     "target_share", "air_yard_share",
 )
 

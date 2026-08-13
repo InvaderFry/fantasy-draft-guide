@@ -31,6 +31,9 @@ from pipeline.features import sources
 from pipeline.features.assertions import assert_as_of_present, assert_no_outcome_columns
 from pipeline.normalize.player_ids import load_player_ids
 
+# Depth charts carry an offensive group, two defensive groups and this one.
+SPECIAL_TEAMS_GROUP = "Special Teams"
+
 
 def build(season: int, weekly: pl.DataFrame | None = None) -> tuple[pl.DataFrame, pl.DataFrame]:
     """Return (features, outcomes) for one season."""
@@ -62,7 +65,7 @@ def build(season: int, weekly: pl.DataFrame | None = None) -> tuple[pl.DataFrame
         pl.col("snap_share").filter(active).mean().alias("snap_share"),
         # denominators cover only the weeks the player was active, so these are
         # shares of team opportunity while playing, not season-wide shares
-        pl.col("team_pass_attempts").filter(active).sum().alias("_team_pass_attempts_active"),
+        pl.col("team_targets").filter(active).sum().alias("_team_targets_active"),
         pl.col("team_rush_attempts").filter(active).sum().alias("_team_rush_attempts_active"),
         pl.col("team_air_yards").filter(active).sum().alias("_team_air_yards_active"),
         pl.col("fantasy_points_standard").sum().alias("fantasy_points_standard"),
@@ -77,11 +80,12 @@ def build(season: int, weekly: pl.DataFrame | None = None) -> tuple[pl.DataFrame
     # over the weeks the player was active. air_yard_share previously divided a
     # player's full-season air yards by the full-season total of whichever team
     # they finished on, which understated every player who missed time and was
-    # simply wrong for anyone traded mid-season.
+    # simply wrong for anyone traded mid-season. target_share divided by team
+    # pass attempts, which count sacks -- see _team_receiving in player_week.
     per_player = per_player.with_columns(
-        (pl.col("targets") / pl.col("_team_pass_attempts_active")).alias("target_share"),
-        (pl.col("carries") / pl.col("_team_rush_attempts_active")).alias("rush_share"),
-        (pl.col("air_yards") / pl.col("_team_air_yards_active")).alias("air_yard_share"),
+        _share("targets", "_team_targets_active").alias("target_share"),
+        _share("carries", "_team_rush_attempts_active").alias("rush_share"),
+        _share("air_yards", "_team_air_yards_active").alias("air_yard_share"),
     )
 
     bio = _biographical(season)
@@ -139,8 +143,8 @@ def _outcomes(season: int, per_player: pl.DataFrame, as_of: dt.date) -> pl.DataF
         pl.lit(True).alias("is_outcome"),
     )
     frame = frame.with_columns(
-        (pl.col("fantasy_points_ppr") / pl.col("rostered_weeks")).alias("fantasy_ppg"),
-        (pl.col("fantasy_points_ppr") / pl.col("games")).alias("fantasy_ppg_active"),
+        _share("fantasy_points_ppr", "rostered_weeks").alias("fantasy_ppg"),
+        _share("fantasy_points_ppr", "games").alias("fantasy_ppg_active"),
     )
     _assert_absences_add_up(frame, season)
     return frame.select(
@@ -149,6 +153,21 @@ def _outcomes(season: int, per_player: pl.DataFrame, as_of: dt.date) -> pl.DataF
         "games", "rostered_weeks", "games_missed", "games_missed_injury",
         "fantasy_points_standard", "fantasy_points_half_ppr", "fantasy_points_ppr",
         "fantasy_ppg", "fantasy_ppg_active",
+    )
+
+
+def _share(numerator: str, denominator: str) -> pl.Expr:
+    """A ratio that is null, not NaN, when the denominator is zero.
+
+    A player rostered all season who never played has no team opportunity to
+    take a share of. Polars gives 0/0 as NaN, which survives `is_null()`,
+    poisons any `mean()`, and sorts ahead of every real value in a descending
+    sort -- so "top ten by target share" returned ten players with no targets.
+    """
+    return (
+        pl.when(pl.col(denominator) > 0)
+        .then(pl.col(numerator) / pl.col(denominator))
+        .otherwise(None)
     )
 
 
@@ -251,6 +270,14 @@ def _preseason_depth_chart(season: int) -> pl.DataFrame:
     cutoff = decision_date(season)
 
     if "dt" in charts.columns:  # current format
+        # A return man appears twice: once in the offensive group at his real
+        # depth, and once in Special Teams as PR1/KR1. Taking the minimum rank
+        # across both promoted 86 of 2025's 727 player-seasons to "the team's
+        # number one" -- Rashid Shaheed, a WR2, and several WR7s among them.
+        # 2025 is the only season this feature has any data for, so that was
+        # 11.8% of the entire population, biased toward exactly the players
+        # whose role a depth-chart rank is supposed to describe correctly.
+        charts = charts.filter(pl.col("pos_grp") != SPECIAL_TEAMS_GROUP)
         charts = charts.with_columns(
             pl.col("dt").str.slice(0, 10).str.to_date(strict=False).alias("chart_date")
         ).filter((pl.col("chart_date") <= pl.lit(cutoff)) & pl.col("gsis_id").is_not_null())
