@@ -39,6 +39,13 @@ questions:
       distribution fields were present in the snapshot manifest notes.
     status: OPEN                      # resolve in Week 1 -- answer goes here
     answer: null
+    archive_gap: >
+      The adp-archive workflow shipped pinned to a feature branch that was
+      subsequently merged, so it captured nothing before 2026-08-13. Those days
+      of intra-summer price movement do not exist and are not purchasable
+      retroactively (S84). The series starts at the first successful run; any
+      recency weighting (S31.3) must treat the archive as beginning then rather
+      than at the start of the summer.
 
   - id: team_scoring_regression
     question: >

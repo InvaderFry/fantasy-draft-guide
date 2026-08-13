@@ -34,9 +34,13 @@ jobs:
   capture:
     runs-on: ubuntu-latest
     steps:
+      # main, explicitly: the archive has to land on the default branch whatever
+      # ref a manual dispatch was launched from. This previously pinned a feature
+      # branch, which was then merged, so every capture would have gone to a
+      # branch nothing reads.
       - uses: actions/checkout@v4
         with:
-          ref: claude/initial-repo-setup-mzttyy
+          ref: main
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -68,8 +72,7 @@ jobs:
           git add data/snapshots
           git commit -m "ADP archive: $(date -u +%Y-%m-%d) [skip ci]"
           for attempt in 1 2 3 4; do
-            git pull --rebase origin claude/initial-repo-setup-mzttyy && \
-              git push origin claude/initial-repo-setup-mzttyy && exit 0
+            git pull --rebase origin main && git push origin main && exit 0
             sleep $((2 ** attempt))
           done
           exit 1
