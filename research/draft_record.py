@@ -32,6 +32,7 @@ from typing import Any
 import polars as pl
 
 from pipeline.config import PROCESSED_DIR, ConfigError, real_profiles
+from pipeline.normalize.names import name_position_key, normalize_name
 from research.foundations import survival as survival_mod
 from research.method import ARTIFACT_DIR, MethodArtifact, default_edition
 
@@ -64,10 +65,10 @@ def picks(profile_id: str, *, processed_dir=PROCESSED_DIR) -> pl.DataFrame:
 def _survival_quotes(edition: str, profile_id: str, slot: int, root=ARTIFACT_DIR) -> dict:
     """What the sheet said about each candidate at each of this seat's picks.
 
-    Keyed (pick, player) so the log can be looked up against it directly. The
-    artifact carries every slot when the order was undrawn, which is precisely
-    why the drawn seat has to be recorded separately -- the artifact does not
-    know which of the twelve actually happened.
+    Keyed by pick; the candidates carry their own identity, which is what the log
+    is matched against. The artifact holds every slot when the order was undrawn,
+    which is precisely why the drawn seat has to be recorded separately -- the
+    artifact does not know which of the twelve actually happened.
     """
     path = root / edition / "methods" / f"{survival_mod.METHOD_ID}__{profile_id}.json"
     if not path.exists():
@@ -86,13 +87,12 @@ def _survival_quotes(edition: str, profile_id: str, slot: int, root=ARTIFACT_DIR
             f"the survival artifact covers no slot {slot}; the draft was recorded from "
             f"seat {slot} but the sheet was not rendered for it (S31.2)."
         )
-    quotes = {}
+    quotes: dict[int, list[dict]] = {}
     for block in entry["picks"]:
-        for candidate in block["candidates"]:
-            quotes[(block["pick"], candidate["player"])] = {
-                **candidate,
-                "survival_measured_at": block.get("survival_measured_at"),
-            }
+        quotes[block["pick"]] = [
+            {**candidate, "survival_measured_at": block.get("survival_measured_at")}
+            for candidate in block["candidates"]
+        ]
     return {
         "held_picks": entry["held_picks"],
         "quotes": quotes,
@@ -139,13 +139,63 @@ def compute(
         "adp_snapshot_date": survival["adp_snapshot_date"],
         "opportunity_cost_method": survival["opportunity_cost_method"],
         "picks": rows,
+        "pairing": _pairing(rows),
         "survival_calibration": _calibration(rows),
         "n": len(rows),
     }
 
 
+def _identities(player_id: str | None, name: str, position: str | None) -> list:
+    """Every key one player can be recognised by, strongest first.
+
+    S12's ``gsis_id`` when both sides have one, then name and position, then the
+    name alone. The last is weak everywhere else in this repository and is safe
+    here: the population is one draft, and two players sharing a normalized name
+    inside 168 picks is not a thing that happens.
+    """
+    keys: list = []
+    if player_id:
+        keys.append(("id", player_id))
+    keys.append(("name_pos", name_position_key(name, position)))
+    keys.append(("name", normalize_name(name)))
+    return keys
+
+
+def _drafted_at(taken_at: dict) -> dict:
+    """When each drafted player went, under every key he can be found by.
+
+    A key two different picks both answer to is dropped rather than resolved to
+    the first of them -- ``match_external``'s rule for its own loose key, and for
+    the same reason. Attributing one man's pick to another does not look like an
+    error downstream; it looks like a survival call that came out the other way.
+    """
+    index: dict = {}
+    ambiguous = set()
+    for overall, row in taken_at.items():
+        for key in _identities(
+            row.get("player_id"), row["source_player_name"], row.get("position")
+        ):
+            if key in index and index[key] != int(overall):
+                ambiguous.add(key)
+            index.setdefault(key, int(overall))
+    for key in ambiguous:
+        del index[key]
+    return index
+
+
 def _calls(survival: dict, pick: int, next_pick: int | None, taken_at: dict) -> list[dict]:
     """For each name the sheet quoted at this pick: predicted, then observed.
+
+    **The pairing goes through the id, not the spelling.** The quote is Fantasy
+    Football Calculator's name and the log is whatever a platform's results page
+    printed, and the two do not agree -- FFC and FantasyPros already differ on
+    Kenneth Walker III and Patrick Mahomes II on the board this was written
+    against, and the paste is a third spelling that cannot be seen from here in
+    advance. Matching on the string silently fails open: a quoted player whose
+    name spells differently is never found among the picks, so he reads as still
+    available, and the calibration table reports the approximation as far better
+    than it is. ``player_id`` is on both sides -- ``draft_pick.build`` and
+    ``adp_history`` both run ``match_external`` -- and name keys are the fallback.
 
     Two filters, and the first one is easy to miss. S31.2 draws its candidate
     list from ADP with a buffer reaching back half a round (S19.4's
@@ -163,30 +213,61 @@ def _calls(survival: dict, pick: int, next_pick: int | None, taken_at: dict) -> 
     """
     if next_pick is None:
         return []
-    gone_before = {
-        row["source_player_name"] for overall, row in taken_at.items() if overall < pick
-    }
-    gone_between = {
-        row["source_player_name"]
-        for overall, row in taken_at.items()
-        if pick < overall < next_pick
-    }
+    drafted = _drafted_at(taken_at)
+
     out = []
-    for (quoted_pick, player), candidate in survival["quotes"].items():
-        if quoted_pick != pick or candidate.get("p_available") is None:
+    for candidate in survival["quotes"].get(pick, []):
+        if candidate.get("p_available") is None:
             continue
-        if player in gone_before:
+        went, matched_by = None, None
+        for key in _identities(
+            candidate.get("player_id"), candidate["player"], candidate.get("position")
+        ):
+            if key in drafted:
+                went, matched_by = drafted[key], key[0]
+                break
+        if went is not None and went < pick:
             continue  # off the board before this seat was on the clock
         out.append(
             {
-                "player": player,
+                "player": candidate["player"],
                 "adp": candidate.get("adp"),
                 "p_available_predicted": candidate["p_available"],
-                "was_available": player not in gone_between,
+                "was_available": not (went is not None and pick < went < next_pick),
+                # A quote that matched nothing anywhere in the log is either a
+                # player who went undrafted or a pairing that failed, and the two
+                # are indistinguishable from one row. Recorded per call so
+                # `pairing` can count them and say which this draft looks like.
+                "matched_in_log": went is not None,
+                "matched_by": matched_by,
                 "approximation_note": candidate.get("approximation_note"),
             }
         )
     return sorted(out, key=lambda r: r["adp"] if r["adp"] is not None else 999)
+
+
+def _pairing(rows: list[dict]) -> dict[str, Any]:
+    """How the quotes were joined to the picks, and how much of it held.
+
+    The number to read is ``unmatched``. Every one of those calls scores as
+    available whether or not the player was, so a pairing that quietly half
+    fails does not look like a failure -- it looks like a strikingly well
+    calibrated approximation.
+    """
+    calls = [c for row in rows for c in row["survival_calls"]]
+    by = {"id": 0, "name_pos": 0, "name": 0}
+    for call in calls:
+        if call["matched_by"] in by:
+            by[call["matched_by"]] += 1
+    unmatched = sum(1 for c in calls if not c["matched_in_log"])
+    return {
+        "calls": len(calls),
+        "matched_by_id": by["id"],
+        "matched_by_name_and_position": by["name_pos"],
+        "matched_by_name": by["name"],
+        "unmatched": unmatched,
+        "unmatched_share": round(unmatched / len(calls), 4) if calls else None,
+    }
 
 
 # Predicted-probability buckets. Coarse on purpose: one draft supplies a couple

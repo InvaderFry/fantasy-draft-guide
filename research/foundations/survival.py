@@ -39,6 +39,7 @@ from pipeline.config import (
 )
 from research import stats
 from research.method import MethodArtifact
+from research.running_back import dead_zone
 
 METHOD_ID = "survival_probability"
 VERSION = "1.0.0"
@@ -51,6 +52,10 @@ OPPORTUNITY_COST_METHOD = "normal_approximation"
 DEFAULT_ROUNDS = 15
 
 UNKNOWN_SLOT = "unknown"
+
+# Shared with S21.1 rather than restated, so the two cannot drift about what is
+# in scope for S88.
+OUT_OF_SCOPE_POSITIONS = dead_zone.ADP_POSITIONS_OUT_OF_SCOPE
 
 
 class BlockedError(ConfigError):
@@ -153,6 +158,15 @@ def compute(
     than by guessing one. The sheet then still works the moment the order is
     drawn.
     """
+    # Kickers and defences are drafted and priced, and every other S88 module
+    # already excludes them by name -- tiers restricts to POSITIONS, dead_zone to
+    # ADP_POSITIONS_OUT_OF_SCOPE. This module did not, so "Denver Defense" was
+    # quoted in the last block of four of the live sheets. Nothing here can value
+    # him: there is no scoring configured for the position and he can never
+    # appear in TIERS, so a name that reaches SURVIVAL and nothing else is a dead
+    # end at the table, printed in a block that holds six.
+    adp = adp.filter(~pl.col("position").is_in(list(OUT_OF_SCOPE_POSITIONS)))
+
     teams = int(profile["teams"])
     slot = draft_slot(profile)
     slots = list(range(1, teams + 1)) if slot is None else [slot]
@@ -224,6 +238,13 @@ def _pick_block(adp: pl.DataFrame, pick: int, next_pick: int | None) -> dict[str
         rows.append(
             {
                 "player": row["source_player_name"],
+                # S12's id, carried so S76 can pair this quote with what actually
+                # happened without going through the spelling. The draft log comes
+                # from a platform's results page and prices come from FFC; the two
+                # already disagree about Kenneth Walker III on the board this was
+                # written against, and the paste is a third spelling nobody here
+                # can see in advance.
+                "player_id": row.get("player_id"),
                 "position": row["position"],
                 "team": row["team"],
                 "adp": round(float(row["adp"]), 1),

@@ -179,9 +179,9 @@ it. §83's seven sections and what each carries today:
 
 | Section | Spec | State |
 |---|---|---|
-| TIERS | §19.3 | **filled in** — tier, player, team, VOR by position |
+| TIERS | §19.3 | **filled in** — tier, player, team, VOR **and ADP** by position |
 | TARGETS | §27 | not built — needs graded evidence (§79) |
-| AVOIDS | §28 | not built — needs graded evidence (§79) |
+| AVOIDS | §28 | **filled in** — §21.1's price band. Player-level avoids still need §79 |
 | REGRESSION | §25 | **filled in** — teams flagged, with the expected move |
 | DARTS | §29 | not built (§79) |
 | SURVIVAL | §31.2 | **filled in** — who is on the board at each held pick, and P(back at the next) |
@@ -194,7 +194,7 @@ to prevent. §83 also forbids evidence grades, confidence intervals and sample
 sizes on the sheet — `assert_sheet_constraints` scans the rendered page for them
 and raises, so the rule survives a section added by someone who did not read it.
 
-Three of the seven sections now carry content, and the page is generated once per
+Four of the seven sections now carry content, and the page is generated once per
 league **and once per draft slot** — 26 sheets plus an `index.html` chooser,
 because the draft order is drawn about an hour before the draft and that is not
 an hour to be running a build in. See *Draft day* below.
@@ -202,6 +202,32 @@ an hour to be running a build in. See *Draft day* below.
 Each of the 26 has been rendered to PDF and verified to print on a single page.
 That is not decoration: the one-page rule broke the moment TIERS and SURVIVAL
 started carrying real content, and it broke silently.
+
+### The price on the board, and where the dead zone actually bites
+
+§83 specifies TIERS "with ADP alongside", and until now the board carried value
+and no price — which cannot answer the question asked at a live pick, which is
+not "is he good" but "is he good *here*". `adp` and `position_adp` now ride along
+on every player, joined from the §84 archive on §12's `gsis_id` with a normalized
+name fallback. Of the 183 players the market prices in scope, 181 land on the
+board; the artifact's `adp_coverage` reports both numbers, because `priced_share`
+alone cannot tell a broken join from a provider projecting 486 players against a
+market that quotes 200.
+
+**The price is carried, never blended.** §19.3's metric is `projected_points -
+replacement_points` and it is computed as if the column were absent. Folding ADP
+into the value is §39 and §56, and both grade evidence.
+
+§21.1 now reaches the sheet as the AVOIDS section: a price band derived from the
+artifact rather than typed in, being the run of adjacent ADP buckets around the
+widest RB/WR gap that all clear ten percentage points. On today's capture that is
+**RB, picks 25–60**. Prices inside it are red.
+
+The band turns out to sit almost entirely *below* the tier list — picks 25–60 is
+the 12th to 22nd back on a board sorted by value — so marking it there catches
+one player. It is marked in the SURVIVAL blocks too, and that is where it earns
+its place: at slot 7 seven backs in the band are flagged across picks 31 to 66,
+which is exactly where the choice gets made.
 
 ## Draft day: the order is drawn an hour before, so nothing is built then
 
@@ -280,10 +306,22 @@ survival artifact behind it at all.
 ### Checking it is still one page
 
 §83's one-page rule is the constraint the sheet is most likely to break as
-sections fill in, and it did break: with TIERS and SURVIVAL finally carrying
-content, 24 players a position rendered 1,078px against a 989px budget and
-printed on two. `MAX_TIER_PLAYERS` in `research/sheet.py` is now 16, measured
-rather than guessed. Re-measure before raising it:
+sections fill in, and it has broken twice. First when TIERS and SURVIVAL started
+carrying content: 24 players a position printed on two pages, and 16 fitted.
+Then again the moment the ADP column arrived — five columns in a 171px cell wrap
+the longer names, and a wrapped name costs height. `MAX_TIER_PLAYERS` in
+`research/sheet.py` is now **12**, measured rather than guessed: across all 26
+sheets, 13 put two of them onto a second page and 12 put none.
+
+Sweep all 26, not one. The survival block is a different height at different
+seats, and a sweep of a single slot says 13 is fine.
+
+The column really binding here is `Tm`. Dropping it clears every sheet at 14, so
+the team code costs about two players a position — kept, because it is what makes
+the §25 regression flags usable at the table: you read `FADE LA` and scan the
+board for LA.
+
+Re-measure before raising it:
 
 ```bash
 for f in artifacts/2026-draft/sheets/*.html; do
@@ -355,11 +393,35 @@ the guide does: *"it cannot be reconstructed later, and it is the only mechanism
 by which the evidence grades in §3.1 are ever checked against reality."*
 
 ```bash
-# 1. paste the platform's draft results into a file, then:
+# 1. paste the platform's draft results into a file, then CHECK it:
+research draft-record --profile half_ppr_12 --slot 7 --picks picks.txt --dry-run
+
+# 2. only once that reads clean, freeze it:
 research draft-record --profile half_ppr_12 --slot 7 --picks picks.txt
 research build-tables --tables draft_pick
 research draft-review --edition 2026-draft
 ```
+
+**Dry-run first, always.** §84 refuses a second record on the same date, so a
+paste frozen with a defect cannot be re-recorded that night. The defects that
+matter are the quiet ones — a line the parser skipped, or a name §12 cannot
+resolve, which parses cleanly and then pairs with nothing. `--dry-run` does the
+same parse and the same crosswalk match and writes nothing:
+
+```
+parsed 168 picks, 14 rounds, 12 teams
+  shapes: round.pick=168
+  seat 7 holds [7, 18, 31, 42, 55, 66, 79, 90, 103, 114, 127, 138, 151, 162] -- 14 pick(s) recorded
+  S12 crosswalk: 167/168 names resolved to an id
+    unmatched: 'Travis Hunter' (WR JAX) at pick 164
+```
+
+That is a real run, and the unmatched name was a real defect: nflverse rosters
+Travis Hunter at his defensive position and every fantasy source lists him at
+his offensive one, so he resolved to no id in all twelve archived ADP captures
+and in the projection snapshot too. `config/manual_id_overrides.yaml` carries the
+correction. **The whole path is exercised on every CI run** —
+`tests/test_draft_dry_run.py` drives the real CLI over a full 12×14 board.
 
 `--slot` is the seat that was actually drawn. **It is the one value nothing else
 in this repository holds** — the sheets are rendered for all twelve precisely
@@ -378,6 +440,17 @@ the first one, and every draft before then is gone.
 The review artifact pairs, for each pick you held: what the sheet said (tier,
 VOR, quoted survival), the market price, who you took, and — the part worth the
 typing — **what the approximation predicted against what actually happened**.
+
+**The pairing goes through the id, not the spelling.** The quote is Fantasy
+Football Calculator's name and the log is whatever the platform's results page
+printed, and the two do not agree: FFC says `Kenneth Walker` and
+`Patrick Mahomes` where every other source adds the generational suffix. Matched
+on the string this fails *open* — a player whose name spells differently is never
+found among the picks, so he reads as still available, and the calibration table
+reports the approximation as far better than it is. Both sides carry `gsis_id`,
+and the artifact's `pairing` block reports how every call was joined and how many
+were not. **Read `unmatched` before reading the calibration**: a pairing that
+quietly half fails does not look like a failure.
 
 **The paste is stored verbatim and never overwritten.** It goes through the same
 §84 snapshot machinery as the ADP captures, so it is hashed, checked by

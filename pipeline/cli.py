@@ -20,11 +20,14 @@ import sys
 from pathlib import Path
 from typing import Annotated, Any
 
+import polars as pl
 import typer
 
 from pipeline import config, snapshot
 from pipeline.ingest import fantasypros, ffc_adp, nflverse, projections_csv
 from pipeline.ingest.base import Fetched
+from pipeline.normalize import player_ids
+from pipeline.normalize.player_ids import match_external
 
 app = typer.Typer(add_completion=False, help="Fantasy draft research guide pipeline.")
 
@@ -449,6 +452,9 @@ def draft_record(
     date: Annotated[str, typer.Option(help="draft date, ISO, default today")] = "",
     rounds: Annotated[int, typer.Option(help="expected rounds, default inferred")] = 0,
     partial: Annotated[bool, typer.Option(help="accept a draft that really ended early")] = False,
+    dry_run: Annotated[
+        bool, typer.Option("--dry-run", help="parse and report; write nothing")
+    ] = False,
 ) -> None:
     """Freeze one league's draft as an immutable record (S76).
 
@@ -461,6 +467,13 @@ def draft_record(
     else in the repository holds: the sheets were rendered for all twelve
     because the order is drawn an hour before the draft (S31.2, S83), and once
     the draft is over there is no way back to which one was real.
+
+    **Run `--dry-run` first.** S84 refuses a second record on the same date, so
+    a paste frozen with a defect cannot be re-recorded that day -- and the
+    defects that matter here are the quiet ones: a line the parser skipped, or a
+    name the S12 crosswalk cannot resolve, which parses cleanly and then pairs
+    with nothing when `draft-review` runs. `--dry-run` does the same parse and
+    the same crosswalk match, reports both, and writes nothing.
     """
     from pipeline.ingest import draft_log
 
@@ -490,6 +503,11 @@ def draft_record(
         typer.echo(f"draft log rejected: {exc}", err=True)
         raise typer.Exit(code=1) from None
 
+    _report_draft_log(body, league, slot)
+    if dry_run:
+        typer.echo("dry run: nothing written. Re-run without --dry-run to freeze it.")
+        return
+
     snap = snapshot.Snapshot(draft_day)
     try:
         written = snap.write(
@@ -516,6 +534,66 @@ def draft_record(
     typer.echo(
         "next: `research build-tables --tables draft_pick` then `research draft-review`"
     )
+
+
+def _report_draft_log(body: dict, league: dict, slot: int) -> None:
+    """What the paste turned into, before anything is frozen.
+
+    Three numbers decide whether the audit will work, and none of them is
+    visible from a successful parse alone: how the lines were read, which picks
+    this seat ends up holding, and how many names S12 could not resolve. An
+    unresolved name is a quote that will pair with nothing when `draft-review`
+    runs -- and an unpaired quote scores as "still available" whether or not he
+    was, which reads as a well calibrated approximation rather than as a fault.
+    """
+    from pipeline.features import draft_pick
+    from pipeline.ingest import draft_log
+    from research.foundations import survival as survival_mod
+
+    picks = draft_log.parse(
+        body["raw_text"], teams=body["teams"], partial=bool(body["partial"])
+    )
+    shapes: dict[str, int] = {}
+    for pick in picks:
+        shapes[pick["parsed_as"]] = shapes.get(pick["parsed_as"], 0) + 1
+
+    typer.echo(
+        f"parsed {body['pick_count']} picks, {body['rounds']} rounds, "
+        f"{body['teams']} teams"
+        + (" (partial)" if body["partial"] else "")
+    )
+    typer.echo("  shapes: " + ", ".join(f"{k}={v}" for k, v in sorted(shapes.items())))
+
+    held = survival_mod.held_picks(body["teams"], slot, rounds=body["rounds"])
+    mine = [p["source_player_name"] for p in picks if p["slot"] == slot]
+    typer.echo(f"  seat {slot} holds {held} -- {len(mine)} pick(s) recorded")
+
+    frame = draft_pick.parse_payload(body, snapshot_date=dt.date.today())
+    try:
+        matched = match_external(pl.DataFrame(frame))
+    except player_ids.CrosswalkError as exc:
+        # Not fatal here. The parse is the half of the check that has to happen
+        # before the record is frozen; the crosswalk can be built afterwards and
+        # the log re-read, because the paste is stored verbatim.
+        typer.echo(f"  S12 crosswalk: not checked -- {exc}")
+        return
+    unmatched = matched.filter(pl.col("gsis_id").is_null())
+    typer.echo(
+        f"  S12 crosswalk: {matched.height - unmatched.height}/{matched.height} names "
+        f"resolved to an id"
+    )
+    for row in unmatched.head(12).iter_rows(named=True):
+        typer.echo(
+            f"    unmatched: {row['source_player_name']!r} "
+            f"({row['position'] or '?'} {row['team'] or '?'}) at pick {row['overall_pick']}"
+        )
+    if unmatched.height > 12:
+        typer.echo(f"    ... and {unmatched.height - 12} more")
+    if unmatched.height:
+        typer.echo(
+            "  an unmatched name pairs with nothing in draft-review; check the "
+            "spelling against the paste before freezing it (S12, S76)."
+        )
 
 
 @app.command("draft-review")

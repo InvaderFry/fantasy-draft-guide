@@ -55,6 +55,27 @@ def _adp(rows=None) -> pl.DataFrame:
 # -- the snake -------------------------------------------------------------
 
 
+def test_kickers_and_defences_are_not_quoted_at_a_pick():
+    """Every other S88 module excludes them by name. This one did not, and
+    "Denver Defense" reached four of the live sheets."""
+    frame = _adp(
+        [
+            ("Real Player", "RB", 90.0, 5.0, 80.0),
+            ("Denver Defense", "DEF", 91.0, 5.0, 80.0),
+            ("A Kicker", "PK", 92.0, 5.0, 80.0),
+        ]
+    )
+    results = survival.compute(frame, PROFILE, rounds=8)
+    quoted = {
+        c["player"]
+        for slot in results["by_slot"]
+        for block in slot["picks"]
+        for c in block["candidates"]
+    }
+    assert "Real Player" in quoted
+    assert not quoted & {"Denver Defense", "A Kicker"}
+
+
 def test_held_picks_snake_back_and_forth():
     assert survival.held_picks(12, 7, 3) == [7, 18, 31]
     assert survival.held_picks(12, 1, 4) == [1, 24, 25, 48]
