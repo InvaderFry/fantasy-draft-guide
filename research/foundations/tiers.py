@@ -9,6 +9,14 @@ replacement_points(position)``. Nothing is added to it -- no ADP blend, no
 uncertainty adjustment, no positional multiplier. Those are S39 and S56 and they
 grade evidence, which S88 forbids here.
 
+**The market price is carried beside that metric, never inside it.** S83
+specifies the tier board "with ADP alongside", because a value with no price
+attached cannot answer the question asked at a live pick -- not "is he good" but
+"is he good *here*". So ``adp`` and ``position_adp`` ride along as their own
+columns and the value above is computed exactly as if they were absent. A
+column is not a blend; the moment one is folded into the other this module is
+doing S56's job without S56's evidence.
+
 **Replacement level is per profile and never shared.** S19.4: "Do not use the
 same replacement level for 1-QB and Superflex." It is computed from
 ``teams x starters`` for the specific league, which is why S14 gates this module
@@ -37,7 +45,9 @@ from pipeline.config import (
     real_profiles,
 )
 from pipeline.features import projections as projection_table
+from pipeline.normalize.names import name_position_key
 from pipeline.scoring import score_frame
+from research.foundations import survival as survival_mod
 from research.method import MethodArtifact
 
 METHOD_ID = "tiers_and_replacement_level"
@@ -143,6 +153,160 @@ def board(
     frame = frame.filter(pl.col("position").is_in(list(POSITIONS)))
     frame = score_frame(frame, profile, alias="projected_points")
     return frame.filter(pl.col("projected_points") > 0).sort("projected_points", descending=True)
+
+
+def market_price(
+    profile: dict[str, Any], *, processed_dir=PROCESSED_DIR
+) -> pl.DataFrame | None:
+    """The latest archived ADP for this league, or None when there is none.
+
+    ``survival.latest_adp`` already resolves the profile's ADP format, filters to
+    the newest capture and refuses a stale-but-plausible mixture of seasons; it is
+    reused rather than reimplemented so both boards price off the same rule.
+
+    The failure is swallowed on purpose. S84's archive and S11's projections are
+    separate failure domains, and this module is gated on the projections. A
+    morning when the capture job did not run degrades the board to an unpriced
+    one; it does not withhold it. ``blockers()`` keeps its two gates and gains no
+    third.
+    """
+    try:
+        return survival_mod.latest_adp(
+            profile, processed_dir=processed_dir, season=draft_season(profile)
+        )
+    except survival_mod.BlockedError:
+        return None
+
+
+def _name_key() -> pl.Expr:
+    """S12's weaker join key, for rows one side or the other never matched."""
+    return (
+        pl.struct(["source_player_name", "position"])
+        .map_elements(
+            lambda s: name_position_key(s["source_player_name"], s["position"]),
+            return_dtype=pl.String,
+        )
+        .alias("_name_key")
+    )
+
+
+def _adp_coverage(
+    total: int, priced: int, snapshot_date: str | None, market_rows: int = 0
+) -> dict[str, Any]:
+    """How much of the board the market actually priced.
+
+    Reported for the same reason ``projections.coverage`` is: a join that half
+    fails renders as a column of dashes, which reads on the sheet like a fringe
+    nobody drafts rather than like a broken join.
+
+    ``priced_share`` alone cannot tell those apart. A provider projects several
+    hundred players and the ADP source prices about two hundred, so most of the
+    unpriced tail is a market that never quoted them rather than a join that lost
+    them. ``market_rows_in_scope`` is the denominator that answers the question
+    actually being asked -- of the players the market did price, how many landed.
+    """
+    return {
+        "board_rows": total,
+        "priced": priced,
+        "unpriced": total - priced,
+        "priced_share": round(priced / total, 4) if total else None,
+        "market_rows_in_scope": market_rows,
+        "matched_share_of_market": round(priced / market_rows, 4) if market_rows else None,
+        "adp_snapshot_date": snapshot_date,
+    }
+
+
+def attach_adp(
+    board_frame: pl.DataFrame, adp: pl.DataFrame | None
+) -> tuple[pl.DataFrame, dict[str, Any]]:
+    """Carry the market price onto the board (S83, S19.3).
+
+    Joined on ``player_id`` first -- ``adp_history`` and ``projection_snapshot``
+    both carry S12's ``gsis_id`` under that name, so it is the same crosswalk on
+    both sides -- then on normalized name and position for whatever is left. An
+    ambiguous name prices nobody, which is ``match_external``'s own rule for its
+    loose key: two players sharing a name and a position cannot be told apart, and
+    guessing puts one man's price on another man's row.
+
+    A player who matches neither keeps his row with a null price. Dropping him
+    would change how many players sit above replacement, and the whole board is
+    measured from there.
+    """
+    unpriced = (
+        pl.lit(None, dtype=pl.Float64).alias("adp"),
+        pl.lit(None, dtype=pl.Int64).alias("position_adp"),
+    )
+    if adp is None or not adp.height or not board_frame.height:
+        return (
+            board_frame.with_columns(*unpriced),
+            _adp_coverage(board_frame.height, 0, None),
+        )
+
+    captured = str(adp["snapshot_date"].max()) if "snapshot_date" in adp.columns else None
+    # Kickers and defences are drafted and priced; no S88 module scores them and
+    # the board never carries them. Counting them as unmatched would make the
+    # join look broken every single day.
+    adp = adp.filter(pl.col("position").is_in(list(POSITIONS)))
+    price = adp.select(
+        "player_id", "source_player_name", "position", "adp", "position_adp"
+    ).with_columns(_name_key())
+
+    by_id = (
+        price.filter(pl.col("player_id").is_not_null())
+        .sort("adp")
+        .select(
+            pl.col("player_id"),
+            pl.col("adp").alias("_id_adp"),
+            pl.col("position_adp").alias("_id_position_adp"),
+        )
+        .unique(subset="player_id", keep="first")
+    )
+    by_name = (
+        price.select(
+            pl.col("_name_key"),
+            pl.col("adp").alias("_name_adp"),
+            pl.col("position_adp").alias("_name_position_adp"),
+        )
+        # keep="none": an ambiguous key resolves to nothing (S12).
+        .unique(subset="_name_key", keep="none")
+    )
+
+    joined = (
+        board_frame.with_columns(_name_key())
+        # The loose key has to be unambiguous on *both* sides. `match_external`
+        # dedups only the crosswalk, because there each source row is one row;
+        # here the board itself can carry two players sharing a name and a
+        # position, and a single ADP row would then price both of them.
+        .with_columns(pl.len().over("_name_key").alias("_name_key_rows"))
+        .join(by_id, on="player_id", how="left")
+        .join(by_name, on="_name_key", how="left")
+        .with_columns(
+            pl.when(pl.col("_name_key_rows") > 1)
+            .then(None)
+            .otherwise(pl.col("_name_adp"))
+            .alias("_name_adp"),
+            pl.when(pl.col("_name_key_rows") > 1)
+            .then(None)
+            .otherwise(pl.col("_name_position_adp"))
+            .alias("_name_position_adp"),
+        )
+        .with_columns(
+            pl.coalesce("_id_adp", "_name_adp").cast(pl.Float64).alias("adp"),
+            pl.coalesce("_id_position_adp", "_name_position_adp")
+            .cast(pl.Int64)
+            .alias("position_adp"),
+        )
+        .drop(
+            "_name_key",
+            "_name_key_rows",
+            "_id_adp",
+            "_name_adp",
+            "_id_position_adp",
+            "_name_position_adp",
+        )
+    )
+    priced = joined.filter(pl.col("adp").is_not_null()).height
+    return joined, _adp_coverage(joined.height, priced, captured, adp.height)
 
 
 def chosen_provider(frame: pl.DataFrame) -> str:
@@ -282,9 +446,12 @@ def assign_tiers(values: list[float], multiple: float = TIER_BREAK_MULTIPLE) -> 
     return tiers
 
 
-def compute(frame: pl.DataFrame, profile: dict[str, Any]) -> dict[str, Any]:
+def compute(
+    frame: pl.DataFrame, profile: dict[str, Any], *, adp: pl.DataFrame | None = None
+) -> dict[str, Any]:
     provider = chosen_provider(frame)
     single = frame.filter(pl.col("provider_id") == provider)
+    single, adp_coverage = attach_adp(single, adp)
 
     ranked = {
         pos: single.filter(pl.col("position") == pos)["projected_points"].to_list()
@@ -312,13 +479,17 @@ def compute(frame: pl.DataFrame, profile: dict[str, Any]) -> dict[str, Any]:
                     "tier": tier,
                     "projected_points": round(float(points), 1),
                     "value_over_replacement": value,
+                    "adp": None if price is None else round(float(price), 1),
+                    "position_adp": None if pos_rank is None else int(pos_rank),
                 }
-                for name, team, points, value, tier in zip(
+                for name, team, points, value, tier, price, pos_rank in zip(
                     rows["source_player_name"].to_list(),
                     rows["team"].to_list(),
                     rows["projected_points"].to_list(),
                     values,
                     tiers,
+                    rows["adp"].to_list(),
+                    rows["position_adp"].to_list(),
                     strict=True,
                 )
             ],
@@ -335,6 +506,7 @@ def compute(frame: pl.DataFrame, profile: dict[str, Any]) -> dict[str, Any]:
         "positions": positions,
         "provider_dispersion": provider_dispersion(frame),
         "coverage": projection_table.coverage(frame),
+        "adp_coverage": adp_coverage,
         "n": single.height,
     }
 
@@ -353,6 +525,7 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
             "starters": profile.get("starters"),
             "flex_eligible": profile.get("flex_eligible"),
             "provider": results.get("provider"),
+            "adp_snapshot_date": (results.get("adp_coverage") or {}).get("adp_snapshot_date"),
         },
         outcome=None,  # construction, not a hypothesis test
         sample_size=results.get("n", 0),
@@ -373,8 +546,17 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
             "injuries (S85.1) are not modelled.",
             "Players with no ID match leave the board; they skew fringe, so replacement "
             "level sits slightly high and every value is slightly compressed (see coverage).",
+            "ADP is carried beside the value, never inside it: the S19.3 metric is computed "
+            "as if the price column were absent. It is the Fantasy Football Calculator "
+            "mock-draft population rather than the league being drafted (S10B), and it is a "
+            "rolling-window average rather than a same-day price (S31.3). Players the price "
+            "join could not reach keep their row unpriced -- see adp_coverage.",
         ],
-        sources=["FantasyPros projections (S11)", "league profile (S14)"],
+        sources=[
+            "FantasyPros projections (S11)",
+            "Fantasy Football Calculator ADP archive (S84)",
+            "league profile (S14)",
+        ],
     )
 
 
@@ -389,6 +571,8 @@ def run(processed_dir=PROCESSED_DIR) -> list[tuple[dict[str, Any], MethodArtifac
     for profile in real_profiles():
         # Same rule as survival: a board must be one season's board.
         frame = board(profile, processed_dir=processed_dir, season=draft_season(profile))
-        results = compute(frame, profile)
+        results = compute(
+            frame, profile, adp=market_price(profile, processed_dir=processed_dir)
+        )
         out.append((results, export(results, profile)))
     return out

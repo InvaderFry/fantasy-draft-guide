@@ -60,6 +60,170 @@ def _board(counts=None, points=None) -> pl.DataFrame:
     )
 
 
+NAMES = ("Bijan Robinson", "Breece Hall", "Chase Brown", "Derrick Henry", "Josh Jacobs")
+
+
+def _named_board(n: int = 3, position: str = "RB") -> pl.DataFrame:
+    """A board with names S12's normalizer can actually tell apart.
+
+    `_board` numbers its players RB1, RB2, RB3, and `normalize_name` strips
+    digits -- so all three collapse to one key. That is invisible to the
+    arithmetic tests and fatal to a join test.
+    """
+    from pipeline.scoring import score_frame
+
+    rows = [
+        {
+            "season": 2026,
+            "snapshot_date": dt.date(2026, 8, 14),
+            "provider_id": "fixture",
+            "player_id": f"00-{position}{i:05d}",
+            "source_player_name": NAMES[i],
+            "team": "ATL",
+            "position": position,
+            "receptions": 0.0,
+            "receiving_yards": (300 - i * 5) * 10,
+        }
+        for i in range(n)
+    ]
+    return score_frame(pl.DataFrame(rows), PROFILE, alias="projected_points").sort(
+        "projected_points", descending=True
+    )
+
+
+def _adp(rows) -> pl.DataFrame:
+    """An archived capture, shaped as `adp_history` hands it to `latest_adp`."""
+    return pl.DataFrame(
+        [
+            {
+                "snapshot_date": dt.date(2026, 8, 14),
+                "player_id": r.get("player_id"),
+                "source_player_name": r["source_player_name"],
+                "position": r["position"],
+                "adp": r["adp"],
+                "position_adp": r.get("position_adp"),
+            }
+            for r in rows
+        ],
+        schema_overrides={"player_id": pl.String, "position_adp": pl.Int64},
+    )
+
+
+# -- the price on the board (S83) ------------------------------------------
+
+
+def test_the_price_joins_on_the_shared_id():
+    board = _named_board()
+    priced, coverage = tiers.attach_adp(
+        board,
+        _adp([{"player_id": "00-RB00001", "source_player_name": "nothing like it",
+               "position": "RB", "adp": 14.8, "position_adp": 6}]),
+    )
+    row = priced.filter(pl.col("player_id") == "00-RB00001")
+    assert row["adp"].item() == 14.8
+    assert row["position_adp"].item() == 6
+    assert coverage["priced"] == 1
+    assert coverage["unpriced"] == 2
+    assert coverage["adp_snapshot_date"] == "2026-08-14"
+
+
+def test_a_source_with_no_id_still_reaches_the_board_by_name():
+    """FFC publishes no gsis_id; S12's weaker key is the whole fallback."""
+    board = _named_board()
+    priced, coverage = tiers.attach_adp(
+        board,
+        _adp([{"player_id": None, "source_player_name": "breece hall", "position": "RB",
+               "adp": 27.2, "position_adp": 11}]),
+    )
+    assert priced.filter(pl.col("source_player_name") == "Breece Hall")["adp"].item() == 27.2
+    assert coverage["priced"] == 1
+
+
+def test_two_players_sharing_a_name_price_neither():
+    """S12's rule for the loose key: an ambiguous match resolves to nothing.
+    Guessing puts one man's price on another man's row."""
+    board = _named_board()
+    priced, _ = tiers.attach_adp(
+        board,
+        _adp([
+            {"player_id": None, "source_player_name": "Bijan Robinson", "position": "RB",
+             "adp": 3.0},
+            {"player_id": None, "source_player_name": "bijan robinson", "position": "RB",
+             "adp": 90.0},
+        ]),
+    )
+    assert priced.filter(pl.col("source_player_name") == "Bijan Robinson")["adp"].item() is None
+
+
+def test_two_players_on_the_board_sharing_a_name_price_neither():
+    """The ambiguity runs the other way too, and one ADP row would price both."""
+    board = _named_board(2).with_columns(
+        pl.lit("Mike Williams").alias("source_player_name"),
+        pl.lit(None, dtype=pl.String).alias("player_id"),
+    )
+    priced, coverage = tiers.attach_adp(
+        board,
+        _adp([{"player_id": None, "source_player_name": "Mike Williams",
+               "position": "RB", "adp": 55.0}]),
+    )
+    assert coverage["priced"] == 0
+
+
+def test_a_player_the_market_never_priced_keeps_his_row():
+    """Dropping him would change how many players sit above replacement, and the
+    whole board is measured from there."""
+    board = _named_board()
+    priced, coverage = tiers.attach_adp(
+        board,
+        _adp([{"player_id": "00-RB00000", "source_player_name": "Bijan Robinson",
+               "position": "RB", "adp": 1.5, "position_adp": 1}]),
+    )
+    assert priced.height == board.height
+    assert coverage["priced_share"] == round(1 / 3, 4)
+
+
+def test_an_unarchived_market_degrades_the_board_rather_than_withholding_it():
+    """S84's archive and S11's projections are separate failure domains."""
+    board = _named_board()
+    priced, coverage = tiers.attach_adp(board, None)
+    assert priced.height == board.height
+    assert priced["adp"].null_count() == board.height
+    assert coverage == {
+        "board_rows": 3, "priced": 0, "unpriced": 3, "priced_share": 0.0,
+        "market_rows_in_scope": 0, "matched_share_of_market": None,
+        "adp_snapshot_date": None,
+    }
+
+
+def test_an_absent_archive_is_not_a_third_gate(monkeypatch, tmp_path):
+    """`blockers()` has two gates and gains no third: a morning the capture job
+    did not run must still produce a sheet."""
+    monkeypatch.setattr(tiers, "real_profiles", lambda: [PROFILE])
+    (tmp_path / "projection_snapshot.parquet").write_bytes(b"")
+    assert tiers.market_price(PROFILE, processed_dir=tmp_path) is None
+
+
+def test_compute_carries_the_price_beside_the_value_and_not_inside_it():
+    board = pl.concat(
+        [_named_board(3), _board(counts={"QB": 8, "WR": 40, "TE": 8})], how="diagonal"
+    ).sort("projected_points", descending=True)
+    market = _adp([{"player_id": "00-RB00000", "source_player_name": "Bijan Robinson",
+                    "position": "RB", "adp": 1.5, "position_adp": 1}])
+    unpriced = tiers.compute(board, PROFILE)
+    priced = tiers.compute(board, PROFILE, adp=market)
+
+    top = priced["positions"]["RB"]["players"][0]
+    assert top["adp"] == 1.5
+    assert top["position_adp"] == 1
+    assert priced["positions"]["RB"]["players"][1]["adp"] is None
+    assert priced["adp_coverage"]["priced"] == 1
+
+    # The S19.3 metric is computed as if the price column were absent.
+    assert [p["value_over_replacement"] for p in priced["positions"]["RB"]["players"]] == [
+        p["value_over_replacement"] for p in unpriced["positions"]["RB"]["players"]
+    ]
+
+
 # -- the gates -------------------------------------------------------------
 
 

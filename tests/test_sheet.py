@@ -52,9 +52,14 @@ TIER_ARTIFACT = {
                 "tier_count": 2,
                 "players": [
                     {"player": "Bijan Robinson", "team": "ATL", "tier": 1,
-                     "projected_points": 290.0, "value_over_replacement": 170.0},
+                     "projected_points": 290.0, "value_over_replacement": 170.0,
+                     "adp": 2.1, "position_adp": 2},
                     {"player": "Player Two", "team": "DET", "tier": 2,
-                     "projected_points": 200.0, "value_over_replacement": 80.0},
+                     "projected_points": 200.0, "value_over_replacement": 80.0,
+                     "adp": 41.2, "position_adp": 18},
+                    {"player": "Unpriced Man", "team": "CHI", "tier": 2,
+                     "projected_points": 180.0, "value_over_replacement": 60.0,
+                     "adp": None, "position_adp": None},
                 ],
             }
         }
@@ -81,6 +86,8 @@ SURVIVAL_ARTIFACT = {
                              "p_available": 0.02, "approximation_note": None},
                             {"player": "No Spread", "position": "WR", "adp": 30.0,
                              "p_available": None, "approximation_note": "no spread published"},
+                            {"player": "Dead Zone Back", "position": "RB", "adp": 41.2,
+                             "p_available": 0.31, "approximation_note": None},
                         ],
                     }
                 ],
@@ -89,8 +96,37 @@ SURVIVAL_ARTIFACT = {
     },
 }
 
+DEAD_ZONE_ARTIFACT = {
+    "method_id": "rb_dead_zone_bucket_rates",
+    "primary_results": {
+        "n": 1285,
+        "rb_vs_wr": [
+            {"bucket": 1, "bucket_label": "1-12", "n_rb": 63, "n_wr": 31,
+             "rb_high_end_rate": 0.6349, "rb_ci": [0.51, 0.74],
+             "wr_high_end_rate": 0.8065, "wr_ci": [0.63, 0.90],
+             "absolute_difference_pp": -17.15},
+            {"bucket": 2, "bucket_label": "13-24", "n_rb": 39, "n_wr": 41,
+             "rb_high_end_rate": 0.5128, "wr_high_end_rate": 0.6098,
+             "absolute_difference_pp": -9.69},
+            {"bucket": 3, "bucket_label": "25-36", "n_rb": 39, "n_wr": 47,
+             "rb_high_end_rate": 0.2308, "wr_high_end_rate": 0.4043,
+             "absolute_difference_pp": -17.35},
+            {"bucket": 4, "bucket_label": "37-48", "n_rb": 34, "n_wr": 45,
+             "rb_high_end_rate": 0.1176, "wr_high_end_rate": 0.4222,
+             "absolute_difference_pp": -30.46},
+            {"bucket": 5, "bucket_label": "49-60", "n_rb": 32, "n_wr": 40,
+             "rb_high_end_rate": 0.0938, "wr_high_end_rate": 0.225,
+             "absolute_difference_pp": -13.12},
+            {"bucket": 6, "bucket_label": "61-72", "n_rb": 27, "n_wr": 37,
+             "rb_high_end_rate": 0.1481, "wr_high_end_rate": 0.2162,
+             "absolute_difference_pp": -6.81},
+        ],
+    },
+}
+
 FULL = {
     "team_scoring_regression": REGRESSION_ARTIFACT,
+    "rb_dead_zone_bucket_rates": DEAD_ZONE_ARTIFACT,
     f"{tiers_mod.METHOD_ID}__fixture_12": TIER_ARTIFACT,
     f"{survival_mod.METHOD_ID}__fixture_12": SURVIVAL_ARTIFACT,
 }
@@ -123,6 +159,10 @@ def test_the_sheet_carries_no_grades_intervals_or_sample_sizes():
     # reaches the page.
     assert "ci_low" not in page
     assert ">70<" not in page
+    # S21.1 carries n and an interval on every bucket too; only the label, the
+    # two rates and the gap are read.
+    assert "n_rb" not in page
+    assert ">34<" not in page and ">45<" not in page
 
 
 def test_the_constraint_is_enforced_rather_than_documented():
@@ -145,6 +185,87 @@ def test_the_tier_section_shows_tiers_value_and_replacement():
     assert "Bijan Robinson" in page
     assert "replacement 120.0 pts" in page
     assert "tier-start" in page
+
+
+def test_the_tier_board_carries_the_price_beside_the_value():
+    """S83: "with ADP alongside". A value with no price cannot be acted on."""
+    page = sheet.render("test", profile=PROFILE, artifacts=FULL)
+    assert "<th class=\"num\">ADP</th>" in page
+    assert ">2<" in page          # Bijan, ADP 2.1
+    assert ">41<" in page         # Player Two, ADP 41.2
+
+
+def test_a_player_the_market_never_priced_says_so_rather_than_showing_a_zero():
+    page = sheet.render("test", profile=PROFILE, artifacts=FULL)
+    assert "Unpriced Man" in page
+    # An em dash, not a 0 -- an unpriced player is not a free one.
+    assert '<td class="num">&mdash;</td>' in page
+
+
+def test_avoids_carries_the_band_its_rates_and_a_price_trigger():
+    page = sheet.render("test", profile=PROFILE, artifacts=FULL)
+    assert "DEAD ZONE" in page
+    assert "picks 25&ndash;60" in page
+    assert "12%" in page and "42%" in page      # the widest bucket, both positions
+    assert "-30 pp" in page
+
+
+def test_avoids_still_names_the_section_it_is_not():
+    """A price band is not S28. Letting it read as S28 is the failure
+    `_not_built` exists to prevent."""
+    page = sheet.render("test", profile=PROFILE, artifacts=FULL)
+    assert "S28" in page and "S79" in page
+    assert "positional price band, not a list of players" in page
+
+
+def test_the_band_follows_the_artifact_rather_than_a_number_typed_here():
+    """A hard-coded band would print unchanged over a refreshed artifact."""
+    moved = json.loads(json.dumps(DEAD_ZONE_ARTIFACT))
+    rows = moved["primary_results"]["rb_vs_wr"]
+    for row in rows:
+        row["absolute_difference_pp"] = -1.0
+    rows[5]["absolute_difference_pp"] = -25.0      # 61-72 is now the only gap
+
+    page = sheet.render(
+        "test", profile=PROFILE, artifacts={**FULL, "rb_dead_zone_bucket_rates": moved}
+    )
+    assert "picks 61&ndash;72" in page
+    assert "picks 25&ndash;60" not in page
+
+
+def test_a_band_nothing_clears_is_a_result_and_not_a_silence():
+    flat = json.loads(json.dumps(DEAD_ZONE_ARTIFACT))
+    for row in flat["primary_results"]["rb_vs_wr"]:
+        row["absolute_difference_pp"] = -1.0
+    page = sheet.render(
+        "test", profile=PROFILE, artifacts={**FULL, "rb_dead_zone_bucket_rates": flat}
+    )
+    assert "flags no price band" in page
+    assert "DEAD ZONE" not in page
+
+
+def test_a_price_inside_the_band_is_marked_on_the_board():
+    """The finding has to reach the pick, not sit eight lines below it."""
+    page = sheet.render("test", profile=PROFILE, artifacts=FULL)
+    assert '<td class="num dz">41</td>' in page      # Player Two, RB, ADP 41.2
+    assert '<td class="num dz">2</td>' not in page   # Bijan is priced above it
+
+
+def test_the_band_is_marked_where_the_pick_is_actually_made():
+    """S21.1 sits at picks 25-60, which on a board sorted by value is past the end
+    of the tier list -- and right in the middle of the survival candidates."""
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=FULL)
+    survival = page.split("SURVIVAL")[1]
+    assert '<td class="dz">41.2</td>' in survival     # the back
+    assert '<td class="dz">30.0</td>' not in survival  # the receiver beside him
+
+
+def test_the_band_is_not_applied_to_a_position_it_was_never_measured_on():
+    """S21.1 measured running backs. A WR at pick 41 is not evidence."""
+    assert sheet.in_dead_zone({"low": 25, "high": 60}, "WR", 41.2) is False
+    assert sheet.in_dead_zone({"low": 25, "high": 60}, "RB", 41.2) is True
+    assert sheet.in_dead_zone(None, "RB", 41.2) is False
+    assert sheet.in_dead_zone({"low": 25, "high": 60}, "RB", None) is False
 
 
 def test_survival_shows_a_probability_and_a_dash_where_there_is_none():

@@ -179,9 +179,9 @@ it. §83's seven sections and what each carries today:
 
 | Section | Spec | State |
 |---|---|---|
-| TIERS | §19.3 | **filled in** — tier, player, team, VOR by position |
+| TIERS | §19.3 | **filled in** — tier, player, team, VOR **and ADP** by position |
 | TARGETS | §27 | not built — needs graded evidence (§79) |
-| AVOIDS | §28 | not built — needs graded evidence (§79) |
+| AVOIDS | §28 | **filled in** — §21.1's price band. Player-level avoids still need §79 |
 | REGRESSION | §25 | **filled in** — teams flagged, with the expected move |
 | DARTS | §29 | not built (§79) |
 | SURVIVAL | §31.2 | **filled in** — who is on the board at each held pick, and P(back at the next) |
@@ -194,7 +194,7 @@ to prevent. §83 also forbids evidence grades, confidence intervals and sample
 sizes on the sheet — `assert_sheet_constraints` scans the rendered page for them
 and raises, so the rule survives a section added by someone who did not read it.
 
-Three of the seven sections now carry content, and the page is generated once per
+Four of the seven sections now carry content, and the page is generated once per
 league **and once per draft slot** — 26 sheets plus an `index.html` chooser,
 because the draft order is drawn about an hour before the draft and that is not
 an hour to be running a build in. See *Draft day* below.
@@ -202,6 +202,32 @@ an hour to be running a build in. See *Draft day* below.
 Each of the 26 has been rendered to PDF and verified to print on a single page.
 That is not decoration: the one-page rule broke the moment TIERS and SURVIVAL
 started carrying real content, and it broke silently.
+
+### The price on the board, and where the dead zone actually bites
+
+§83 specifies TIERS "with ADP alongside", and until now the board carried value
+and no price — which cannot answer the question asked at a live pick, which is
+not "is he good" but "is he good *here*". `adp` and `position_adp` now ride along
+on every player, joined from the §84 archive on §12's `gsis_id` with a normalized
+name fallback. Of the 183 players the market prices in scope, 181 land on the
+board; the artifact's `adp_coverage` reports both numbers, because `priced_share`
+alone cannot tell a broken join from a provider projecting 486 players against a
+market that quotes 200.
+
+**The price is carried, never blended.** §19.3's metric is `projected_points -
+replacement_points` and it is computed as if the column were absent. Folding ADP
+into the value is §39 and §56, and both grade evidence.
+
+§21.1 now reaches the sheet as the AVOIDS section: a price band derived from the
+artifact rather than typed in, being the run of adjacent ADP buckets around the
+widest RB/WR gap that all clear ten percentage points. On today's capture that is
+**RB, picks 25–60**. Prices inside it are red.
+
+The band turns out to sit almost entirely *below* the tier list — picks 25–60 is
+the 12th to 22nd back on a board sorted by value — so marking it there catches
+one player. It is marked in the SURVIVAL blocks too, and that is where it earns
+its place: at slot 7 seven backs in the band are flagged across picks 31 to 66,
+which is exactly where the choice gets made.
 
 ## Draft day: the order is drawn an hour before, so nothing is built then
 
@@ -280,10 +306,22 @@ survival artifact behind it at all.
 ### Checking it is still one page
 
 §83's one-page rule is the constraint the sheet is most likely to break as
-sections fill in, and it did break: with TIERS and SURVIVAL finally carrying
-content, 24 players a position rendered 1,078px against a 989px budget and
-printed on two. `MAX_TIER_PLAYERS` in `research/sheet.py` is now 16, measured
-rather than guessed. Re-measure before raising it:
+sections fill in, and it has broken twice. First when TIERS and SURVIVAL started
+carrying content: 24 players a position printed on two pages, and 16 fitted.
+Then again the moment the ADP column arrived — five columns in a 171px cell wrap
+the longer names, and a wrapped name costs height. `MAX_TIER_PLAYERS` in
+`research/sheet.py` is now **12**, measured rather than guessed: across all 26
+sheets, 13 put two of them onto a second page and 12 put none.
+
+Sweep all 26, not one. The survival block is a different height at different
+seats, and a sweep of a single slot says 13 is fine.
+
+The column really binding here is `Tm`. Dropping it clears every sheet at 14, so
+the team code costs about two players a position — kept, because it is what makes
+the §25 regression flags usable at the table: you read `FADE LA` and scan the
+board for LA.
+
+Re-measure before raising it:
 
 ```bash
 for f in artifacts/2026-draft/sheets/*.html; do

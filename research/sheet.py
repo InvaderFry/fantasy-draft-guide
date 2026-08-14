@@ -66,21 +66,48 @@ FORBIDDEN = (
 # ones worth flagging. S25 measured what happens next at exactly these cuts.
 REGRESSION_Z = 1.0
 
+# How far a position's hit rate has to fall below the position priced alongside it
+# before the gap is worth printing as a band, in percentage points.
+#
+# Committed here with its reasoning rather than read off the answer: S80 prohibits
+# choosing a threshold after seeing what it produces. Ten points is one drafted
+# player in ten, which at these prices is about one pick a draft -- the smallest
+# gap that changes what somebody does at the table. The band is then the run of
+# adjacent buckets around the widest gap that all clear it, so a single extreme
+# bucket does not become a "zone" on its own.
+DEAD_ZONE_MIN_GAP_PP = 10.0
+
 # Cut lists so the page stays one page at arm's length.
 #
-# MAX_TIER_PLAYERS is the one that binds, and it was measured rather than
-# guessed. Letter portrait at 0.35in margins gives 989px of body at 96dpi; with
-# every section finally filled in -- which only happened once the S14 profile
-# gate opened -- 24 players a position rendered 1,078px and printed on two pages.
-# 18 lands on 987px, which is inside the budget by two pixels and therefore not
-# inside it at all; 16 lands on 957px and leaves room for a longer name or an
-# extra tier break. Re-measure before raising it (see README, "Checking it is
-# still one page").
+# MAX_TIER_PLAYERS is the one that binds, and it is measured rather than guessed.
+# It has been re-measured twice, and both times the measurement is the page count
+# of the rendered PDF rather than a pixel height -- pixel heights depend on which
+# instrument took them and do not survive being compared across two of them.
+#
+#   24 players a position printed on two pages, and 16 fitted, once the S14 gate
+#   opened and TIERS and SURVIVAL started carrying real content.
+#   16 then printed on two pages again the moment the ADP column arrived: five
+#   columns in a 171px cell wrap the longer names, and a wrapped name costs
+#   height. Across all 26 sheets, 13 put two of them onto a second page and 12
+#   put none -- and it has to be all 26, because the survival block is a
+#   different height at different seats and a sweep of one slot says 13 is fine.
+#
+# So 12. Four rows a position is what the price costs, and it is worth paying:
+# a ranked player with no price beside him cannot be acted on at a live pick,
+# and the players given up are the 13th to 16th at a position, who by then are
+# being read off the survival block anyway.
+#
+# The column that is really binding here is `Tm`. Dropping it clears all 26
+# sheets at 14, so the team code is worth about two players a position -- kept,
+# because it is what makes the S25 regression flags usable: you read FADE LA at
+# the top and scan the board for LA.
+#
+# Re-measure before raising it (see README, "Checking it is still one page").
 #
 # MAX_SURVIVAL_PICKS costs no height -- the pick blocks are columns in one flex
 # row, so more of them makes each narrower rather than the page longer.
 MAX_REGRESSION_TEAMS = 8
-MAX_TIER_PLAYERS = 16
+MAX_TIER_PLAYERS = 12
 MAX_SURVIVAL_PICKS = 8
 
 
@@ -121,7 +148,11 @@ def _blocked(reasons: list[str]) -> str:
     return f'<p class="missing"><strong>BLOCKED.</strong></p><ul class="missing">{items}</ul>'
 
 
-def tiers_section(artifacts: dict[str, Any], profile: dict[str, Any] | None) -> str:
+def tiers_section(
+    artifacts: dict[str, Any],
+    profile: dict[str, Any] | None,
+    band: dict[str, Any] | None = None,
+) -> str:
     if profile is None:
         return _blocked(tiers_mod.blockers() or ["no league profile selected"])
     art = artifacts.get(f"{tiers_mod.METHOD_ID}__{profile['id']}")
@@ -140,23 +171,140 @@ def tiers_section(artifacts: dict[str, Any], profile: dict[str, Any] | None) -> 
         for p in players[:MAX_TIER_PLAYERS]:
             new_tier = p["tier"] != last_tier
             last_tier = p["tier"]
+            adp = p.get("adp")
             rows.append(
                 '<tr class="{cls}"><td>{tier}</td><td>{player}</td><td>{team}</td>'
-                "<td>{vor}</td></tr>".format(
+                '<td class="num">{vor}</td><td class="num{dz}">{adp}</td></tr>'.format(
                     cls="tier-start" if new_tier else "",
                     tier=p["tier"],
                     player=html.escape(str(p["player"])),
                     team=html.escape(str(p["team"] or "")),
-                    vor=p["value_over_replacement"],
+                    vor=f'{p["value_over_replacement"]:.0f}',
+                    # S83: "with ADP alongside". A value with no price cannot
+                    # answer the question asked at a live pick.
+                    adp="&mdash;" if adp is None else f"{adp:.0f}",
+                    dz=" dz" if in_dead_zone(band, pos, adp) else "",
                 )
             )
         blocks.append(
             f'<div class="pos"><h4>{pos} <span class="sub">replacement '
             f"{replacement} pts</span></h4>"
-            '<table><thead><tr><th>T</th><th>Player</th><th>Tm</th><th>VOR</th></tr></thead>'
+            "<table><thead><tr><th>T</th><th>Player</th><th>Tm</th>"
+            '<th class="num">VOR</th><th class="num">ADP</th></tr></thead>'
             f"<tbody>{''.join(rows)}</tbody></table></div>"
         )
     return f'<div class="cols">{"".join(blocks)}</div>'
+
+
+def dead_zone_band(artifacts: dict[str, Any]) -> dict[str, Any] | None:
+    """S21.1's price band, read off the artifact rather than written down here.
+
+    The finding is a run of ADP buckets where backs returned a top-12 season far
+    less often than the receivers going at the same price. Which buckets those are
+    is a property of the data and moves when the data does, so it is derived: the
+    widest gap, extended outward through every adjacent bucket that also clears
+    ``DEAD_ZONE_MIN_GAP_PP``. Hard-coding today's answer would leave a stale band
+    printed over a refreshed artifact, and nothing would say so.
+
+    Returns None when no artifact is present or nothing clears the threshold --
+    "no band this year" is a real answer and must not render as one.
+    """
+    art = artifacts.get("rb_dead_zone_bucket_rates")
+    if art is None:
+        return None
+    rows = (art.get("primary_results") or {}).get("rb_vs_wr") or []
+    ordered = [r for r in sorted(rows, key=lambda r: r["bucket"])]
+    scored = [r for r in ordered if r.get("absolute_difference_pp") is not None]
+    if not scored:
+        return None
+    widest = min(scored, key=lambda r: r["absolute_difference_pp"])
+    if widest["absolute_difference_pp"] > -DEAD_ZONE_MIN_GAP_PP:
+        return None
+
+    def clears(row: dict[str, Any]) -> bool:
+        gap = row.get("absolute_difference_pp")
+        return gap is not None and gap <= -DEAD_ZONE_MIN_GAP_PP
+
+    start = end = ordered.index(widest)
+    while start > 0 and clears(ordered[start - 1]):
+        start -= 1
+    while end + 1 < len(ordered) and clears(ordered[end + 1]):
+        end += 1
+
+    band = ordered[start : end + 1]
+    low, high = _band_edges(band)
+    return {"buckets": band, "widest": widest, "low": low, "high": high}
+
+
+def _band_edges(band: list[dict[str, Any]]) -> tuple[int | None, int | None]:
+    """First and last pick of the band, from the buckets' own labels ("25-36")."""
+    try:
+        return int(band[0]["bucket_label"].split("-")[0]), int(
+            band[-1]["bucket_label"].split("-")[-1]
+        )
+    except (KeyError, IndexError, ValueError):
+        return None, None
+
+
+def in_dead_zone(band: dict[str, Any] | None, position: str, adp: float | None) -> bool:
+    """Whether this player's price sits inside the band.
+
+    S21.1 measured running backs, and the claim is about running backs. Applying
+    the band to a position it was never computed on would be a new claim wearing
+    an old one's evidence.
+    """
+    if band is None or adp is None or position != "RB":
+        return False
+    return band["low"] is not None and band["low"] <= adp <= band["high"]
+
+
+def dead_zone_section(artifacts: dict[str, Any], band: dict[str, Any] | None) -> str:
+    """S21.1 as an S83 avoid: a price band, and what was bought at that price.
+
+    S83 requires a price trigger on every recommendation, and here the price range
+    *is* the recommendation -- there is no player named, because the finding is
+    about what a position costs rather than about anybody in particular.
+
+    S83 also keeps sample sizes and intervals off the sheet, and this artifact
+    carries both. Only four keys are read: the label, the two rates and the gap.
+    """
+    unbuilt = _not_built("Avoids", "a research section (S28) requiring graded evidence")
+    if band is None:
+        # Two different nothings, and they must not read alike: no artifact means
+        # the analysis has not run, while an artifact with no qualifying band means
+        # it ran and found none. The second is a result.
+        if "rb_dead_zone_bucket_rates" not in artifacts:
+            return unbuilt
+        return unbuilt + (
+            '<p class="missing">S21.1 ran and flags no price band wide enough to '
+            "print this year.</p>"
+        )
+
+    rows = "".join(
+        '<tr><td>{label}</td><td class="num">{rb:.0%}</td><td class="num">{wr:.0%}</td>'
+        '<td class="num {cls}">{gap:+.0f} pp</td></tr>'.format(
+            label=html.escape(str(b["bucket_label"])),
+            rb=b["rb_high_end_rate"],
+            wr=b["wr_high_end_rate"],
+            gap=b["absolute_difference_pp"],
+            cls="fade" if b is band["widest"] else "",
+        )
+        for b in band["buckets"]
+    )
+    return (
+        '<div class="cols"><div class="pos" style="flex:2">'
+        f'<p class="sub"><span class="tag fade">DEAD ZONE</span> '
+        f'<strong>RB, picks {band["low"]}&ndash;{band["high"]}</strong> '
+        "&mdash; how often a back drafted at each price returned a top-12 season, "
+        "against the receivers going alongside him (2018&ndash;2025). Prices inside the "
+        'band are <span class="dz">red</span> on the boards above and below.</p>'
+        '<p class="sub">A positional price band, not a list of players: S28 avoids need '
+        "graded evidence and are the September-February build (S79).</p>"
+        '</div><div class="pos">'
+        "<table><thead><tr><th>Picks</th><th>RB</th><th>WR</th><th>Gap</th></tr></thead>"
+        f"<tbody>{rows}</tbody></table>"
+        "</div></div>"
+    )
 
 
 def regression_section(artifacts: dict[str, Any]) -> str:
@@ -215,7 +363,10 @@ def _expected_move(buckets: list[dict[str, Any]], z: float) -> str:
 
 
 def survival_section(
-    artifacts: dict[str, Any], profile: dict[str, Any] | None, slot: int | None = None
+    artifacts: dict[str, Any],
+    profile: dict[str, Any] | None,
+    slot: int | None = None,
+    band: dict[str, Any] | None = None,
 ) -> str:
     if profile is None:
         return _blocked(survival_mod.blockers() or ["no league profile selected"])
@@ -243,11 +394,17 @@ def survival_section(
     blocks = []
     for pick_block in chosen["picks"][:MAX_SURVIVAL_PICKS]:
         rows = "".join(
-            '<tr><td>{player}</td><td>{pos}</td><td>{adp}</td><td>{p}</td></tr>'.format(
+            '<tr><td>{player}</td><td>{pos}</td><td class="{dz}">{adp}</td>'
+            "<td>{p}</td></tr>".format(
                 player=html.escape(str(c["player"])),
                 pos=html.escape(str(c["position"] or "")),
                 adp=c["adp"],
                 p="--" if c["p_available"] is None else f'{c["p_available"]:.0%}',
+                # This is where S21.1 actually bites. The band sits at picks
+                # 25-60, which on a board sorted by value is the 12th to 22nd back
+                # -- past the end of the tier list, but squarely in the candidates
+                # at the middle picks, where the choice is being made.
+                dz="dz" if in_dead_zone(band, c["position"], c["adp"]) else "",
             )
             for c in pick_block["candidates"][:6]
         )
@@ -363,13 +520,17 @@ def render(
     artifacts: dict[str, Any] | None = None,
 ) -> str:
     arts = artifacts if artifacts is not None else load_artifacts(edition)
+    # Derived once and shared: the section states the band, and the board marks
+    # the players standing in it. A finding printed eight lines away from the
+    # prices it applies to is a finding somebody has to remember.
+    band = dead_zone_band(arts)
     bodies = {
-        "TIERS": tiers_section(arts, profile),
+        "TIERS": tiers_section(arts, profile, band),
         "TARGETS": _not_built("Targets", "a research section (S27) requiring graded evidence"),
-        "AVOIDS": _not_built("Avoids", "a research section (S28) requiring graded evidence"),
+        "AVOIDS": dead_zone_section(arts, band),
         "REGRESSION": regression_section(arts),
         "DARTS": _not_built("Dart throws", "a research section (S29)"),
-        "SURVIVAL": survival_section(arts, profile, slot),
+        "SURVIVAL": survival_section(arts, profile, slot, band),
         "FALSE FRIENDS": _not_built(
             "False friends", "the current-player matching engine (S32, S34)"
         ),
@@ -611,6 +772,11 @@ _PAGE = """<!doctype html>
   .pos {{ flex: 1; min-width: 0; }}
   .tag {{ font-weight: 700; font-size: 7pt; }}
   .fade {{ color: #a11; }} .buy {{ color: #161; }}
+  td.num {{ text-align: right; }}
+  /* A price inside S21.1's band. Colour rather than a marker: ADP is the
+     narrowest column on the page and a two-character tag wraps the name beside
+     it, and wrapping costs height, which is the budget that binds. */
+  .dz {{ color: #a11; font-weight: 700; }}
   .missing {{ color: #777; font-size: 7.5pt; font-style: italic; }}
   ul.missing {{ margin: 2px 0 4px; padding-left: 14px; }}
   code {{ font-size: 7.5pt; }}
