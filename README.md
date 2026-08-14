@@ -19,9 +19,10 @@ Built here:
 | ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires — followed by a second job that re-renders the sheets from it |
 | nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play, schedules |
 | ID normalization | §12 | `gsis_id` canonical, crosswalk + labelled name matching |
-| Canonical tables | §13 | `player_week`, `player_season` (+ outcomes), `team_season`, `adp_history`, `projection_snapshot` |
+| Canonical tables | §13 | `player_week`, `player_season` (+ outcomes), `team_season`, `adp_history`, `projection_snapshot`, `draft_pick` |
 | Snapshots | §65 | dated, hashed, immutable |
 | Tests | §51 | data, leakage, grading-config and snapshot checks |
+| Audit trail | §76 | the draft as recorded, paired against what the sheet said |
 
 | Research modules | §88 Week 2 | §25 team scoring regression, §21.1 dead-zone bucket rates — both DESCRIPTIVE |
 | Projection ingest | §11 | FantasyPros API adapter (key-gated) with the manual-CSV fallback, `projection_snapshot` table |
@@ -30,7 +31,8 @@ Built here:
 | Draft-day sheet | §83, §88 Week 3 | one printable page per league profile **and per draft slot**, plus an index |
 
 **Not** built here: evidence grading, the draft simulator, and any publication
-layer. Those are §79 Steps 4+.
+layer. Those are §79 Steps 4+. §77's end-of-season review consumes the §76
+audit trail and is next.
 
 ## Quick start
 
@@ -346,6 +348,48 @@ ones, since discovering a gap on draft week means the missing days are already
 gone (§84).
 
 
+## After the draft: the audit trail (§76)
+
+§59 promoted this into the MVP, and the reason it gives is why it exists before
+the guide does: *"it cannot be reconstructed later, and it is the only mechanism
+by which the evidence grades in §3.1 are ever checked against reality."*
+
+```bash
+# 1. paste the platform's draft results into a file, then:
+research draft-record --profile half_ppr_12 --slot 7 --picks picks.txt
+research build-tables --tables draft_pick
+research draft-review --edition 2026-draft
+```
+
+`--slot` is the seat that was actually drawn. **It is the one value nothing else
+in this repository holds** — the sheets are rendered for all twelve precisely
+because the order is drawn an hour beforehand, and once the draft is over there
+is no way back to which one was real.
+
+**Every pick by every team, not just yours.** More to paste, and the reason is
+§31.1: Fantasy Football Calculator publishes a mean and a spread and no
+percentiles, so every P(available) on the sheet is §19.4's labelled normal
+approximation. A full board is a real pick distribution. §10B names this as the
+one corpus needing no external access at all — *"the drafter's own historical
+league draft logs are a small but fully permitted corpus … start exporting
+them"*. One draft settles nothing; the corpus cannot start until something writes
+the first one, and every draft before then is gone.
+
+The review artifact pairs, for each pick you held: what the sheet said (tier,
+VOR, quoted survival), the market price, who you took, and — the part worth the
+typing — **what the approximation predicted against what actually happened**.
+
+**The paste is stored verbatim and never overwritten.** It goes through the same
+§84 snapshot machinery as the ADP captures, so it is hashed, checked by
+`research validate`, and re-parsed from the original text every time the table is
+rebuilt. A parser that learns a new results format improves every draft ever
+recorded, not just the ones taken after the fix.
+
+**The parser refuses rather than shrugs.** It counts what it produced against
+`teams × rounds` and raises naming the line it choked on. A paste silently short
+by eight lines yields a board that looks complete, parses cleanly, and is wrong
+about who was available at every pick after the gap.
+
 ## Data sources and attribution
 
 * **nflverse** (`nflverse-data`), CC-BY-4.0 — statistics, rosters, depth
@@ -391,7 +435,8 @@ data/raw/    downloaded source files (gitignored, reproducible)
 data/snapshots/  dated immutable captures with hashes (COMMITTED — the archive)
 data/processed/  canonical parquet tables (gitignored, rebuildable)
 pipeline/    ingest, normalize, features, scoring, snapshot, cli
-research/    questions.yaml, method contract, foundations/ teams/ running_back/, sheet.py
+research/    questions.yaml, method contract, foundations/ teams/ running_back/,
+             sheet.py, draft_record.py (S76)
 artifacts/   dated editions: methods/*.json (S16) and sheets/*.html (S83),
              plus 2026-draft/ -- the live board, refreshed daily in place
 tests/       data, leakage, config and snapshot tests

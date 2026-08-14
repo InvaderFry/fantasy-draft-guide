@@ -32,6 +32,7 @@ import polars as pl
 from pipeline.config import (
     PROCESSED_DIR,
     ConfigError,
+    draft_season,
     draft_slot,
     profile_adp_format,
     real_profiles,
@@ -174,6 +175,7 @@ def compute(
     return {
         "profile_id": profile.get("id"),
         "profile_label": profile.get("label"),
+        "season": draft_season(profile),
         "teams": teams,
         "draft_slot": UNKNOWN_SLOT if slot is None else slot,
         "rounds": rounds,
@@ -292,7 +294,9 @@ def run(processed_dir=PROCESSED_DIR) -> list[tuple[dict[str, Any], MethodArtifac
         )
     out = []
     for profile in real_profiles():
-        adp = latest_adp(profile, processed_dir=processed_dir)
+        # The season is mandatory here. Without it "the newest capture" spans
+        # every backfilled season at once -- see config.draft_season().
+        adp = latest_adp(profile, processed_dir=processed_dir, season=draft_season(profile))
         results = compute(adp, profile)
         out.append((results, export(results, profile)))
     return out

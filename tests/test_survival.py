@@ -183,3 +183,41 @@ def test_the_candidate_window_starts_near_the_pick():
     late = results["by_slot"][0]["picks"][1]  # pick 24
     adps = [c["adp"] for c in late["candidates"]]
     assert adps and min(adps) >= 24 - survival.AVAILABILITY_BUFFER
+
+
+def test_the_board_is_one_seasons_board(tmp_path):
+    """Regression: nine seasons were being priced into one ranking.
+
+    The ADP archive backfilled 2018-2025 on the same day it captured 2026, so
+    every historical season shares a snapshot_date with the live one. `latest_adp`
+    took "the newest capture" and got all nine, and the shipped draft sheets had
+    Todd Gurley and Dalvin Cook on the 2026 board, ranked against Jahmyr Gibbs.
+    Nothing looked wrong: the section was full, the ADPs were plausible, and the
+    row count was merely large.
+    """
+    frame = _adp()
+    old = frame.with_columns(
+        pl.lit(2019, dtype=pl.Int64).alias("season"),
+        pl.col("source_player_name") + pl.lit(" (2019)"),
+    )
+    path = tmp_path / "adp_history.parquet"
+    pl.concat([frame, old]).write_parquet(path)
+
+    profile = {**PROFILE, "draft_date": "2026-08-30"}
+    board = survival.latest_adp(profile, processed_dir=tmp_path, season=2026)
+    assert board["season"].unique().to_list() == [2026]
+    assert not any("(2019)" in n for n in board["source_player_name"])
+
+
+def test_a_season_with_no_capture_blocks_rather_than_falling_back(tmp_path):
+    """Silently widening to every season is how the bug above happened."""
+    _adp().write_parquet(tmp_path / "adp_history.parquet")
+    with pytest.raises(survival.BlockedError, match="season 2031"):
+        survival.latest_adp(PROFILE, processed_dir=tmp_path, season=2031)
+
+
+def test_the_draft_season_follows_the_draft_date_when_there_is_one():
+    from pipeline.config import draft_season
+
+    assert draft_season({"id": "t", "draft_date": "2026-08-30"}) == 2026
+    assert draft_season({"id": "t", "draft_date": "unknown"}) == dt.datetime.now(dt.UTC).year
