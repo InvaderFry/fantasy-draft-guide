@@ -25,6 +25,7 @@ def run_all(processed_dir: Path = PROCESSED_DIR) -> list[tuple[str, bool]]:
         ("team_season", _check_team_season),
         ("adp_history", _check_adp_history),
         ("projection_snapshot", _check_projection_snapshot),
+        ("draft_pick", _check_draft_pick),
     ):
         path = processed_dir / f"{name}.parquet"
         if not path.exists():
@@ -358,3 +359,55 @@ def _check_adp_against_decision_dates(frame: pl.DataFrame) -> list[tuple[str, bo
             "bucket analysis is using a price fixed after the notional draft (S6.1, S21.1)"
         )
     ]
+
+
+def _check_draft_pick(frame: pl.DataFrame) -> list[tuple[str, bool]]:
+    """S13, S76. The recorded league drafts.
+
+    An empty table is the normal state until a draft happens, and it is the state
+    the whole season is spent in.
+    """
+    if frame.height == 0:
+        return [
+            _ok(
+                "draft_pick: empty -- no draft recorded yet (S76). `research draft-record` "
+                "writes one."
+            )
+        ]
+    out = _season_check(frame, "draft_pick") + _value_type_check(frame, "draft_pick")
+
+    # Every draft must be a complete, gapless board. draft_log refuses to record
+    # anything else, so a hole here means the parquet was assembled some other
+    # way -- and a board missing picks is wrong about who was available at every
+    # pick after the gap.
+    for (season, profile), group in frame.group_by(["season", "profile_id"]):
+        picks = sorted(group["overall_pick"].to_list())
+        label = f"draft_pick {profile} {season}"
+        expected = list(range(1, len(picks) + 1))
+        out.append(
+            _ok(f"{label}: {len(picks)} picks, contiguous from 1")
+            if picks == expected
+            else _fail(f"{label}: pick numbers are not 1..{len(picks)} (S76)")
+        )
+        drafter = group.filter(pl.col("is_drafter")).height
+        rounds = group["round"].max()
+        out.append(
+            _ok(f"{label}: {drafter} picks from the drafter's seat over {rounds} round(s)")
+            if drafter == rounds
+            else _fail(
+                f"{label}: {drafter} picks marked as the drafter's across {rounds} rounds "
+                "-- one seat makes exactly one pick per round (S31.2)"
+            )
+        )
+
+    unmatched = frame.filter(pl.col("player_id").is_null()).height
+    share = unmatched / frame.height
+    out.append(
+        _ok(f"draft_pick: {unmatched} unmatched rows ({share:.1%})")
+        if share < 0.15
+        else _fail(
+            f"draft_pick: {unmatched} unmatched rows ({share:.1%}) -- triage into "
+            "config/manual_id_overrides.yaml (S12)"
+        )
+    )
+    return out

@@ -123,5 +123,15 @@ PROJECTION_SNAPSHOT_COLUMNS = (
 )
 
 
+# S13 draft_pick (S76, S10B). The drafter's own league drafts, every seat.
+DRAFT_PICK_COLUMNS = (
+    "season", "draft_date", "snapshot_date", "as_of", "source_as_of", "value_type",
+    "source", "profile_id", "teams",
+    "overall_pick", "round", "slot", "is_drafter",
+    "player_id", "source_player_name", "position", "team",
+    "parsed_as", "match_method", "match_confidence",
+)
+
+
 def outcome_columns_in(columns) -> list[str]:
     return sorted(set(columns) & OUTCOME_COLUMNS)

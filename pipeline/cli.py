@@ -15,7 +15,9 @@ chunk. See S79 Steps 4+.
 from __future__ import annotations
 
 import datetime as dt
+import json
 import sys
+from pathlib import Path
 from typing import Annotated, Any
 
 import typer
@@ -312,6 +314,109 @@ def _projection_status() -> str:
         "from the environment, so an unset key here says nothing about the repository "
         "secret the archive workflow uses."
     )
+
+
+@app.command("draft-record")
+def draft_record(
+    profile: Annotated[str, typer.Option(help="league profile id, e.g. half_ppr_12")],
+    slot: Annotated[int, typer.Option(help="the seat actually drawn")],
+    picks: Annotated[str, typer.Option(help="file holding the pasted draft results")],
+    season: Annotated[int, typer.Option(help="season drafted, default current year")] = 0,
+    date: Annotated[str, typer.Option(help="draft date, ISO, default today")] = "",
+    rounds: Annotated[int, typer.Option(help="expected rounds, default inferred")] = 0,
+    partial: Annotated[bool, typer.Option(help="accept a draft that really ended early")] = False,
+) -> None:
+    """Freeze one league's draft as an immutable record (S76).
+
+    The paste is stored verbatim through the S84 snapshot machinery, so it is
+    hashed, verified by `research validate`, and can never be quietly edited
+    afterwards -- a recommendation audit whose inputs are editable audits
+    nothing.
+
+    `--slot` is the seat that was actually drawn. It is the one value nothing
+    else in the repository holds: the sheets were rendered for all twelve
+    because the order is drawn an hour before the draft (S31.2, S83), and once
+    the draft is over there is no way back to which one was real.
+    """
+    from pipeline.ingest import draft_log
+
+    profiles = {p["id"]: p for p in config.league_profiles()}
+    if profile not in profiles:
+        raise typer.BadParameter(
+            f"no league profile {profile!r} in config/league_profiles.yaml (S14). "
+            f"Known: {sorted(profiles)}"
+        )
+    league = profiles[profile]
+    draft_day = dt.date.fromisoformat(date) if date else dt.date.today()
+    year = season or draft_day.year
+
+    text = Path(picks).read_text()
+    try:
+        body = draft_log.payload(
+            text,
+            profile_id=profile,
+            season=year,
+            teams=int(league["teams"]),
+            draft_slot=slot,
+            draft_date=draft_day,
+            rounds=rounds or None,
+            partial=partial,
+        )
+    except draft_log.DraftLogError as exc:
+        typer.echo(f"draft log rejected: {exc}", err=True)
+        raise typer.Exit(code=1) from None
+
+    snap = snapshot.Snapshot(draft_day)
+    try:
+        written = snap.write(
+            draft_log.filename(profile, year),
+            (json.dumps(body, indent=2, sort_keys=True) + "\n").encode(),
+            source=draft_log.SOURCE_NAME,
+            license="own_data",
+            notes=(
+                f"{body['pick_count']} picks, {body['rounds']} rounds, "
+                f"{body['teams']} teams, drafted from seat {slot}"
+            ),
+            extra={
+                "profile_id": profile,
+                "season": year,
+                "draft_slot": slot,
+                "partial": body["partial"],
+            },
+        )
+    except snapshot.SnapshotExistsError as exc:
+        typer.echo(f"{exc}", err=True)
+        raise typer.Exit(code=1) from None
+
+    typer.echo(f"wrote {written} -- {body['pick_count']} picks from seat {slot}")
+    typer.echo(
+        "next: `research build-tables --tables draft_pick` then `research draft-review`"
+    )
+
+
+@app.command("draft-review")
+def draft_review(
+    edition: Annotated[str, typer.Option(help="edition whose sheet was on the table")] = "",
+) -> None:
+    """Pair what the sheet said with what happened (S76).
+
+    Reads the recorded draft and the survival artifact of the edition actually
+    used, and writes one S16 artifact per league. Includes the check S31.1 said
+    the market could not supply: P(available) as quoted, against whether he was.
+    """
+    from research import draft_record
+    from research import method as method_mod
+
+    edition_name = edition or method_mod.default_edition()
+    try:
+        outcomes = draft_record.run(edition=edition_name)
+    except draft_record.BlockedError as exc:
+        typer.echo(f"draft-review is blocked, not killed:\n  {exc}", err=True)
+        raise typer.Exit(code=1) from None
+
+    for results, artifact in outcomes:
+        path = artifact.write(edition_name)
+        typer.echo(f"{artifact.method_id}: {results['n']} held pick(s) -> {path}")
 
 
 @app.command()

@@ -101,6 +101,25 @@ def draft_date(profile: dict[str, Any]) -> dt.date | None:
     return value if isinstance(value, dt.date) else dt.date.fromisoformat(str(value))
 
 
+def draft_season(profile: dict[str, Any]) -> int:
+    """The season this league is drafting for (S6.1, S31.2).
+
+    Not optional, and not defaultable to "whatever is in the table". The ADP
+    archive backfilled 2018-2025 on the same capture day it took 2026, so every
+    historical season shares a snapshot_date with the live one -- and a board
+    built from "the newest capture" without a season filter interleaves nine
+    drafts into one ranking. That shipped: Todd Gurley and Dalvin Cook were on
+    the 2026 survival board, priced against Jahmyr Gibbs.
+
+    The draft date's year when it is known; the current year when it is not,
+    which is the same rule `research draft-record` applies to a recorded draft.
+    """
+    date = draft_date(profile)
+    if date is not None:
+        return date.year
+    return dt.datetime.now(dt.UTC).date().year
+
+
 def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
     """Reject a profile still carrying a placeholder (S14).
 

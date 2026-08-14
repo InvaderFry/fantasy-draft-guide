@@ -17,6 +17,7 @@ import polars as pl
 from pipeline.config import PROCESSED_DIR, ConfigError
 from pipeline.features import (
     adp_history,
+    draft_pick,
     player_season,
     player_week,
     projections,
@@ -30,6 +31,7 @@ TABLES = (
     "team_season",
     "adp_history",
     "projection_snapshot",
+    "draft_pick",
 )
 
 
@@ -91,6 +93,10 @@ def build_all(
         written["projection_snapshot"] = _write(
             frame, output_dir / "projection_snapshot.parquet"
         )
+
+    if "draft_pick" in wanted:
+        frame = draft_pick.build()
+        written["draft_pick"] = _write(frame, output_dir / "draft_pick.parquet")
 
     return written
 

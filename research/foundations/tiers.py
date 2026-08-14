@@ -32,6 +32,7 @@ import polars as pl
 from pipeline.config import (
     PROCESSED_DIR,
     ConfigError,
+    draft_season,
     projection_source_available,
     real_profiles,
 )
@@ -386,7 +387,8 @@ def run(processed_dir=PROCESSED_DIR) -> list[tuple[dict[str, Any], MethodArtifac
         )
     out = []
     for profile in real_profiles():
-        frame = board(profile, processed_dir=processed_dir)
+        # Same rule as survival: a board must be one season's board.
+        frame = board(profile, processed_dir=processed_dir, season=draft_season(profile))
         results = compute(frame, profile)
         out.append((results, export(results, profile)))
     return out
