@@ -92,3 +92,29 @@ def test_an_unchanged_sheet_does_not_fail_the_refresh():
     script = _run_script("sheets")
     assert "sheets unchanged" in script
     assert "exit 0" in script
+
+
+def test_the_archive_comes_back_after_a_late_publish():
+    """FFC publishes once a day, and not always before 11:00 UTC.
+
+    `snapshot` now declines to file a window that closed before the capture date
+    -- correctly, since that is the previous day's price -- so a single morning
+    run would turn a late publish into a lost day. A second pass is what makes
+    the refusal safe.
+    """
+    schedule = _workflow()[True]["schedule"]  # PyYAML reads bare `on:` as True
+    hours = sorted(int(entry["cron"].split()[1]) for entry in schedule)
+    assert len(hours) > 1, "one run a day cannot recover from a late publish"
+    assert hours[0] == 11
+
+
+def test_an_already_captured_day_does_not_fail_the_archive():
+    """The mirror of the sheets rule, and the 2026-08-14 regression.
+
+    A day already in hand is not a day lost. The capture step decides which of
+    the two it is and exits accordingly; the commit step must not overrule it by
+    failing on a clean tree.
+    """
+    script = _run_script("capture")
+    assert "nothing new to commit" in script
+    assert "::error::no snapshot files were produced" not in script

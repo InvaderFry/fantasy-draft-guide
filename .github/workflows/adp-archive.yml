@@ -14,6 +14,12 @@ on:
     # 11:00 UTC daily. FFC updates once per day; a fixed hour keeps the
     # intra-summer series evenly spaced, which S31.3 (recency weighting) needs.
     - cron: "0 11 * * *"
+    # A second pass, because `snapshot` no longer writes a payload whose window
+    # closed before the capture date -- on a day FFC publishes later than usual
+    # the 11:00 run correctly declines to file yesterday's numbers as today's,
+    # and something has to come back for the real ones. A run with the day
+    # already in hand reports that and exits 0, so this costs nothing.
+    - cron: "0 14 * * *"
   workflow_dispatch:
     inputs:
       season:
@@ -21,11 +27,10 @@ on:
         required: false
         type: string
       sources:
-        # A dated capture is immutable (S84), so re-running a source that has
-        # already landed today fails the overwrite guard -- correctly, but it
-        # also aborts the run before a source that has NOT landed gets its turn.
-        # Narrowing the source list is how a projection capture is attempted on
-        # a day whose ADP is already archived.
+        # A dated capture is immutable (S84). Re-running a source that has
+        # already landed today is reported and skipped rather than failed, so
+        # the default list is safe to dispatch at any hour; narrow it only to
+        # retry one source without waiting on the others.
         description: "Comma list of sources to capture (default: ffc,projections)"
         required: false
         default: "ffc,projections"
@@ -62,7 +67,10 @@ jobs:
 
       - name: Capture ADP and projection snapshots
         # Non-zero exit on an empty capture is deliberate: a silent no-op day
-        # looks like success and costs a day of price movement.
+        # looks like success and costs a day of price movement. What counts as
+        # empty is decided in `snapshot_`, not here -- a payload the source has
+        # not republished, and a date already captured, are days in hand rather
+        # than days lost, and exit 0.
         #
         # The `projections` source falls back API -> manual CSV -> skip (S11), so
         # an absent FANTASYPROS_API_KEY reports itself and leaves the ADP
@@ -80,8 +88,12 @@ jobs:
       - name: Commit snapshot
         run: |
           if [ -z "$(git status --porcelain data/snapshots)" ]; then
-            echo "::error::no snapshot files were produced - a capture day would be lost"
-            exit 1
+            # Not a guard any more: the capture step distinguishes a lost day from
+            # a day already in hand and exits non-zero for the first, which fails
+            # this job before it reaches here. A clean tree at this point means it
+            # said so and was right.
+            echo "nothing new to commit - the capture step reported why and exited 0"
+            exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

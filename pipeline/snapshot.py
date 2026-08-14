@@ -60,6 +60,15 @@ class Snapshot:
             fh.write("\n")
         tmp.replace(self.manifest_path)
 
+    def recorded_entry(self, filename: str) -> dict[str, Any] | None:
+        """This date's manifest entry for `filename`, if it holds one.
+
+        Lets a caller tell three collisions apart: bytes it already has, a
+        capture the source has since republished, and a capture whose contents
+        predate the date it is filed under. Only the third is a defect.
+        """
+        return self.read_manifest().get("files", {}).get(filename)
+
     # -- writing -------------------------------------------------------
     def write(
         self,
@@ -126,6 +135,37 @@ class Snapshot:
             if path.name not in files and path.name != "manifest.json":
                 problems.append(f"{path.name}: present on disk but absent from the manifest")
         return problems
+
+
+def previous_capture(
+    filename: str, *, before: dt.date, root: Path | None = None
+) -> tuple[dt.date, str] | None:
+    """The most recent capture of `filename` strictly before `before`, as (date, sha256).
+
+    A source that has not published since its last capture serves those same
+    bytes again. Filing them under a new date would invent a day of price
+    movement that never happened, so the caller compares against this first.
+    """
+    root = root if root is not None else SNAPSHOT_DIR
+    if not root.exists():
+        return None
+    for d in sorted(root.iterdir(), reverse=True):
+        if not d.is_dir():
+            continue
+        try:
+            date = dt.date.fromisoformat(d.name)
+        except ValueError:
+            continue
+        if date >= before:
+            continue
+        manifest_path = d / "manifest.json"
+        if not manifest_path.exists():
+            continue
+        with manifest_path.open() as fh:
+            entry = json.load(fh).get("files", {}).get(filename)
+        if entry and entry.get("sha256"):
+            return date, entry["sha256"]
+    return None
 
 
 def verify_all() -> dict[str, list[str]]:
