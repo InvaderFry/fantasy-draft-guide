@@ -12,4 +12,17 @@
 #     position: WR
 #     note: "Two active Mike Williams; name+pos+team is ambiguous."
 
-overrides: []
+overrides:
+  # Found by `research draft-record --dry-run` on the 2026 board: he is the one
+  # name in 168 that resolved to no id. nflverse rosters him at his defensive
+  # position and every fantasy source lists him at his offensive one, so the
+  # name+position key misses in both directions. Unmatched in all 12 archived ADP
+  # captures and in the projection snapshot too, which means he was absent from
+  # the tier board and from every survival block as well as from the draft log.
+  - gsis_id: "00-0040718"
+    source: ffc
+    source_name: "Travis Hunter"
+    source_team: JAX
+    position: WR
+    note: "Two-way player: rostered CB, drafted WR. JAC normalizes to JAX, so
+      this entry covers the FantasyPros spelling as well."

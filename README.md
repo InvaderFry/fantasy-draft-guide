@@ -393,11 +393,35 @@ the guide does: *"it cannot be reconstructed later, and it is the only mechanism
 by which the evidence grades in §3.1 are ever checked against reality."*
 
 ```bash
-# 1. paste the platform's draft results into a file, then:
+# 1. paste the platform's draft results into a file, then CHECK it:
+research draft-record --profile half_ppr_12 --slot 7 --picks picks.txt --dry-run
+
+# 2. only once that reads clean, freeze it:
 research draft-record --profile half_ppr_12 --slot 7 --picks picks.txt
 research build-tables --tables draft_pick
 research draft-review --edition 2026-draft
 ```
+
+**Dry-run first, always.** §84 refuses a second record on the same date, so a
+paste frozen with a defect cannot be re-recorded that night. The defects that
+matter are the quiet ones — a line the parser skipped, or a name §12 cannot
+resolve, which parses cleanly and then pairs with nothing. `--dry-run` does the
+same parse and the same crosswalk match and writes nothing:
+
+```
+parsed 168 picks, 14 rounds, 12 teams
+  shapes: round.pick=168
+  seat 7 holds [7, 18, 31, 42, 55, 66, 79, 90, 103, 114, 127, 138, 151, 162] -- 14 pick(s) recorded
+  S12 crosswalk: 167/168 names resolved to an id
+    unmatched: 'Travis Hunter' (WR JAX) at pick 164
+```
+
+That is a real run, and the unmatched name was a real defect: nflverse rosters
+Travis Hunter at his defensive position and every fantasy source lists him at
+his offensive one, so he resolved to no id in all twelve archived ADP captures
+and in the projection snapshot too. `config/manual_id_overrides.yaml` carries the
+correction. **The whole path is exercised on every CI run** —
+`tests/test_draft_dry_run.py` drives the real CLI over a full 12×14 board.
 
 `--slot` is the seat that was actually drawn. **It is the one value nothing else
 in this repository holds** — the sheets are rendered for all twelve precisely
@@ -416,6 +440,17 @@ the first one, and every draft before then is gone.
 The review artifact pairs, for each pick you held: what the sheet said (tier,
 VOR, quoted survival), the market price, who you took, and — the part worth the
 typing — **what the approximation predicted against what actually happened**.
+
+**The pairing goes through the id, not the spelling.** The quote is Fantasy
+Football Calculator's name and the log is whatever the platform's results page
+printed, and the two do not agree: FFC says `Kenneth Walker` and
+`Patrick Mahomes` where every other source adds the generational suffix. Matched
+on the string this fails *open* — a player whose name spells differently is never
+found among the picks, so he reads as still available, and the calibration table
+reports the approximation as far better than it is. Both sides carry `gsis_id`,
+and the artifact's `pairing` block reports how every call was joined and how many
+were not. **Read `unmatched` before reading the calibration**: a pairing that
+quietly half fails does not look like a failure.
 
 **The paste is stored verbatim and never overwritten.** It goes through the same
 §84 snapshot machinery as the ADP captures, so it is hashed, checked by

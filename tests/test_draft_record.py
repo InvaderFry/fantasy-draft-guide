@@ -9,10 +9,12 @@ known by construction, so a wrong pairing is visible rather than plausible.
 import datetime as dt
 import json
 
+import polars as pl
 import pytest
 
 from pipeline.features import draft_pick
 from pipeline.ingest import draft_log
+from pipeline.normalize.names import match_key, name_position_key
 from research import draft_record
 from research.foundations import survival as survival_mod
 
@@ -25,9 +27,25 @@ PROFILE = {"id": "fixture_12", "label": "12-team fixture", "teams": TEAMS, "real
 HELD = [7, 18]
 
 
+# Named in words, not digits. S12's normalizer strips digits, so "Player07" and
+# "Player18" are the same name to every join in this repository -- a fixture that
+# spelled them that way could not tell a correct pairing from one that matched
+# every candidate to pick 1.
+ORDINALS = (
+    "One Two Three Four Five Six Seven Eight Nine Ten Eleven Twelve Thirteen "
+    "Fourteen Fifteen Sixteen Seventeen Eighteen Nineteen Twenty Twentyone "
+    "Twentytwo Twentythree Twentyfour"
+).split()
+
+
+def _name(pick: int) -> str:
+    """The player taken at this overall pick, in the fixture board below."""
+    return f"Player {ORDINALS[pick - 1]}"
+
+
 def _board() -> str:
-    """Two rounds, 24 picks, every name distinct and positional."""
-    return "\n".join(f"{n}. Player{n:02d} RB ATL" for n in range(1, TEAMS * 2 + 1))
+    """Two rounds, 24 picks, every name distinct under S12's normalizer."""
+    return "\n".join(f"{n}. {_name(n)} RB ATL" for n in range(1, TEAMS * 2 + 1))
 
 
 def _survival_artifact(candidates: list[dict]) -> dict:
@@ -52,7 +70,22 @@ def _survival_artifact(candidates: list[dict]) -> dict:
     }
 
 
-def _record(tmp_path, artifact: dict | None, board: str | None = None) -> dict:
+def _crosswalk(names: dict[str, str]) -> pl.DataFrame:
+    """A crosswalk resolving the given fixture names to S12 ids."""
+    return pl.DataFrame(
+        {
+            "gsis_id": list(names.values()),
+            "match_key": [match_key(n, "RB", "ATL") for n in names],
+            "name_position_key": [name_position_key(n, "RB") for n in names],
+            "override_match_key": [None] * len(names),
+        },
+        schema_overrides={"override_match_key": pl.String},
+    )
+
+
+def _record(
+    tmp_path, artifact: dict | None, board: str | None = None, crosswalk=None
+) -> dict:
     """Write a draft log and a survival artifact, then run the audit."""
     snapshots = tmp_path / "snapshots" / "2026-08-30"
     snapshots.mkdir(parents=True)
@@ -73,7 +106,9 @@ def _record(tmp_path, artifact: dict | None, board: str | None = None) -> dict:
     # picks would be wrong about who was on the board.
     from tests.test_projections import CROSSWALK
 
-    log = draft_pick.build(tmp_path / "snapshots", crosswalk=CROSSWALK)
+    log = draft_pick.build(
+        tmp_path / "snapshots", crosswalk=CROSSWALK if crosswalk is None else crosswalk
+    )
 
     methods = tmp_path / "artifacts" / "ed" / "methods"
     methods.mkdir(parents=True)
@@ -91,29 +126,29 @@ def test_the_audit_records_what_this_seat_actually_took(tmp_path):
     results = _record(tmp_path, _survival_artifact([]))
     assert results["draft_slot"] == SLOT
     assert [p["pick"] for p in results["picks"]] == HELD
-    assert results["picks"][0]["took"] == "Player07"
-    assert results["picks"][1]["took"] == "Player18"
+    assert results["picks"][0]["took"] == _name(7)
+    assert results["picks"][1]["took"] == _name(18)
     assert results["adp_snapshot_date"] == "2026-08-14"
 
 
 def test_survival_is_scored_against_what_the_log_says_happened(tmp_path):
     """The check S31.1 said the market could not supply.
 
-    Player08 goes at pick 8, between this seat's picks -- so he was NOT available
-    at 18, whatever the approximation said. Player20 is not taken until after 18,
+    Player Eight goes at pick 8, between this seat's picks -- so he was NOT available
+    at 18, whatever the approximation said. Player Twenty is not taken until after 18,
     so he was.
     """
     candidates = [
-        {"player": "Player08", "position": "RB", "adp": 8.0, "p_available": 0.9,
+        {"player": _name(8), "position": "RB", "adp": 8.0, "p_available": 0.9,
          "approximation_note": None},
-        {"player": "Player20", "position": "RB", "adp": 20.0, "p_available": 0.1,
+        {"player": _name(20), "position": "RB", "adp": 20.0, "p_available": 0.1,
          "approximation_note": None},
     ]
     results = _record(tmp_path, _survival_artifact(candidates))
     calls = {c["player"]: c for c in results["picks"][0]["survival_calls"]}
-    assert calls["Player08"]["was_available"] is False   # taken at 8, before 18
-    assert calls["Player20"]["was_available"] is True    # taken at 20, after 18
-    assert calls["Player08"]["p_available_predicted"] == 0.9
+    assert calls[_name(8)]["was_available"] is False   # taken at 8, before 18
+    assert calls[_name(20)]["was_available"] is True    # taken at 20, after 18
+    assert calls[_name(8)]["p_available_predicted"] == 0.9
 
 
 def test_the_last_held_pick_makes_no_survival_calls(tmp_path):
@@ -127,7 +162,7 @@ def test_a_candidate_with_no_published_spread_is_not_scored(tmp_path):
     """S31.2 returns None rather than a point estimate when FFC published no
     stdev. A null prediction cannot be right or wrong and must not be counted."""
     candidates = [
-        {"player": "Player08", "position": "RB", "adp": 8.0, "p_available": None,
+        {"player": _name(8), "position": "RB", "adp": 8.0, "p_available": None,
          "approximation_note": "no spread published; survival not computable"},
     ]
     results = _record(tmp_path, _survival_artifact(candidates))
@@ -138,12 +173,12 @@ def test_a_candidate_with_no_published_spread_is_not_scored(tmp_path):
 def test_calibration_buckets_predicted_against_observed(tmp_path):
     candidates = [
         # High confidence, and wrong: taken before the next pick.
-        {"player": "Player08", "position": "RB", "adp": 8.0, "p_available": 0.8,
+        {"player": _name(8), "position": "RB", "adp": 8.0, "p_available": 0.8,
          "approximation_note": None},
-        {"player": "Player09", "position": "RB", "adp": 9.0, "p_available": 0.9,
+        {"player": _name(9), "position": "RB", "adp": 9.0, "p_available": 0.9,
          "approximation_note": None},
         # High confidence, and right.
-        {"player": "Player21", "position": "RB", "adp": 21.0, "p_available": 0.85,
+        {"player": _name(21), "position": "RB", "adp": 21.0, "p_available": 0.85,
          "approximation_note": None},
     ]
     results = _record(tmp_path, _survival_artifact(candidates))
@@ -171,6 +206,73 @@ def test_a_sheet_never_rendered_for_the_drawn_seat_blocks(tmp_path):
         _record(tmp_path, artifact)
 
 
+# -- the pairing goes through the id, not the spelling ---------------------
+
+
+def test_a_quote_and_a_pick_spelled_differently_are_still_the_same_player(tmp_path):
+    """The quote is FFC's spelling and the log is a platform's, and they differ.
+
+    On the real board FFC says "Kenneth Walker" where FantasyPros says "Kenneth
+    Walker III"; the paste is a third spelling nobody can see in advance. Matched
+    on the string this fails open -- the player is never found among the picks, so
+    he reads as still available and the approximation looks better than it is.
+    """
+    ids = {_name(8): "00-0000008"}
+    candidates = [
+        {"player": f"{_name(8)} III", "player_id": "00-0000008", "position": "RB",
+         "adp": 8.0, "p_available": 0.9, "approximation_note": None},
+    ]
+    results = _record(tmp_path, _survival_artifact(candidates), crosswalk=_crosswalk(ids))
+    call = results["picks"][0]["survival_calls"][0]
+    assert call["matched_in_log"] is True
+    assert call["matched_by"] == "id"
+    assert call["was_available"] is False       # taken at 8, before this seat's 18
+
+
+def test_a_quote_that_matched_nothing_is_counted_rather_than_scored_as_available(tmp_path):
+    """A pairing that half fails does not look like a failure. It looks like a
+    strikingly well calibrated approximation."""
+    candidates = [
+        {"player": "Nobody In This Draft", "position": "RB", "adp": 8.0,
+         "p_available": 0.9, "approximation_note": None},
+    ]
+    results = _record(tmp_path, _survival_artifact(candidates))
+    assert results["pairing"]["unmatched"] == 1
+    assert results["pairing"]["unmatched_share"] == 1.0
+    assert results["picks"][0]["survival_calls"][0]["matched_in_log"] is False
+
+
+def test_a_name_two_picks_answer_to_resolves_to_neither(tmp_path):
+    """match_external's rule for its loose key. Attributing one man's pick to
+    another reads downstream as a survival call that came out the other way."""
+    board = "\n".join(
+        f"{n}. {'Same Name' if n in (8, 20) else _name(n)} RB ATL"
+        for n in range(1, TEAMS * 2 + 1)
+    )
+    candidates = [
+        {"player": "Same Name", "position": "RB", "adp": 8.0, "p_available": 0.9,
+         "approximation_note": None},
+    ]
+    results = _record(tmp_path, _survival_artifact(candidates), board=board)
+    call = results["picks"][0]["survival_calls"][0]
+    assert call["matched_in_log"] is False
+    assert results["pairing"]["unmatched"] == 1
+
+
+def test_the_pairing_block_says_how_every_call_was_joined(tmp_path):
+    candidates = [
+        {"player": _name(8), "position": "RB", "adp": 8.0, "p_available": 0.9,
+         "approximation_note": None},
+        {"player": "Nobody In This Draft", "position": "RB", "adp": 9.0,
+         "p_available": 0.5, "approximation_note": None},
+    ]
+    results = _record(tmp_path, _survival_artifact(candidates))
+    pairing = results["pairing"]
+    assert pairing["calls"] == 2
+    assert pairing["matched_by_name_and_position"] == 1
+    assert pairing["unmatched"] == 1
+
+
 def test_the_artifact_carries_no_evidence_grade(tmp_path):
     """S88 forbids grades here; S79 Step 4 is the grading engine."""
     results = _record(tmp_path, _survival_artifact([]))
@@ -191,12 +293,12 @@ def test_a_candidate_already_gone_before_this_pick_is_not_scored(tmp_path):
     """
     candidates = [
         # Taken at pick 2, five picks before this seat was on the clock.
-        {"player": "Player02", "position": "RB", "adp": 2.0, "p_available": 0.01,
+        {"player": _name(2), "position": "RB", "adp": 2.0, "p_available": 0.01,
          "approximation_note": None},
         # Genuinely on the board at 7, and taken at 8.
-        {"player": "Player08", "position": "RB", "adp": 8.0, "p_available": 0.4,
+        {"player": _name(8), "position": "RB", "adp": 8.0, "p_available": 0.4,
          "approximation_note": None},
     ]
     results = _record(tmp_path, _survival_artifact(candidates))
     scored = {c["player"] for c in results["picks"][0]["survival_calls"]}
-    assert scored == {"Player08"}
+    assert scored == {_name(8)}
