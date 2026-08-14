@@ -24,6 +24,7 @@ import typer
 
 from pipeline import config, snapshot
 from pipeline.ingest import fantasypros, ffc_adp, nflverse, projections_csv
+from pipeline.ingest.base import Fetched
 
 app = typer.Typer(add_completion=False, help="Fantasy draft research guide pipeline.")
 
@@ -52,8 +53,9 @@ def snapshot_(
 ) -> None:
     """Capture raw sources into an immutable dated snapshot (S65, S84).
 
-    Exits non-zero if any source yields nothing. A silent no-op day is a
-    permanently lost day of price movement, not a successful run.
+    Exits non-zero when a day of price movement was actually lost. A payload the
+    source has not republished is not that, and neither is a second run of a day
+    already in hand -- see `_classify`.
     """
     snap_date = dt.date.fromisoformat(date) if date else dt.datetime.now(dt.UTC).date()
     year = season or snap_date.year
@@ -61,6 +63,7 @@ def snapshot_(
     wanted = [s.strip() for s in sources.split(",") if s.strip()]
     written = 0
     skipped: list[str] = []
+    held: dict[str, list[str]] = {}  # category -> filenames not written
 
     for name in wanted:
         if name == "ffc":
@@ -78,6 +81,12 @@ def snapshot_(
             raise typer.BadParameter(f"unknown source '{name}'")
 
         for f in payloads:
+            verdict = _classify(f, snap=snap, snap_date=snap_date, year=year)
+            if verdict is not None:
+                category, message = verdict
+                held.setdefault(category, []).append(f.filename)
+                typer.echo(message, err=True)
+                continue
             try:
                 path = snap.write(
                     f.filename,
@@ -89,26 +98,141 @@ def snapshot_(
                     extra=f.extra,
                 )
             except snapshot.SnapshotExistsError as exc:
-                typer.echo(f"skip (already captured): {exc}", err=True)
+                # `_classify` clears every collision the manifest knows about, so
+                # reaching here means a file exists on disk that no manifest
+                # entry describes. `verify` reports the same thing; it is not a
+                # state to write through.
+                held.setdefault("unmanifested", []).append(f.filename)
+                typer.echo(f"unmanifested file in the way: {exc}", err=True)
                 continue
             written += 1
             typer.echo(f"wrote {path} ({len(f.data):,} bytes) -- {f.notes or ''}")
 
-    if written == 0:
-        # A source that skipped for a stated reason is not the same failure. S84's
-        # rule is about ADP, whose missed day is unrecoverable; a projection with
-        # no key configured is fetchable tomorrow and must not red the archive job,
-        # which runs `snapshot` and then commits the ADP captured seconds earlier.
-        if skipped and set(skipped) == set(wanted):
-            reason = ", ".join(skipped)
-            typer.echo(f"snapshot {snap_date.isoformat()}: nothing to capture ({reason})")
-            return
+    if written:
+        typer.echo(f"snapshot {snap_date.isoformat()}: {written} file(s)")
+        return
+
+    _report_nothing_written(held, skipped=skipped, wanted=wanted, snap_date=snap_date)
+
+
+# Categories that account for an unwritten payload without a day being lost. The
+# capture either is already in hand or does not exist yet at the source.
+BENIGN_HOLDS = ("already_captured", "superseded", "unchanged", "not_yet_published")
+
+
+def _classify(
+    f: Fetched, *, snap: snapshot.Snapshot, snap_date: dt.date, year: int
+) -> tuple[str, str] | None:
+    """Decide whether a fetched payload should be written. None means write it.
+
+    Returns (category, message) for a payload that must not be written. The order
+    matters: a source that has not published yet is serving its previous day's
+    bytes, and saying so is more use than reporting them as unchanged.
+    """
+    window_end = _as_date((f.extra or {}).get("window_end"))
+    if year == snap_date.year and window_end is not None and window_end < snap_date:
+        return (
+            "not_yet_published",
+            f"not yet published: {f.filename} covers a window closing {window_end}, "
+            f"before {snap_date}. The source has not published for this date; filing "
+            "it here would date the previous day's numbers as today's (S84).",
+        )
+
+    digest = snapshot.sha256(f.data)
+    recorded = snap.recorded_entry(f.filename)
+    if recorded is not None:
+        if recorded.get("sha256") == digest:
+            return (
+                "already_captured",
+                f"already captured: {snap.dir / f.filename} holds these exact bytes. "
+                "Nothing to do -- this date is in hand.",
+            )
+        stored_window = _as_date(recorded.get("window_end"))
+        if stored_window is not None and stored_window < snap_date:
+            return (
+                "misdated",
+                f"{snap.dir / f.filename} covers a window closing {stored_window}, "
+                f"but it is filed under {snap_date}.",
+            )
+        # Differing bytes are not by themselves a defect: FFC's average moves as
+        # the day's drafts land, so an afternoon pass over a morning capture sees
+        # a payload the stored one is simply older than. S84 keeps the first, and
+        # keeping it consistently is what makes the series evenly spaced (S31.3).
+        return (
+            "superseded",
+            f"already captured: {snap.dir / f.filename} holds this date. The source "
+            "has republished since; the first capture stands (S84).",
+        )
+
+    prior = snapshot.previous_capture(f.filename, before=snap_date)
+    if prior is not None and prior[1] == digest:
+        return (
+            "unchanged",
+            f"unchanged since {prior[0]}: {f.filename} is byte-identical to that "
+            "capture. The source has not republished, so there is no new day to file.",
+        )
+    return None
+
+
+def _report_nothing_written(
+    held: dict[str, list[str]],
+    *,
+    skipped: list[str],
+    wanted: list[str],
+    snap_date: dt.date,
+) -> None:
+    """Exit for a run that wrote nothing. Only a lost day is a failure."""
+    misdated = held.get("misdated", []) + held.get("unmanifested", [])
+    if misdated:
+        # The fetch is not what is wrong here. Some earlier run filed a capture
+        # under a date its contents do not describe -- which is how a stale
+        # snapshot silently takes the slot a real one needed.
         typer.echo(
-            "no payloads written. Treating as failure: a capture day cannot be recovered (S84).",
+            f"{len(misdated)} file(s) dated {snap_date.isoformat()} hold a capture "
+            "taken before that date:",
+            err=True,
+        )
+        for name in misdated:
+            typer.echo(f"  {name}", err=True)
+        typer.echo(
+            "A snapshot whose contents predate its own date corrupts the intra-summer "
+            "series, and it blocks the real capture for that date. Resolve it "
+            "deliberately before re-running (S84).",
             err=True,
         )
         raise typer.Exit(code=1)
-    typer.echo(f"snapshot {snap_date.isoformat()}: {written} file(s)")
+
+    parts = []
+    in_hand = len(held.get("already_captured", [])) + len(held.get("superseded", []))
+    if in_hand:
+        parts.append(f"{in_hand} already captured")
+    if held.get("unchanged"):
+        parts.append(f"{len(held['unchanged'])} unchanged at the source")
+    if held.get("not_yet_published"):
+        parts.append(f"{len(held['not_yet_published'])} not yet published for this date")
+    if skipped:
+        parts.append(f"skipped: {', '.join(skipped)}")
+
+    # A source that skipped for a stated reason is not the same failure. S84's
+    # rule is about ADP, whose missed day is unrecoverable; a projection with
+    # no key configured is fetchable tomorrow and must not red the archive job,
+    # which runs `snapshot` and then commits the ADP captured seconds earlier.
+    if any(held.get(c) for c in BENIGN_HOLDS) or (skipped and set(skipped) == set(wanted)):
+        typer.echo(f"snapshot {snap_date.isoformat()}: nothing new to capture ({'; '.join(parts)})")
+        return
+
+    typer.echo(
+        "no payloads written. Treating as failure: a capture day cannot be recovered (S84).",
+        err=True,
+    )
+    raise typer.Exit(code=1)
+
+
+def _as_date(value: Any) -> dt.date | None:
+    try:
+        return dt.date.fromisoformat(value) if value else None
+    except (TypeError, ValueError):
+        return None
 
 
 def _fetch_projections(season: int) -> list | None:
