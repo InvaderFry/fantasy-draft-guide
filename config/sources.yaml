@@ -26,6 +26,19 @@ sources:
       ingested in this chunk. Full routes-run history is NOT available here;
       use target share / snap share / air-yard share instead (S10A).
 
+      MUTABLE PER-SEASON ASSETS. depth_charts, rosters, weekly_rosters and
+      injuries for a live season are rewritten upstream all season long, and
+      data/raw/ is gitignored -- so "re-downloadable" is true of the file and
+      not of its contents. S84's second capture program archives those four into
+      dated snapshots before Week 1 (`research snapshot --sources
+      nflverse-preseason`, .github/workflows/preseason-bundle.yml). The static
+      tables (players, draft_picks, combine) are pinned once alongside them for
+      S65. Everything else here stays reproducible-on-demand.
+
+      injuries_{season} does not exist until the season's injury reports begin;
+      the capture reports the 404 by name and keeps the rest. See
+      `nflverse_preseason_injuries_published` in research/questions.yaml.
+
   nfldata_schedules:
     url: https://github.com/nflverse/nfldata
     asset: https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv

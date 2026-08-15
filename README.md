@@ -17,6 +17,7 @@ Built here:
 |---|---|---|
 | Config gates | §14, §6.1, §46, §15, §3.1, §68 | league profiles, decision dates, sources, outcomes, evidence rules, question registry |
 | ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires — followed by a second job that re-renders the sheets from it |
+| Preseason bundle | §84, §86 | the second capture program: nflverse depth charts, rosters and injuries archived before Week 1, on a cadence the code decides |
 | nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play, schedules |
 | ID normalization | §12 | `gsis_id` canonical, crosswalk + labelled name matching |
 | Canonical tables | §13 | `player_week`, `player_season` (+ outcomes), `team_season`, `adp_history`, `projection_snapshot`, `draft_pick` |
@@ -366,6 +367,96 @@ That last one is also the check that the whole mapping is right rather than
 merely non-empty: scoring the mapped frame under a half-PPR profile reproduces
 FantasyPros' own `points_half` to the cent. A stat map can be wrong in a way that
 still computes, and a tier board built on it looks exactly like a correct one.
+
+## The preseason bundle (§84)
+
+§84 has two capture programs. The daily one archives prices. The second is a
+single instruction:
+
+> **Also capture, once, before Week 1:** preseason depth charts (§86), preseason
+> injury designations, final preseason ADP for every format, projection
+> snapshots from all providers.
+>
+> *"These become the decision-date snapshot for the 2026 season in next year's
+> historical research. Without them, 2026 enters the training data with the same
+> missing preseason context that limits every season before it."*
+
+ADP and projections were already covered — the daily job captures six formats
+and the FantasyPros board, so the *final* preseason value of each is just its
+last run before Week 1. The nflverse half was archived nowhere. Those files land
+in `data/raw/` (gitignored, re-downloadable) and upstream rewrites every one of
+them across the season, so "reproducible from the source" is true of the file and
+false of its contents.
+
+The cost is concrete and this repository already pays it once.
+`player_season._preseason_depth_chart` dates a chart by its own `dt` and takes
+the last one at or before the decision date. It returns **nothing for 2012–2024**,
+because the legacy format's earliest chart is regular-season week 1 and dating
+that as preseason is the leakage §6.1 exists to stop. 2026 can answer it — today.
+
+```bash
+uv run research snapshot --sources nflverse-preseason   # capture, if today is a capture day
+uv run research preseason-status                        # what the archive holds
+```
+
+### Which days are capture days
+
+`.github/workflows/preseason-bundle.yml` runs daily and
+`pipeline/preseason.py::capture_due` decides, in this order:
+
+| Condition | Outcome |
+|---|---|
+| the season has started | nothing — upstream is now rewriting these files for a season in progress |
+| today is the season's **decision date** (`config/decision_dates.yaml`, 2026-08-29) | capture; §6.1 dates every 2026 feature to this day |
+| today is **the day before Week 1** (derived from the nfldata calendar: 2026-09-09) | capture; §84's literal instruction |
+| ≥ 7 days since the last capture | capture |
+| otherwise | nothing, and exit 0 |
+
+Roughly four captures for a preseason, at ~3 MB each. That cadence is the size
+answer as much as the schedule answer: daily would add 60–70 MB to a repository
+whose draft sheets are meant to open from a phone. A day that is not a capture
+day writes nothing and exits 0 — the opposite of the ADP job, where a day with
+nothing written is a day lost.
+
+The two never share a failure, which is why this is a separate workflow rather
+than another job in `adp-archive.yml`, and why `research validate` **reports**
+the bundle without failing on it: `validate` runs inside the archive job between
+capturing a day of price movement and committing it, so anything that exits
+non-zero from there is a reason a captured day does not land.
+
+### Where the alarm lives, and when it stops
+
+`research preseason-status` is the gate, and it runs last in the bundle workflow,
+after the commit. It fails from the day after the decision date until Week 1
+opens — the window in which a missed capture is still worth taking, because a
+bundle taken that week describes very nearly the roster the draft saw. From Week
+1 it stops failing and reports the gap instead. Nothing recovers what those files
+said in August, and a permanently red job is a job nobody reads.
+
+It also checks the capture is *useful* rather than merely present: it opens the
+captured depth chart and reports the latest chart published on or before the
+decision date. A file that hashes, parses, and holds only post-decision charts is
+worth nothing to §86 and looks exactly like a success — the same shape of defect
+as a projection stat map that maps cleanly onto the wrong columns.
+
+### What the source did not serve
+
+`injuries_2026.parquet` **404s**: nflverse appears to create the file when the
+season's first injury report is filed. The capture reports it by name and keeps
+the three files that are published — those are the ones that expire, and one
+absent file must not cost them. Whether preseason designations are published at
+all is `nflverse_preseason_injuries_published` in `research/questions.yaml`,
+answered from what the captures find rather than by assertion; the capture asks
+again on every capture day until Week 1.
+
+The static tables (`players.parquet` — the §12 crosswalk — `draft_picks`,
+`combine`) ride along **once**, the first time the bundle runs, which pins them
+for §65. They identify the players in the preseason rather than describing it,
+so they are not re-filed weekly.
+
+**Nothing in this edition reads these bytes.** The builders still load from
+`data/raw/`. The bundle is captured for the 2027 build, which is §84's whole
+argument: the value is in having it, and it cannot be acquired later.
 
 ## Before running research
 
