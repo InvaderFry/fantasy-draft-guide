@@ -849,12 +849,14 @@ def _archive_report(today: dt.date | None = None) -> tuple[list[str], list[str]]
     # in a CI log bury the one number that matters, which is how far behind.
     if len(stalled) == len(state.formats) and state.formats:
         ages = {f.age(today) for f in state.formats}
-        if len(ages) == 1:
+        # None means no capture at all, which already reads clearly per format.
+        if len(ages) == 1 and None not in ages:
             age = ages.pop()
+            newest = state.formats[0].newest
             stalled = [
-                f"every format is stalled -- newest capture {state.formats[0].newest}, "
-                f"{age} days old, and S84 allows {archive.tolerance(today)} at this "
-                "time of year"
+                f"every format is stalled -- newest capture {newest}, "
+                f"{age} days old, and S84 allows {archive.tolerance(today, newest)} "
+                "across the days it went quiet"
             ]
     return lines, stalled
 
@@ -871,7 +873,11 @@ def archive_status(
 
     Deliberately not run by the archive workflow: the failure this catches is
     that workflow not running at all, and a gate inside a job that never fires
-    cannot fire either. It runs in the test suite, on every push.
+    cannot fire either. It runs on its own daily schedule
+    (.github/workflows/archive-monitor.yml), which opens an issue when it reds,
+    and in the test suite on every push -- the schedule because the repository
+    can go quiet, the test because a stalled archive should also stop a human
+    pushing anything else.
     """
     today = dt.date.fromisoformat(date) if date else dt.datetime.now(dt.UTC).date()
     lines, stalled = _archive_report(today)
@@ -922,6 +928,11 @@ def refresh_check(
 
     problems: list[str] = []
 
+    # First, because everything after it reads the rendered pages or the
+    # artifacts behind them, and both read an edition that was never written as
+    # a clean one: nothing rendered means nothing blocked.
+    problems.extend(refresh.missing_sheets(edition_name, profiles, root))
+
     blocked = refresh.blocked_pages(edition_name, root)
     if blocked:
         # Aggregated: every sheet fails the same way when an artifact is missing,
@@ -941,7 +952,11 @@ def refresh_check(
             for p in refresh.sheets_dir(edition_name, root).glob("*.html")
             if p.name != "index.html"
         ]
-        typer.echo(f"refresh: {len(checked)} sheet(s) checked, none blocked where content is due")
+        due = [n for n in refresh.expected_sheets(profiles) if n != "index.html"]
+        typer.echo(
+            f"refresh: {len(checked)} sheet(s) checked of {len(due)} due, "
+            "none blocked where content is due"
+        )
 
     metrics = refresh.edition_metrics(arts, profiles)
     for pid, entry in metrics.items():

@@ -141,10 +141,17 @@ def test_a_corrupt_baseline_does_not_red_the_refresh_forever(tmp_path):
 
 
 def edition(tmp_path, *, tiers_page: str, artifacts: bool = True) -> None:
-    """A rendered edition on disk, as `research sheet` leaves one."""
+    """A rendered edition on disk, as `research sheet` leaves one.
+
+    The whole set, not one page: twelve seats, the slot-agnostic sheet and the
+    chooser. The gate now counts them, for the same reason it reads them.
+    """
     sheets = tmp_path / "2026-draft" / "sheets"
     sheets.mkdir(parents=True)
+    (sheets / "index.html").write_text("<a href='half_ppr_12__slot01.html'>1</a>")
     (sheets / "half_ppr_12.html").write_text(tiers_page + NOT_BUILT_TARGETS)
+    for seat in range(1, 13):
+        (sheets / f"half_ppr_12__slot{seat:02d}.html").write_text(tiers_page + NOT_BUILT_TARGETS)
     methods = tmp_path / "2026-draft" / "methods"
     methods.mkdir(parents=True)
     if artifacts:
@@ -214,6 +221,7 @@ def test_a_refused_board_does_not_become_the_new_baseline(one_league):
 
     (one_league / "2026-draft" / "sheets" / "half_ppr_12.html").write_text(BLOCKED_TIERS)
     assert run() == 1
+
     assert (one_league / "2026-draft" / refresh.STATE_FILENAME).read_text() == good
 
 
@@ -232,3 +240,48 @@ def test_no_write_leaves_the_baseline_alone(one_league):
     edition(one_league, tiers_page=FILLED_TIERS)
     assert run(write=False) == 0
     assert not (one_league / "2026-draft" / refresh.STATE_FILENAME).exists()
+
+
+# -- a board that was never rendered -----------------------------------------
+
+
+def test_the_full_set_of_pages_is_what_the_gate_expects():
+    """Every seat, the slot-agnostic sheet, the chooser. Read from `sheet`'s own
+    helpers so the two cannot drift."""
+    profiles = [{"id": "half_ppr_12", "label": "L", "teams": 12, "real": True}]
+    assert refresh.expected_sheets(profiles) == sorted(
+        ["index.html", "half_ppr_12.html"]
+        + [f"half_ppr_12__slot{s:02d}.html" for s in range(1, 13)]
+    )
+
+
+def test_a_league_whose_order_is_drawn_needs_one_page(one_league):
+    """A configured slot means one sheet named for the league, and no seats."""
+    profiles = [{"id": "half_ppr_12", "label": "L", "teams": 12, "real": True, "draft_slot": 7}]
+    assert refresh.expected_sheets(profiles) == ["half_ppr_12.html", "index.html"]
+
+
+def test_a_missing_seat_sheet_is_refused(one_league):
+    edition(one_league, tiers_page=FILLED_TIERS)
+    (one_league / "2026-draft" / "sheets" / "half_ppr_12__slot07.html").unlink()
+    assert run() == 1
+    assert not (one_league / "2026-draft" / refresh.STATE_FILENAME).exists()
+
+
+def test_a_missing_chooser_is_refused(one_league):
+    """S83's index is how a seat is found at the table; an edition without one is
+    not a published board."""
+    edition(one_league, tiers_page=FILLED_TIERS)
+    (one_league / "2026-draft" / "sheets" / "index.html").unlink()
+    assert run() == 1
+
+
+def test_an_edition_that_rendered_nothing_is_refused(one_league, capsys):
+    """The gate's own blind spot: nothing rendered means nothing blocked, and the
+    counts come from the artifacts rather than the pages, so a morning that
+    produced no board at all passed both halves and recorded itself as the board
+    to beat."""
+    (one_league / "2026-draft" / "methods").mkdir(parents=True)
+    assert run() == 1
+    assert not (one_league / "2026-draft" / refresh.STATE_FILENAME).exists()
+    assert "missing" in capsys.readouterr().err

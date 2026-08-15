@@ -16,6 +16,12 @@ SURVIVAL say BLOCKED and commits them over the good ones, at 11:00 UTC, with
 nobody looking until the draft. The index banner cannot see it either: it
 compares the ADP capture date, and ADP was fine.
 
+There is a third way to lose the board, and it is the quiet one: not rendering
+it. A blocked-section scan reads the pages that exist and the counts come from
+the artifacts rather than from the pages, so an edition with no pages at all
+passes both -- nothing rendered means nothing blocked. `missing_sheets` counts
+the filenames S83's own renderer would have written.
+
 This module is the measurement that sits between the render and the commit. When
 it refuses, the job reds and yesterday's complete sheets stay where they are,
 already carrying the banner that says they are not today's. **Stale-but-complete
@@ -68,6 +74,51 @@ def blocked_sections(page: str) -> list[str]:
 
 def sheets_dir(edition: str, root: Path | None = None) -> Path:
     return (root or ARTIFACT_DIR) / edition / "sheets"
+
+
+def expected_sheets(profiles: list[dict[str, Any]]) -> list[str]:
+    """Every filename a rendered edition must carry, from the same rule that
+    writes them.
+
+    Read from `sheet`'s own helpers rather than restated here, so the gate and
+    the renderer cannot drift into disagreeing about what a complete edition is.
+    """
+    from research.sheet import profile_draft_slot, slot_filename, slots_to_render
+
+    names = ["index.html"]
+    for profile in profiles:
+        pid = profile["id"]
+        names.append(f"{pid}.html")
+        if profile_draft_slot(profile) is None:
+            # An undrawn order: one page per seat, plus the slot-agnostic one
+            # already added above.
+            names.extend(slot_filename(pid, seat) for seat in slots_to_render(profile))
+    return sorted(names)
+
+
+def missing_sheets(
+    edition: str, profiles: list[dict[str, Any]], root: Path | None = None
+) -> list[str]:
+    """Pages the edition should carry and does not.
+
+    The blocked-section check reads the files that are there, which makes an
+    edition with no files at all its healthiest possible state: nothing rendered
+    means nothing blocked, and the gate would wave through a morning that
+    produced no board. The counts it compares come from the S16 artifacts, not
+    from the pages, so they cannot see it either -- a run whose artifacts are
+    fine and whose render never happened passes on both.
+    """
+    if not profiles:
+        return ["no real league profile to render a sheet for (S14)"]
+    directory = sheets_dir(edition, root)
+    absent = [name for name in expected_sheets(profiles) if not (directory / name).exists()]
+    if not absent:
+        return []
+    return [
+        f"{len(absent)} expected sheet(s) missing from {directory}: "
+        + ", ".join(absent[:5])
+        + (f" and {len(absent) - 5} more" if len(absent) > 5 else "")
+    ]
 
 
 def blocked_pages(edition: str, root: Path | None = None) -> dict[str, list[str]]:

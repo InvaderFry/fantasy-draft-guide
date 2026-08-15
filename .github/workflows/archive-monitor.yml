@@ -1,0 +1,102 @@
+# The alarm for an ADP archive that has stopped (S84).
+#
+# `research archive-status` has existed since the archive was measured, and it
+# ran in one place: the test suite, on push. That cannot see the failure it was
+# written for. The capture commits with [skip ci], so the robot never triggers
+# the tests; if the schedule stops firing and nobody pushes, no run happens and
+# nothing goes red. The quieter the repository gets, the less likely the alarm
+# is to sound -- which is exactly backwards, because a quiet repository is the
+# symptom.
+#
+# So: its own schedule, and its own workflow file. Not a job in adp-archive.yml,
+# because the failure being watched for is that workflow not running, and a gate
+# inside a job that never fires cannot fire either. Nothing here can red the
+# capture (the same separation preseason-bundle.yml argues for).
+#
+# This reads only committed snapshots -- no network past the checkout -- so it
+# costs a checkout and a `uv sync` a day, and it cannot itself lose a capture.
+#
+# Known limitation, recorded rather than papered over: GitHub disables every
+# scheduled workflow in a repository after 60 days without activity, so a
+# same-repo monitor shares one failure mode with the job it watches. It catches
+# the cases that actually happen -- the capture erroring, FFC going away, a
+# schedule edited or a secret expiring -- and GitHub emails the owner before
+# disabling anything. A heartbeat pinged to an outside service is the only way
+# to close the last case, and is deliberately not built yet.
+
+name: Archive monitor
+
+on:
+  schedule:
+    # 16:00 UTC: after both capture attempts (11:00 and 14:00) have had their
+    # chance, and clear of the preseason bundle at 08:00. A stall found here is
+    # still fixable -- the day's capture can be dispatched by hand.
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Evaluate as of this date (YYYY-MM-DD), default today (UTC)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: archive-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # main, explicitly: a stale ref carries a stale copy of the archive and
+      # would report a stall that is only the checkout's.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install project
+        run: uv sync
+
+      - name: Check the archive is still moving
+        id: status
+        run: |
+          uv run research archive-status \
+            ${{ inputs.date && format('--date {0}', inputs.date) || '' }} \
+            2>&1 | tee status.txt
+          exit "${PIPESTATUS[0]}"
+
+      # A red run in a repository nobody is watching is the failure this
+      # workflow exists to fix, one level up. An issue is the artifact that
+      # survives: it emails, it stays open until the archive moves again, and it
+      # is the same place the reasoning for the fix can be written down.
+      - name: Open or update the stall issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          body="$(printf '%s\n\n```\n%s\n```\n\n%s\n' \
+            "The ADP archive monitor failed on $(date -u +%Y-%m-%d)." \
+            "$(tail -c 4000 status.txt 2>/dev/null || echo 'no output captured')" \
+            "Run: $RUN_URL")"
+          # Created first, and ignored if it is already there: `gh issue list`
+          # errors on a label the repository has never seen.
+          gh label create archive-stall \
+            --description "The S84 ADP archive has stopped capturing" \
+            --color B60205 2>/dev/null || true
+          existing="$(gh issue list --label archive-stall --state open \
+            --limit 1 --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --label archive-stall \
+              --title "ADP archive has stopped capturing" --body "$body"
+          fi

@@ -18,7 +18,8 @@ red-job-nobody-reads pattern this repository has already declined twice.
 GitHub disables cron workflows in a repository that goes quiet, and this one
 stays awake only because the archive itself commits daily, which is circular. A
 stall is live and actionable -- the next capture can still be taken -- so a stall
-is what fails.
+is what fails, on a schedule that is not the archive's own
+(.github/workflows/archive-monitor.yml).
 """
 
 from __future__ import annotations
@@ -49,9 +50,39 @@ def cadence(day: dt.date) -> int:
     return DAILY if day.month in DAILY_MONTHS else WEEKLY
 
 
-def tolerance(day: dt.date) -> int:
-    """How old the newest capture may be before the archive is stalled."""
-    return cadence(day) * (1 + SLACK_PERIODS)
+def strictest_cadence(start: dt.date, end: dt.date) -> int:
+    """The tightest cadence S84 asks for anywhere between two dates.
+
+    A silence is measured against the cadence it was silent through, not against
+    the month the check happens to run in. Reading it from `today` alone breaks
+    at both ends of the daily window: on September 1 the tolerance triples while
+    the newest capture is still an August one, so an archive that stopped on
+    August 29 reads healthy until September 8 -- the day before Week 1, the last
+    week the captures are for. The July 1 boundary fails the same way in reverse.
+    """
+    if end < start:
+        start, end = end, start
+    month = dt.date(start.year, start.month, 1)
+    while month <= end:
+        if month.month in DAILY_MONTHS:
+            return DAILY
+        month = (month.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+    return WEEKLY
+
+
+def tolerance(day: dt.date, newest: dt.date | None = None) -> int:
+    """How old the newest capture may be before the archive is stalled.
+
+    With no capture named this is the cadence of `day` itself, which is what a
+    caller asking "what does S84 allow today?" means.
+
+    One consequence is deliberate: between September 1 and Week 1 a series whose
+    last capture was in August keeps August's two-day deadline, even though the
+    spec's letter allows weekly by then. The capture job runs daily year-round,
+    `ArchiveHealth.watching` already retires the alarm at the opener, and those
+    last days are the ones the draft is about to read.
+    """
+    return strictest_cadence(newest or day, day) * (1 + SLACK_PERIODS)
 
 
 def series(season: int, root: Path | None = None) -> dict[tuple[str, int], list[dt.date]]:
@@ -160,16 +191,17 @@ class ArchiveHealth:
         """Formats whose newest capture is older than S84's cadence allows."""
         if not self.watching:
             return []
-        limit = tolerance(self.today)
         out = []
         for f in self.formats:
             age = f.age(self.today)
             if age is None:
                 out.append(f"{f.label()}: no capture at all for {self.season}")
-            elif age > limit:
+                continue
+            limit = tolerance(self.today, f.newest)
+            if age > limit:
                 out.append(
                     f"{f.label()}: newest capture {f.newest} is {age} days old, "
-                    f"and S84 allows {limit} at this time of year"
+                    f"and S84 allows {limit} across the days it went quiet"
                 )
         return out
 

@@ -10,8 +10,9 @@ never failed on; a job that reds forever on an unfixable fact is a job nobody
 reads, which is the pattern `preseason-status` and the refresh gate both avoid.
 
 A STALL is live. The next capture can still be taken, and every day it is not is
-gone. That is what fails -- and it fails in the test suite rather than in the
-archive workflow, because the failure being caught is that workflow not running.
+gone. That is what fails -- and it fails outside the archive workflow, because
+the failure being caught is that workflow not running: on a schedule of its own
+(.github/workflows/archive-monitor.yml) and, for a human's push, here.
 """
 
 import datetime as dt
@@ -53,6 +54,15 @@ def test_the_tolerance_leaves_room_for_a_job_that_has_not_run_yet():
     """The daily capture runs at 11:00 and 14:00 UTC. A check at 09:00 sees
     yesterday's capture as the newest one and is right to."""
     assert archive.tolerance(AUGUST) == 2
+
+
+def test_the_tolerance_is_read_from_the_days_the_archive_was_quiet():
+    """Not from the month the check runs in. Read from `today` alone, the
+    deadline triples on September 1 while the newest capture is still August's,
+    and the reverse hole opens on July 1."""
+    assert archive.tolerance(dt.date(2026, 9, 1), dt.date(2026, 8, 29)) == 2
+    assert archive.tolerance(dt.date(2026, 7, 5), dt.date(2026, 6, 28)) == 2
+    assert archive.tolerance(dt.date(2026, 9, 20), dt.date(2026, 9, 14)) == 14
 
 
 # -- the shape of the series -------------------------------------------------
@@ -124,6 +134,26 @@ def test_three_days_of_silence_in_august_is_a_stall(tmp_path, monkeypatch):
                    monkeypatch=monkeypatch)
     assert len(health.stalled) == len(adp_capture_formats())
     assert "3 days old" in health.stalled[0]
+
+
+def test_an_archive_that_stopped_in_august_is_a_stall_in_september(tmp_path, monkeypatch):
+    """The week the alarm exists for. S84's cadence loosens on September 1, and
+    with the deadline read from the calendar rather than from the series, a
+    capture last taken on August 29 stayed healthy until September 8 -- one day
+    before the 2026 opener, with every day of it unrecoverable."""
+    stopped = dt.date(2026, 8, 29)
+    for today in (dt.date(2026, 9, 1), dt.date(2026, 9, 8)):
+        health = state(tmp_path, [stopped], today=today, monkeypatch=monkeypatch)
+        assert health.watching
+        assert health.stalled, today
+
+
+def test_a_september_archive_still_capturing_is_not_a_stall(tmp_path, monkeypatch):
+    """The other half: the deadline tightens because the series went quiet in
+    August, not because September is being held to August's cadence."""
+    health = state(tmp_path, [dt.date(2026, 9, 4)], today=dt.date(2026, 9, 5),
+                   monkeypatch=monkeypatch)
+    assert health.stalled == []
 
 
 def test_a_format_with_no_capture_at_all_is_a_stall(tmp_path, monkeypatch):

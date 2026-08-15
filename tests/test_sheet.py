@@ -366,6 +366,33 @@ def test_writing_one_slot_leaves_the_pre_rendered_set_alone(tmp_path, monkeypatc
     assert (tmp_path / "ed" / "sheets" / "fixture_12__slot01.html").exists()
 
 
+def test_a_one_slot_refresh_leaves_the_chooser_pointing_at_every_seat(tmp_path, monkeypatch):
+    """The index is rewritten on a targeted refresh, so it has to survive one.
+
+    Read from the seats this call rendered, it replaced twelve links with a
+    single generic one -- at draft hour, which is the only hour `--slot` is for.
+    """
+    monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE])
+    _seed(tmp_path)
+    sheet.write("ed", root=tmp_path)
+    sheet.write("ed", root=tmp_path, slot=7)
+    index = (tmp_path / "ed" / "sheets" / "index.html").read_text()
+    for seat in range(1, 13):
+        assert f'href="fixture_12__slot{seat:02d}.html"' in index
+
+
+def test_the_chooser_never_links_a_seat_that_was_not_rendered(tmp_path, monkeypatch):
+    """A targeted refresh with no pre-rendered set behind it. A dead link on a
+    phone with no signal (S8) is worse than a short list."""
+    monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE])
+    _seed(tmp_path)
+    sheet.write("ed", root=tmp_path, slot=7)
+    index = (tmp_path / "ed" / "sheets" / "index.html").read_text()
+    assert 'href="fixture_12__slot07.html"' in index
+    for seat in (1, 6, 8, 12):
+        assert f'href="fixture_12__slot{seat:02d}.html"' not in index
+
+
 def test_the_index_lists_every_seat_and_needs_no_network(tmp_path, monkeypatch):
     """S8: opened on a phone at a draft table, possibly with no signal."""
     monkeypatch.setattr(sheet, "real_profiles", lambda: [PROFILE])
