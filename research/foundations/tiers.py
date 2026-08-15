@@ -47,6 +47,7 @@ from pipeline.config import (
 from pipeline.features import projections as projection_table
 from pipeline.normalize.names import name_position_key
 from pipeline.scoring import score_frame
+from research.foundations import price_movement
 from research.foundations import survival as survival_mod
 from research.method import MethodArtifact
 
@@ -157,12 +158,14 @@ def board(
 
 def market_price(
     profile: dict[str, Any], *, processed_dir=PROCESSED_DIR
-) -> pl.DataFrame | None:
-    """The latest archived ADP for this league, or None when there is none.
+) -> tuple[pl.DataFrame | None, dict[str, Any]]:
+    """The latest archived ADP for this league with S31.3's movement attached.
 
-    ``survival.latest_adp`` already resolves the profile's ADP format, filters to
-    the newest capture and refuses a stale-but-plausible mixture of seasons; it is
-    reused rather than reimplemented so both boards price off the same rule.
+    ``survival.priced_board`` already resolves the profile's ADP format, filters to
+    the newest capture, refuses a stale-but-plausible mixture of seasons and
+    measures the move since the prior capture; it is reused rather than
+    reimplemented so the tier board and the survival blocks cannot quote the price
+    as of different days.
 
     The failure is swallowed on purpose. S84's archive and S11's projections are
     separate failure domains, and this module is gated on the projections. A
@@ -171,11 +174,11 @@ def market_price(
     third.
     """
     try:
-        return survival_mod.latest_adp(
+        return survival_mod.priced_board(
             profile, processed_dir=processed_dir, season=draft_season(profile)
         )
-    except survival_mod.BlockedError:
-        return None
+    except survival_mod.BlockedError as exc:
+        return None, price_movement.unavailable(str(exc))
 
 
 def _name_key() -> pl.Expr:
@@ -216,6 +219,20 @@ def _adp_coverage(
     }
 
 
+# What rides across from the market capture onto the board, and as what.
+#
+# One dict rather than three parallel lists of column names: the join below
+# resolves each column twice, by id and by name, and coalesces the two. Written
+# out per column, a new one arrives null for exactly the players the id join
+# missed -- which looks like a fringe nobody prices rather than like a column
+# that was forgotten in one of the three places.
+CARRIED_PRICE_COLUMNS: dict[str, Any] = {
+    "adp": pl.Float64,
+    "position_adp": pl.Int64,
+    "adp_delta": pl.Float64,   # S31.3, negative = going earlier
+}
+
+
 def attach_adp(
     board_frame: pl.DataFrame, adp: pl.DataFrame | None
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
@@ -232,9 +249,8 @@ def attach_adp(
     would change how many players sit above replacement, and the whole board is
     measured from there.
     """
-    unpriced = (
-        pl.lit(None, dtype=pl.Float64).alias("adp"),
-        pl.lit(None, dtype=pl.Int64).alias("position_adp"),
+    unpriced = tuple(
+        pl.lit(None, dtype=dtype).alias(col) for col, dtype in CARRIED_PRICE_COLUMNS.items()
     )
     if adp is None or not adp.height or not board_frame.height:
         return (
@@ -247,8 +263,15 @@ def attach_adp(
     # the board never carries them. Counting them as unmatched would make the
     # join look broken every single day.
     adp = adp.filter(pl.col("position").is_in(list(POSITIONS)))
+    # A caller may hand over a capture with no S31.3 movement attached -- an
+    # archive one day old has none to attach. The column is added empty rather
+    # than special-cased in the join below, so every carried column takes exactly
+    # the same path and none can be quietly dropped on the way through.
+    for col, dtype in CARRIED_PRICE_COLUMNS.items():
+        if col not in adp.columns:
+            adp = adp.with_columns(pl.lit(None, dtype=dtype).alias(col))
     price = adp.select(
-        "player_id", "source_player_name", "position", "adp", "position_adp"
+        "player_id", "source_player_name", "position", *CARRIED_PRICE_COLUMNS
     ).with_columns(_name_key())
 
     by_id = (
@@ -256,16 +279,14 @@ def attach_adp(
         .sort("adp")
         .select(
             pl.col("player_id"),
-            pl.col("adp").alias("_id_adp"),
-            pl.col("position_adp").alias("_id_position_adp"),
+            *(pl.col(col).alias(f"_id_{col}") for col in CARRIED_PRICE_COLUMNS),
         )
         .unique(subset="player_id", keep="first")
     )
     by_name = (
         price.select(
             pl.col("_name_key"),
-            pl.col("adp").alias("_name_adp"),
-            pl.col("position_adp").alias("_name_position_adp"),
+            *(pl.col(col).alias(f"_name_{col}") for col in CARRIED_PRICE_COLUMNS),
         )
         # keep="none": an ambiguous key resolves to nothing (S12).
         .unique(subset="_name_key", keep="none")
@@ -281,28 +302,25 @@ def attach_adp(
         .join(by_id, on="player_id", how="left")
         .join(by_name, on="_name_key", how="left")
         .with_columns(
-            pl.when(pl.col("_name_key_rows") > 1)
-            .then(None)
-            .otherwise(pl.col("_name_adp"))
-            .alias("_name_adp"),
-            pl.when(pl.col("_name_key_rows") > 1)
-            .then(None)
-            .otherwise(pl.col("_name_position_adp"))
-            .alias("_name_position_adp"),
+            *(
+                pl.when(pl.col("_name_key_rows") > 1)
+                .then(None)
+                .otherwise(pl.col(f"_name_{col}"))
+                .alias(f"_name_{col}")
+                for col in CARRIED_PRICE_COLUMNS
+            )
         )
         .with_columns(
-            pl.coalesce("_id_adp", "_name_adp").cast(pl.Float64).alias("adp"),
-            pl.coalesce("_id_position_adp", "_name_position_adp")
-            .cast(pl.Int64)
-            .alias("position_adp"),
+            *(
+                pl.coalesce(f"_id_{col}", f"_name_{col}").cast(dtype).alias(col)
+                for col, dtype in CARRIED_PRICE_COLUMNS.items()
+            )
         )
         .drop(
             "_name_key",
             "_name_key_rows",
-            "_id_adp",
-            "_name_adp",
-            "_id_position_adp",
-            "_name_position_adp",
+            *(f"_id_{col}" for col in CARRIED_PRICE_COLUMNS),
+            *(f"_name_{col}" for col in CARRIED_PRICE_COLUMNS),
         )
     )
     priced = joined.filter(pl.col("adp").is_not_null()).height
@@ -447,7 +465,11 @@ def assign_tiers(values: list[float], multiple: float = TIER_BREAK_MULTIPLE) -> 
 
 
 def compute(
-    frame: pl.DataFrame, profile: dict[str, Any], *, adp: pl.DataFrame | None = None
+    frame: pl.DataFrame,
+    profile: dict[str, Any],
+    *,
+    adp: pl.DataFrame | None = None,
+    movement: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     provider = chosen_provider(frame)
     single = frame.filter(pl.col("provider_id") == provider)
@@ -481,8 +503,12 @@ def compute(
                     "value_over_replacement": value,
                     "adp": None if price is None else round(float(price), 1),
                     "position_adp": None if pos_rank is None else int(pos_rank),
+                    # S31.3. Negative means the market is taking him earlier than
+                    # it was at the prior capture; read it through
+                    # price_movement.direction(), never by testing the sign.
+                    "adp_delta": None if delta is None else round(float(delta), 1),
                 }
-                for name, team, points, value, tier, price, pos_rank in zip(
+                for name, team, points, value, tier, price, pos_rank, delta in zip(
                     rows["source_player_name"].to_list(),
                     rows["team"].to_list(),
                     rows["projected_points"].to_list(),
@@ -490,6 +516,7 @@ def compute(
                     tiers,
                     rows["adp"].to_list(),
                     rows["position_adp"].to_list(),
+                    rows["adp_delta"].to_list(),
                     strict=True,
                 )
             ],
@@ -507,6 +534,7 @@ def compute(
         "provider_dispersion": provider_dispersion(frame),
         "coverage": projection_table.coverage(frame),
         "adp_coverage": adp_coverage,
+        "price_movement": movement or price_movement.unavailable("movement was not computed"),
         "n": single.height,
     }
 
@@ -526,6 +554,9 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
             "flex_eligible": profile.get("flex_eligible"),
             "provider": results.get("provider"),
             "adp_snapshot_date": (results.get("adp_coverage") or {}).get("adp_snapshot_date"),
+            "price_movement_since": (results.get("price_movement") or {}).get(
+                "prior_snapshot_date"
+            ),
         },
         outcome=None,  # construction, not a hypothesis test
         sample_size=results.get("n", 0),
@@ -546,6 +577,7 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
             "injuries (S85.1) are not modelled.",
             "Players with no ID match leave the board; they skew fringe, so replacement "
             "level sits slightly high and every value is slightly compressed (see coverage).",
+            price_movement.ROLLING_WINDOW_LIMITATION,
             "ADP is carried beside the value, never inside it: the S19.3 metric is computed "
             "as if the price column were absent. It is the Fantasy Football Calculator "
             "mock-draft population rather than the league being drafted (S10B), and it is a "
@@ -571,8 +603,7 @@ def run(processed_dir=PROCESSED_DIR) -> list[tuple[dict[str, Any], MethodArtifac
     for profile in real_profiles():
         # Same rule as survival: a board must be one season's board.
         frame = board(profile, processed_dir=processed_dir, season=draft_season(profile))
-        results = compute(
-            frame, profile, adp=market_price(profile, processed_dir=processed_dir)
-        )
+        adp, movement = market_price(profile, processed_dir=processed_dir)
+        results = compute(frame, profile, adp=adp, movement=movement)
         out.append((results, export(results, profile)))
     return out

@@ -102,10 +102,15 @@ def _adp(rows) -> pl.DataFrame:
                 "position": r["position"],
                 "adp": r["adp"],
                 "position_adp": r.get("position_adp"),
+                "adp_delta": r.get("adp_delta"),
             }
             for r in rows
         ],
-        schema_overrides={"player_id": pl.String, "position_adp": pl.Int64},
+        schema_overrides={
+            "player_id": pl.String,
+            "position_adp": pl.Int64,
+            "adp_delta": pl.Float64,
+        },
     )
 
 
@@ -137,6 +142,39 @@ def test_a_source_with_no_id_still_reaches_the_board_by_name():
     )
     assert priced.filter(pl.col("source_player_name") == "Breece Hall")["adp"].item() == 27.2
     assert coverage["priced"] == 1
+
+
+def test_the_move_rides_across_on_both_join_paths():
+    """S31.3's delta is carried by the same join as the price, and the failure it
+    is written against is silent: a column resolved in one of the two branches
+    arrives null for exactly the players the id join missed, which reads on the
+    sheet as a market that did not move rather than as a column that was dropped.
+    """
+    board = _named_board()
+    priced, _ = tiers.attach_adp(
+        board,
+        _adp([
+            {"player_id": "00-RB00000", "source_player_name": "nothing like it",
+             "position": "RB", "adp": 14.8, "adp_delta": -7.5},
+            {"player_id": None, "source_player_name": "breece hall", "position": "RB",
+             "adp": 27.2, "adp_delta": 9.1},
+        ]),
+    )
+    by_id = priced.filter(pl.col("player_id") == "00-RB00000")
+    by_name = priced.filter(pl.col("source_player_name") == "Breece Hall")
+    assert by_id["adp_delta"].item() == -7.5
+    assert by_name["adp_delta"].item() == 9.1
+
+
+def test_a_capture_with_no_movement_attached_still_prices_the_board():
+    """An archive one day old has no movement to attach, and the board is the
+    deliverable -- it does not wait for a second capture."""
+    board = _named_board()
+    capture = _adp([{"player_id": "00-RB00001", "source_player_name": "x", "position": "RB",
+                     "adp": 14.8}]).drop("adp_delta")
+    priced, coverage = tiers.attach_adp(board, capture)
+    assert coverage["priced"] == 1
+    assert priced["adp_delta"].null_count() == priced.height
 
 
 def test_two_players_sharing_a_name_price_neither():
@@ -200,7 +238,11 @@ def test_an_absent_archive_is_not_a_third_gate(monkeypatch, tmp_path):
     did not run must still produce a sheet."""
     monkeypatch.setattr(tiers, "real_profiles", lambda: [PROFILE])
     (tmp_path / "projection_snapshot.parquet").write_bytes(b"")
-    assert tiers.market_price(PROFILE, processed_dir=tmp_path) is None
+    price, movement = tiers.market_price(PROFILE, processed_dir=tmp_path)
+    assert price is None
+    # ...and the movement says why rather than reading as "nothing moved" (S31.3).
+    assert movement["available"] is False
+    assert "adp_history" in movement["reason"]
 
 
 def test_compute_carries_the_price_beside_the_value_and_not_inside_it():

@@ -282,6 +282,51 @@ questions:
     claim_type_permitted: DESCRIPTIVE
     first_edition: null
 
+  - id: adp_price_movement
+    question: >
+      How has each player's price moved across the intra-summer archive, and
+      does recency weighting predict the next draft better than the published
+      mean (S31.3)?
+    type: descriptive_construction
+    blocks:
+      - S83 draft-day sheet (the price shown at a live pick)
+      - S31.3 recency-weighted ADP
+      - S36.2 draft simulator
+    decision_change: >
+      Whether a drafter reads the printed price as current or as stale. A player
+      whose ADP has moved half a round since the last capture will not be
+      available where the sheet says he will, and the drafter either waits a
+      round too long or reaches a round too early.
+    resolution_method: >
+      The descriptive half is computed from adp_history across every archived
+      capture: the delta between the newest capture and the one a lookback
+      earlier, joined on Fantasy Football Calculator's own player id.
+      research/foundations/price_movement.py.
+    power_status: NOT_APPLICABLE   # a construction from the archive, not a test
+    status: partially_answered
+    answered: >
+      DESCRIPTIVE only. The movement is measured and displayed; the published
+      mean remains the price, and nothing is reweighted or fed into S31.2
+      survival. First measurement 2026-08-15 against 2026-08-13, half-PPR
+      12-team: 217 players matched across the two captures, 24 of them moved half
+      a round or more, the largest being 12.3 picks.
+    unanswered: >
+      Whether recency weighting PREDICTS better -- S31.3's actual question -- is
+      not answerable here. It needs a real draft to score against, which is what
+      S76's audit trail supplies once one is recorded. Until then any weighted
+      price would be an unvalidated claim about where a player will go, and S88
+      forbids a prescriptive claim from a two-week analysis.
+    limitation: >
+      The delta is between two captures of a ROLLING WINDOW average, not two
+      same-day prices: consecutive captures share most of their underlying
+      drafts, so a delta is damped and successive deltas are not independent.
+      Both source windows are recorded on every artifact.
+    kill_rule: >
+      If the archive holds one capture for a format, no movement is reported for
+      it at all -- no glyph, no legend, and `available: false` with the reason.
+      An interpolated or assumed move is worse than none: it would print a
+      confident arrow at a draft table from data that does not exist.
+
   - id: fantasypros_projection_shape
     question: >
       What does the FantasyPros public API actually return for season

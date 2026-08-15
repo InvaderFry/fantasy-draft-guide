@@ -18,6 +18,7 @@ Built here:
 | Config gates | §14, §6.1, §46, §15, §3.1, §68 | league profiles, decision dates, sources, outcomes, evidence rules, question registry |
 | ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires — followed by a second job that re-renders the sheets from it |
 | Preseason bundle | §84, §86 | the second capture program: nflverse depth charts, rosters and injuries archived before Week 1, on a cadence the code decides |
+| Price movement | §31.3 | what the archive is *for*: how each price has moved since the prior capture, marked on the board and in the pick blocks |
 | nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play, schedules |
 | ID normalization | §12 | `gsis_id` canonical, crosswalk + labelled name matching |
 | Canonical tables | §13 | `player_week`, `player_season` (+ outcomes), `team_season`, `adp_history`, `projection_snapshot`, `draft_pick` |
@@ -229,6 +230,65 @@ the 12th to 22nd back on a board sorted by value — so marking it there catches
 one player. It is marked in the SURVIVAL blocks too, and that is where it earns
 its place: at slot 7 seven backs in the band are flagged across picks 31 to 66,
 which is exactly where the choice gets made.
+
+### The price, and which way it is moving (§31.3)
+
+§84 opens by naming what the daily archive is for:
+
+> §31.3 (recency-weighted ADP) and parts of §31.1 need intra-summer ADP history:
+> how a player's price moved across July and August.
+
+Until now nothing read the series. Every board priced off `snapshot_date == max`,
+so a player being drafted twelve picks earlier this week than last read exactly
+like one who had not moved. The sheet now carries the direction: a small ▲ or ▼
+ahead of the price, on the tier board and in every SURVIVAL block, with a legend
+naming the capture the move is measured from.
+
+```
+TE  ▲148   the market is taking him EARLIER than it did on 2026-08-13
+QB  ▼111   ...and later
+```
+
+**The sign is the whole risk.** An ADP is a pick number, so a player the market
+wants *more* has a *smaller* one: `adp_delta = now − prior` is **negative** for a
+riser. Nothing outside `price_movement.direction()` reads that sign, and the test
+that pins it does so by name — Hunter Henry 156.8 → 147.9 must render ▲, Jaxson
+Dart 98.6 → 110.9 must render ▼. Getting those two the wrong way round would not
+look like a bug. It would look like a confident arrow, at a draft table, under a
+pick clock.
+
+**A move counts at half a round** — six picks in both leagues, `teams / 2`, so it
+scales with league size rather than being a magic number. Half a round is roughly
+the granularity at which a plan changes. It is committed in code with that
+reasoning beside it and was *not* chosen from the observed distribution, which
+§80 prohibits.
+
+**Measured against a stated day, never an implied one.** The lookback is seven
+days, and when the archive is shorter than that the delta is taken against the
+oldest capture there is and reports the span it actually used. On 2026-08-15 that
+is two days, not seven, and the artifact says `span_days: 2`. A delta labelled a
+week that is really two days is the same lie as a page whose generated date is
+current while the board under it is weeks old, and this sheet already refuses
+that one.
+
+**It is carried, never acted on.** The published mean is still the price and
+§31.2 survival is still computed from it. §31.3's actual question — whether
+recency weighting *predicts* the next draft better — needs a draft to score
+against, which is §76's audit trail after the draft. A weighted price today would
+be an unvalidated claim about where a player will go, which is what §88 forbids
+making from a two-week analysis.
+
+One limitation travels on every artifact that carries a delta: FFC publishes a
+**rolling window** average, so two captures days apart share most of their
+underlying drafts. The 08-13 and 08-15 captures cover 08-08→08-13 and
+08-10→08-15 — four shared days — which means the deltas are damped and successive
+ones are not independent. Both windows are recorded, so the overlap is readable
+rather than assumed.
+
+First run, half-PPR 12-team: 217 players matched across the two captures, **24
+moved half a round or more**, the largest 12.3 picks. All 26 sheets were
+re-measured to PDF afterwards and every one is still a single page — the glyph
+costs no column, which is why it is a glyph.
 
 ## Draft day: the order is drawn an hour before, so nothing is built then
 
