@@ -19,6 +19,8 @@ Built here:
 | ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires — followed by a second job that re-renders the sheets from it |
 | Preseason bundle | §84, §86 | the second capture program: nflverse depth charts, rosters and injuries archived before Week 1, on a cadence the code decides |
 | Price movement | §31.3 | what the archive is *for*: how each price has moved since the prior capture, marked on the board and in the pick blocks |
+| Refresh gate | §83 | the daily job refuses to publish a board worse than the one it would replace |
+| Archive health | §84 | the series measured: what it holds, what it lost, and whether it has stopped |
 | nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play, schedules |
 | ID normalization | §12 | `gsis_id` canonical, crosswalk + labelled name matching |
 | Canonical tables | §13 | `player_week`, `player_season` (+ outcomes), `team_season`, `adp_history`, `projection_snapshot`, `draft_pick` |
@@ -351,6 +353,49 @@ make sheet SLOT=7            # rewrites that seat only, leaves the other 11 alon
 Set `draft_slot: 7` in the profile instead if the order is drawn well in advance:
 the league then gets a single `half_ppr_12.html` and no per-slot fan-out.
 
+### What stops the refresh publishing a broken board
+
+The refresh runs unattended and nobody opens its output until the draft, which is
+the argument for it existing and also the reason it can quietly destroy the thing
+it maintains. Every step below works as designed:
+
+* `run-research` treats a blocked module as a **finding, not a failure**, and
+  exits 0 — correct, because §19.3 is blocked by design until its gates open;
+* `artifacts/2026-draft/methods/**` is gitignored bar the two carried-forward
+  artifacts, so a fresh runner has **no previous board to fall back on**;
+* a section with no artifact behind it renders `BLOCKED` — deliberately, because
+  a blank space on a draft sheet is worse;
+* the commit step fires on any change under `artifacts/2026-draft`.
+
+So the morning a projection key rotates, the job renders 26 pages whose TIERS and
+SURVIVAL read BLOCKED and commits them over the good ones, and nothing goes red.
+The index banner cannot see it either: it compares the **ADP** capture date, and
+ADP was fine.
+
+`research refresh-check` sits between the render and the commit, and **that
+ordering is the whole mechanism** — a failed step skips the commit. It refuses on
+either kind of downgrade:
+
+| | |
+|---|---|
+| **A blocked section** | any rendered sheet where TIERS, REGRESSION or SURVIVAL says `BLOCKED`. `NOT BUILT` is not a finding: TARGETS, DARTS and FALSE FRIENDS say so honestly and will until §79. |
+| **A board that thinned** | any tracked count down more than **20%** against the last run that passed — 493 projected players arriving as 40, or 183 priced arriving as 60. The floors cannot see this: the tier list is capped at twelve a position, so a tenth of a board still prints a full-looking page. |
+
+The baseline lives in `artifacts/2026-draft/refresh_state.json`, written **only
+when the check passes**, which is what makes it a record of the last *good* board
+rather than of the last board. Without that rule one bad morning becomes the
+standard every later morning is measured against.
+
+**When it reds, the right thing has already happened.** Yesterday's complete
+sheets are still committed, still openable from a phone, and they say on their
+own face that they are priced from an older capture. Stale-but-complete beats
+fresh-but-blocked: a sheet that admits it is two days old is one you can still
+draft from. Read the run log, fix the capture, and let the next refresh land.
+
+A test asserts the same thing about the sheets in the repository right now, so a
+broken board is a red test on every push rather than a red scheduled run nobody
+reads until draft day.
+
 ### The date to look at on the sheet
 
 Every page carries two dates, and they are not the same thing:
@@ -517,6 +562,58 @@ so they are not re-filed weekly.
 **Nothing in this edition reads these bytes.** The builders still load from
 `data/raw/`. The bundle is captured for the 2027 build, which is §84's whole
 argument: the value is in having it, and it cannot be acquired later.
+
+## The archive's own health (§84)
+
+The ADP archive is the one asset here whose value expires, and until now nothing
+measured it. `snapshot.verify_all()` re-hashes what is present and cannot see
+what is absent; the capture job exits non-zero on a lost day, which reds **only
+on a day it runs**.
+
+```bash
+uv run research archive-status
+```
+
+```
+archive half-ppr/12team: 2 capture(s) 2026-08-13 to 2026-08-15,
+  missing 1 day(s): 2026-08-14; S31.3 span 2
+```
+
+Two states, and they are handled oppositely because only one of them can still
+be acted on.
+
+**A hole is a fact.** 2026-08-14 is gone: a dispatch at 00:08 UTC filed a window
+that had not closed, and the 11:43 run that fetched the real payload was rejected
+by the overwrite guard — correctly, and too late. `_classify` now refuses a
+payload whose window closed before the capture date, so it cannot recur, but the
+day is not purchasable retroactively. It is reported on every run and fails
+nothing. A job that reds forever on something unfixable is a job nobody reads —
+the same reason `preseason-status` stops failing at Week 1.
+
+**A stall is a failure.** If the newest capture falls further behind than §84's
+own cadence allows — *"daily during July–August, weekly otherwise"*, plus one
+period of slack because the job runs at 11:00 and 14:00 UTC — the next capture
+can still be taken, and every day it is not is gone.
+
+**The alarm lives in the test suite, not in the archive workflow.** The failure
+being caught is that workflow *not running*: a schedule that stops firing
+produces no runs and therefore no red, and GitHub disables cron workflows in a
+repository that goes quiet — this one stays awake only because the archive itself
+commits daily, which is circular. So the test reds on every push. The archive's
+own commits carry `[skip ci]`, so it is a human push that surfaces it. If the
+alarm fires on a branch that predates the last few captures, rebase before
+believing it: the archive lands on main daily and a stale branch carries a stale
+copy.
+
+`research validate` prints the same lines and fails on none of them — it runs
+inside the capture job between capturing a day of price movement and committing
+it, so anything that exits non-zero from there is a reason a captured day never
+lands.
+
+The watch stops at Week 1. After the season opens the draft has happened, a quiet
+archive costs nothing, and an alarm that reds from September onward is one nobody
+reads in July. An **unknown** opener keeps watching — not knowing the window has
+closed is not evidence that it has.
 
 ## Before running research
 

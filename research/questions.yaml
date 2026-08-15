@@ -73,6 +73,15 @@ questions:
       no live capture before that date and those days of intra-summer price
       movement are not purchasable retroactively (S84).
 
+      One further day is missing INSIDE the series: 2026-08-14. A dispatch at
+      00:08 UTC captured FFC before it had published and filed the 08-13 window
+      under 08-14; the 11:43 run fetched the real payload and was rejected by the
+      overwrite guard, correctly and too late. `cli._classify` now refuses a
+      payload whose window closed before the capture date, so the defect cannot
+      recur -- but the day itself is gone. `research archive-status` reports it
+      on every run, and reports it as a fact: a hole is permanent, and only a
+      STALLED archive fails, because only a stall can still be fixed.
+
   - id: nflverse_preseason_injuries_published
     question: >
       Does nflverse publish injury designations for a season before that

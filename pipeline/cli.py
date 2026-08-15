@@ -7,6 +7,8 @@
     research run-research  run the S16 method modules (S47 stage 8)
     research sheet         render the S83 draft-day sheets
     research preseason-status  report the S84 preseason bundle (S84, S86)
+    research refresh-check     refuse to publish a degraded draft board (S83)
+    research archive-status    report the S84 archive's series; fail on a stall
     research validate      re-hash snapshots and run the data/leakage checks
 
 Later stages -- evidence grading and the site -- are not implemented in this
@@ -802,6 +804,181 @@ def _preseason_report(today: dt.date | None = None) -> list[tuple[str, bool]]:
     return out
 
 
+def _archive_report(today: dt.date | None = None) -> tuple[list[str], list[str]]:
+    """The S84 archive's series, and whatever is stalled. (lines, problems).
+
+    Same season rule as `snapshot_` and `_preseason_report`: the current year
+    unless a caller says otherwise.
+    """
+    from pipeline import archive
+
+    today = today or dt.datetime.now(dt.UTC).date()
+    state = archive.health(today.year, today=today)
+    lines = []
+    stalled = state.stalled
+    for f in state.formats:
+        if not f.captures:
+            lines.append(f"archive {f.label()}: NO capture for {state.season}")
+            continue
+        missing = f.missing
+        # Named while there are few enough to name. A hole is permanent -- the
+        # day is not purchasable retroactively (S84) -- so this is a fact about
+        # the series, not a job to redo.
+        holes = (
+            ""
+            if not missing
+            else f", missing {len(missing)} day(s): "
+            + (
+                ", ".join(d.isoformat() for d in missing)
+                if len(missing) <= 5
+                else f"{missing[0]} .. {missing[-1]}, longest run "
+                f"{archive.longest_run(missing)}"
+            )
+        )
+        span = f.movement_span()
+        lines.append(
+            f"archive {f.label()}: {f.captures} capture(s) {f.first} to {f.newest}"
+            f"{holes}; S31.3 span {span if span is not None else 'none yet'}"
+        )
+    if not state.watching:
+        lines.append(
+            f"archive: week 1 opened {state.opener}, so a quiet archive no longer "
+            "costs a draft -- reported, not watched (S84)"
+        )
+    # One job captures every format, so they stall together. Six identical lines
+    # in a CI log bury the one number that matters, which is how far behind.
+    if len(stalled) == len(state.formats) and state.formats:
+        ages = {f.age(today) for f in state.formats}
+        if len(ages) == 1:
+            age = ages.pop()
+            stalled = [
+                f"every format is stalled -- newest capture {state.formats[0].newest}, "
+                f"{age} days old, and S84 allows {archive.tolerance(today)} at this "
+                "time of year"
+            ]
+    return lines, stalled
+
+
+@app.command("archive-status")
+def archive_status(
+    date: Annotated[str, typer.Option(help="evaluate as of this date, default today (UTC)")] = "",
+) -> None:
+    """Report the S84 archive's series, and fail on one that has stopped.
+
+    A hole and a stall are different states. A hole is permanent and is reported;
+    a stall can still be fixed by the next capture, and days of intra-summer
+    price movement are not purchasable retroactively, so a stall exits non-zero.
+
+    Deliberately not run by the archive workflow: the failure this catches is
+    that workflow not running at all, and a gate inside a job that never fires
+    cannot fire either. It runs in the test suite, on every push.
+    """
+    today = dt.date.fromisoformat(date) if date else dt.datetime.now(dt.UTC).date()
+    lines, stalled = _archive_report(today)
+    for line in lines:
+        typer.echo(line)
+    if not stalled:
+        return
+    for problem in stalled:
+        typer.echo(f"archive: {problem}", err=True)
+    typer.echo(
+        "the archive has stopped. S84's capture is the one item whose value expires -- "
+        "every day not captured before the draft is gone permanently. Check the ADP "
+        "archive workflow is still scheduled and still running. (On a checkout that "
+        "predates the last few captures, rebase first: the archive lands on main "
+        "daily and a stale branch carries a stale copy of it.)",
+        err=True,
+    )
+    raise typer.Exit(code=1)
+
+
+@app.command("refresh-check")
+def refresh_check(
+    edition: Annotated[str, typer.Option(help="edition just rendered, e.g. 2026-draft")] = "",
+    write: Annotated[
+        bool, typer.Option(help="record this run as the board to be no worse than")
+    ] = True,
+) -> None:
+    """Refuse to publish a draft board worse than the one it replaces (S83).
+
+    Runs between the render and the commit. A blocked module exits 0 from
+    `run-research` on purpose -- for a dated edition it is a finding -- so the
+    knowledge that the LIVE board must not be blocked lives here, in the one
+    command allowed to red the job whose damage it prevents.
+
+    When this fails, nothing is committed and yesterday's complete sheets stay
+    where they are, already carrying the banner that says they are not today's.
+    """
+    from research import method as method_mod
+    from research import refresh
+    from research import sheet as sheet_mod
+
+    edition_name = edition or method_mod.default_edition()
+    # One root, looked up at call time and threaded through, so the whole command
+    # can be driven over a temporary edition in a test.
+    root = method_mod.ARTIFACT_DIR
+    profiles = [p for p in config.real_profiles() if config.validate_profile(p)]
+    arts = sheet_mod.load_artifacts(edition_name, root)
+
+    problems: list[str] = []
+
+    blocked = refresh.blocked_pages(edition_name, root)
+    if blocked:
+        # Aggregated: every sheet fails the same way when an artifact is missing,
+        # and twenty-six identical lines in a CI log bury the one thing that
+        # differs. Section, count, and a name to open.
+        by_section: dict[str, list[str]] = {}
+        for filename, sections in sorted(blocked.items()):
+            for name in sections:
+                by_section.setdefault(name, []).append(filename)
+        for name, files in by_section.items():
+            problems.append(
+                f"{name} is BLOCKED on {len(files)} sheet(s), e.g. {files[0]}"
+            )
+    if not blocked:
+        checked = [
+            p
+            for p in refresh.sheets_dir(edition_name, root).glob("*.html")
+            if p.name != "index.html"
+        ]
+        typer.echo(f"refresh: {len(checked)} sheet(s) checked, none blocked where content is due")
+
+    metrics = refresh.edition_metrics(arts, profiles)
+    for pid, entry in metrics.items():
+        typer.echo(
+            f"refresh: {pid} -- {entry.get('priced')} priced of {entry.get('board_rows')} "
+            f"on the board, {entry.get('survival_slots')} slot(s), "
+            f"capture {entry.get('adp_snapshot_date')}"
+        )
+
+    baseline = refresh.read_state(edition_name, root)
+    if baseline is None:
+        typer.echo("refresh: no previous good run to compare against -- floors only")
+    else:
+        problems.extend(refresh.regressions(metrics, baseline))
+
+    if problems:
+        for problem in problems:
+            typer.echo(f"refresh: {problem}", err=True)
+        typer.echo(
+            f"refusing to publish edition {edition_name}: the board this refresh produced is "
+            "worse than the one it would replace. Nothing has been committed, so the sheets "
+            "already published stand -- and they say on their own face that they are not "
+            "today's (S83). Fix the capture and let the next refresh land.",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    if write:
+        path = refresh.write_state(
+            edition_name,
+            metrics,
+            generated=dt.datetime.now(dt.UTC).date().isoformat(),
+            root=root,
+        )
+        typer.echo(f"refresh: recorded as the board to beat -> {path}")
+
+
 @app.command("preseason-status")
 def preseason_status(
     date: Annotated[str, typer.Option(help="evaluate as of this date, default today (UTC)")] = "",
@@ -862,6 +1039,15 @@ def validate() -> None:
     # `research preseason-status` is the gate, and it runs in its own workflow.
     for message, _ok in _preseason_report():
         typer.echo(message)
+
+    # Report-only here for the same reason as the bundle above: `validate` runs
+    # inside the capture job between capturing a day of price movement and
+    # committing it. `research archive-status` is where a stall fails.
+    archive_lines, archive_stalled = _archive_report()
+    for message in archive_lines:
+        typer.echo(message)
+    for problem in archive_stalled:
+        typer.echo(f"archive: {problem} -- see `research archive-status`")
 
     from pipeline.features import checks
 

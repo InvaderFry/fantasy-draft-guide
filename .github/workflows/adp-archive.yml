@@ -152,6 +152,16 @@ jobs:
             --modules tiers_and_replacement_level,survival_probability
           uv run research sheet --edition 2026-draft
 
+      # Between the render and the commit, and that ordering IS the mechanism: a
+      # failed step skips the commit, so a degraded board never reaches the
+      # branch. `run-research` exits 0 on a blocked module by design -- for a
+      # dated edition a shut gate is a finding -- which is exactly how 26 sheets
+      # reading BLOCKED could otherwise be committed over good ones at 11:00 UTC
+      # with nothing going red. When this fails, yesterday's sheets stand, and
+      # they already say on their own face that they are not today's (S83).
+      - name: Refuse to publish a degraded board
+        run: uv run research refresh-check --edition 2026-draft
+
       - name: Commit the refreshed sheets
         run: |
           if [ -z "$(git status --porcelain artifacts/2026-draft)" ]; then
