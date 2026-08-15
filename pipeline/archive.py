@@ -18,7 +18,8 @@ red-job-nobody-reads pattern this repository has already declined twice.
 GitHub disables cron workflows in a repository that goes quiet, and this one
 stays awake only because the archive itself commits daily, which is circular. A
 stall is live and actionable -- the next capture can still be taken -- so a stall
-is what fails.
+is what fails, on a schedule that is not the archive's own
+(.github/workflows/archive-monitor.yml).
 """
 
 from __future__ import annotations

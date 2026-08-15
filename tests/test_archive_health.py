@@ -10,8 +10,9 @@ never failed on; a job that reds forever on an unfixable fact is a job nobody
 reads, which is the pattern `preseason-status` and the refresh gate both avoid.
 
 A STALL is live. The next capture can still be taken, and every day it is not is
-gone. That is what fails -- and it fails in the test suite rather than in the
-archive workflow, because the failure being caught is that workflow not running.
+gone. That is what fails -- and it fails outside the archive workflow, because
+the failure being caught is that workflow not running: on a schedule of its own
+(.github/workflows/archive-monitor.yml) and, for a human's push, here.
 """
 
 import datetime as dt

@@ -595,15 +595,41 @@ own cadence allows — *"daily during July–August, weekly otherwise"*, plus on
 period of slack because the job runs at 11:00 and 14:00 UTC — the next capture
 can still be taken, and every day it is not is gone.
 
-**The alarm lives in the test suite, not in the archive workflow.** The failure
+The deadline is read from the days the archive was **quiet**, not from the day
+the check runs. §84's cadence loosens on September 1, and reading it from today
+tripled the tolerance that morning while the newest capture was still an August
+one: an archive that stopped on August 29 read healthy through September 8 — the
+day before the 2026 opener. The same hole opens in reverse on July 1. So the
+strictest cadence anywhere between the newest capture and today is the one
+applied, which holds a late-August silence to two days into September. That is
+stricter than the spec's letter for those eight days, deliberately: the job
+captures daily year-round, the watch ends at Week 1 anyway, and those are the
+last captures the draft will read.
+
+**The alarm runs on its own schedule, not in the archive workflow.** The failure
 being caught is that workflow *not running*: a schedule that stops firing
 produces no runs and therefore no red, and GitHub disables cron workflows in a
 repository that goes quiet — this one stays awake only because the archive itself
-commits daily, which is circular. So the test reds on every push. The archive's
-own commits carry `[skip ci]`, so it is a human push that surfaces it. If the
-alarm fires on a branch that predates the last few captures, rebase before
+commits daily, which is circular. `.github/workflows/archive-monitor.yml` runs
+`archive-status` at 16:00 UTC daily, after both capture attempts have had their
+chance, and opens (or comments on) a single `archive-stall` issue when it reds —
+because a red run in a repository nobody is watching is the same failure one
+level up. It reads committed snapshots only, so it cannot itself cost a capture.
+
+The test suite asserts the same thing on every push, and that is not redundant:
+a stalled archive should also stop a human landing anything else. The archive's
+own commits carry `[skip ci]`, so it is a human push that surfaces it there. If
+the alarm fires on a branch that predates the last few captures, rebase before
 believing it: the archive lands on main daily and a stale branch carries a stale
 copy.
+
+One limitation is recorded rather than papered over: GitHub disables *every*
+scheduled workflow in a repository after 60 days without activity, so a
+same-repo monitor shares one failure mode with the job it watches. It catches
+the cases that actually happen — the capture erroring, FFC going away, a schedule
+edited, a secret expiring — and GitHub emails the owner before disabling
+anything. Closing the last case needs a heartbeat pinged to a service outside
+GitHub, which is not built.
 
 `research validate` prints the same lines and fails on none of them — it runs
 inside the capture job between capturing a day of price movement and committing

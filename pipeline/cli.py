@@ -873,7 +873,11 @@ def archive_status(
 
     Deliberately not run by the archive workflow: the failure this catches is
     that workflow not running at all, and a gate inside a job that never fires
-    cannot fire either. It runs in the test suite, on every push.
+    cannot fire either. It runs on its own daily schedule
+    (.github/workflows/archive-monitor.yml), which opens an issue when it reds,
+    and in the test suite on every push -- the schedule because the repository
+    can go quiet, the test because a stalled archive should also stop a human
+    pushing anything else.
     """
     today = dt.date.fromisoformat(date) if date else dt.datetime.now(dt.UTC).date()
     lines, stalled = _archive_report(today)
