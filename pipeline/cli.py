@@ -849,12 +849,14 @@ def _archive_report(today: dt.date | None = None) -> tuple[list[str], list[str]]
     # in a CI log bury the one number that matters, which is how far behind.
     if len(stalled) == len(state.formats) and state.formats:
         ages = {f.age(today) for f in state.formats}
-        if len(ages) == 1:
+        # None means no capture at all, which already reads clearly per format.
+        if len(ages) == 1 and None not in ages:
             age = ages.pop()
+            newest = state.formats[0].newest
             stalled = [
-                f"every format is stalled -- newest capture {state.formats[0].newest}, "
-                f"{age} days old, and S84 allows {archive.tolerance(today)} at this "
-                "time of year"
+                f"every format is stalled -- newest capture {newest}, "
+                f"{age} days old, and S84 allows {archive.tolerance(today, newest)} "
+                "across the days it went quiet"
             ]
     return lines, stalled
 
