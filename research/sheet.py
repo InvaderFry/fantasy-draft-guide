@@ -46,6 +46,7 @@ from typing import Any
 
 from pipeline.config import draft_slot as profile_draft_slot
 from pipeline.config import real_profiles
+from research.foundations import price_movement
 from research.foundations import survival as survival_mod
 from research.foundations import tiers as tiers_mod
 from research.method import ARTIFACT_DIR, default_edition
@@ -174,7 +175,7 @@ def tiers_section(
             adp = p.get("adp")
             rows.append(
                 '<tr class="{cls}"><td>{tier}</td><td>{player}</td><td>{team}</td>'
-                '<td class="num">{vor}</td><td class="num{dz}">{adp}</td></tr>'.format(
+                '<td class="num">{vor}</td><td class="num{dz}">{move}{adp}</td></tr>'.format(
                     cls="tier-start" if new_tier else "",
                     tier=p["tier"],
                     player=html.escape(str(p["player"])),
@@ -184,6 +185,7 @@ def tiers_section(
                     # answer the question asked at a live pick.
                     adp="&mdash;" if adp is None else f"{adp:.0f}",
                     dz=" dz" if in_dead_zone(band, pos, adp) else "",
+                    move=move_mark(p.get("adp_delta"), results.get("teams")),
                 )
             )
         blocks.append(
@@ -256,6 +258,46 @@ def in_dead_zone(band: dict[str, Any] | None, position: str, adp: float | None) 
     if band is None or adp is None or position != "RB":
         return False
     return band["low"] is not None and band["low"] <= adp <= band["high"]
+
+
+def move_mark(delta: float | None, teams: int | None) -> str:
+    """S31.3's direction, as one character inside the price cell.
+
+    Not a column. Five columns in a 171px cell already wrap the longer names and
+    a wrapped name costs height, which is the budget that binds on this page --
+    the same reason S21.1's band is a colour rather than a tag. The glyph sits
+    ahead of the number so the prices stay aligned on their right edge whether or
+    not a player moved.
+
+    Shape rather than colour, because the colour in this cell is already saying
+    something: a red price is a price inside the dead zone.
+    """
+    if teams is None or not price_movement.is_mover(delta, int(teams)):
+        return ""
+    rising = price_movement.direction(delta) == price_movement.RISING
+    # Rising means the market is taking him EARLIER, which is a falling ADP.
+    return f'<span class="mv">{"&#9650;" if rising else "&#9660;"}</span>'
+
+
+def movement_legend(artifacts: dict[str, Any], profile: dict[str, Any] | None) -> str:
+    """One line saying what the glyphs mean and which day they are measured from.
+
+    Omitted entirely when the archive holds a single capture: a legend for marks
+    that cannot appear is a line of the page spent saying nothing.
+    """
+    if profile is None:
+        return ""
+    for method in (tiers_mod.METHOD_ID, survival_mod.METHOD_ID):
+        art = artifacts.get(f"{method}__{profile['id']}")
+        move = ((art or {}).get("primary_results") or {}).get("price_movement") or {}
+        if not move.get("available"):
+            continue
+        return (
+            ' &middot; <span class="mv">&#9650;</span>/<span class="mv">&#9660;</span> '
+            f'moved {move["mover_threshold_picks"]:g}+ picks '
+            f'(half a round) since the capture of {html.escape(move["prior_snapshot_date"])}'
+        )
+    return ""
 
 
 def dead_zone_section(artifacts: dict[str, Any], band: dict[str, Any] | None) -> str:
@@ -394,11 +436,12 @@ def survival_section(
     blocks = []
     for pick_block in chosen["picks"][:MAX_SURVIVAL_PICKS]:
         rows = "".join(
-            '<tr><td>{player}</td><td>{pos}</td><td class="{dz}">{adp}</td>'
+            '<tr><td>{player}</td><td>{pos}</td><td class="{dz}">{move}{adp}</td>'
             "<td>{p}</td></tr>".format(
                 player=html.escape(str(c["player"])),
                 pos=html.escape(str(c["position"] or "")),
                 adp=c["adp"],
+                move=move_mark(c.get("adp_delta"), results.get("teams")),
                 p="--" if c["p_available"] is None else f'{c["p_available"]:.0%}',
                 # This is where S21.1 actually bites. The band sits at picks
                 # 25-60, which on a board sorted by value is the 12th to 22nd back
@@ -540,11 +583,13 @@ def render(
         title = f"{title} \u00b7 slot {slot}"
     generated = dt.datetime.now(dt.UTC).date().isoformat()
     captured = adp_capture_date(arts, profile)
+    moved = movement_legend(arts, profile)
     priced = (
         "ADP not priced"
         if captured is None
         else f"priced from the ADP capture of <strong>{html.escape(captured)}</strong>"
         + ("" if captured == generated else " &mdash; not today&rsquo;s")
+        + moved
     )
     header_note = (
         ""
@@ -777,6 +822,9 @@ _PAGE = """<!doctype html>
      narrowest column on the page and a two-character tag wraps the name beside
      it, and wrapping costs height, which is the budget that binds. */
   .dz {{ color: #a11; font-weight: 700; }}
+  /* S31.3's direction. Sized well below the digits it sits beside: it qualifies
+     the price, it is not the price. */
+  .mv {{ color: #666; font-size: 6pt; padding-right: 1px; }}
   .missing {{ color: #777; font-size: 7.5pt; font-style: italic; }}
   ul.missing {{ margin: 2px 0 4px; padding-left: 14px; }}
   code {{ font-size: 7.5pt; }}

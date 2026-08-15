@@ -38,6 +38,7 @@ from pipeline.config import (
     real_profiles,
 )
 from research import stats
+from research.foundations import price_movement
 from research.method import MethodArtifact
 from research.running_back import dead_zone
 
@@ -119,10 +120,14 @@ def calibration_note(adp: float, adp_stdev: float, pick_high: float | None) -> s
     return None
 
 
-def latest_adp(
+def archived_adp(
     profile: dict[str, Any], *, processed_dir=PROCESSED_DIR, season: int | None = None
 ) -> pl.DataFrame:
-    """The most recent archived ADP capture for this league's format."""
+    """Every archived capture for this league's format -- the S84 series (S31.3).
+
+    One capture is a price; the series is how the price moved, which is the whole
+    reason the archive is captured daily and cannot be reconstructed later.
+    """
     path = processed_dir / "adp_history.parquet"
     if not path.exists():
         raise BlockedError(
@@ -141,8 +146,33 @@ def latest_adp(
             + (f" / season {season}" if season else "")
             + ". S84's capture list must cover every real profile."
         )
-    newest = frame["snapshot_date"].max()
-    return frame.filter(pl.col("snapshot_date") == newest).sort("adp")
+    return frame
+
+
+def newest_capture(history: pl.DataFrame) -> pl.DataFrame:
+    newest = history["snapshot_date"].max()
+    return history.filter(pl.col("snapshot_date") == newest).sort("adp")
+
+
+def latest_adp(
+    profile: dict[str, Any], *, processed_dir=PROCESSED_DIR, season: int | None = None
+) -> pl.DataFrame:
+    """The most recent archived ADP capture for this league's format."""
+    return newest_capture(archived_adp(profile, processed_dir=processed_dir, season=season))
+
+
+def priced_board(
+    profile: dict[str, Any], *, processed_dir=PROCESSED_DIR, season: int | None = None
+) -> tuple[pl.DataFrame, dict[str, Any]]:
+    """The newest capture with S31.3's movement attached, and what it was measured against.
+
+    Shared by both market-dependent modules so the tier board and the survival
+    blocks cannot end up quoting the price as of different days.
+    """
+    history = archived_adp(profile, processed_dir=processed_dir, season=season)
+    return price_movement.with_movement(
+        newest_capture(history), history, teams=int(profile["teams"])
+    )
 
 
 def compute(
@@ -150,6 +180,7 @@ def compute(
     profile: dict[str, Any],
     *,
     rounds: int = DEFAULT_ROUNDS,
+    movement: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Survival at each held pick, for the slot(s) this profile could draft from.
 
@@ -198,6 +229,9 @@ def compute(
         "adp_format": profile_adp_format(profile),
         "players_priced": adp.height,
         "players_with_spread": with_spread,
+        # S31.3, carried rather than acted on: the quoted price is still the
+        # published mean and survival is still computed from it.
+        "price_movement": movement or price_movement.unavailable("movement was not computed"),
         "by_slot": by_slot,
         "n": adp.height,
     }
@@ -248,6 +282,14 @@ def _pick_block(adp: pl.DataFrame, pick: int, next_pick: int | None) -> dict[str
                 "position": row["position"],
                 "team": row["team"],
                 "adp": round(float(row["adp"]), 1),
+                # S31.3. Negative means he is going EARLIER than the prior
+                # capture -- see price_movement.direction(), which is the only
+                # place the sign is read.
+                "adp_delta": (
+                    round(float(row["adp_delta"]), 1)
+                    if row.get("adp_delta") is not None
+                    else None
+                ),
                 "adp_stdev": (
                     round(float(row["adp_stdev"]), 1) if row["adp_stdev"] is not None else None
                 ),
@@ -282,6 +324,9 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
             "adp_format": results.get("adp_format"),
             "adp_snapshot_date": results.get("adp_snapshot_date"),
             "opportunity_cost_method": OPPORTUNITY_COST_METHOD,
+            "price_movement_since": (results.get("price_movement") or {}).get(
+                "prior_snapshot_date"
+            ),
         },
         outcome=None,
         sample_size=results.get("n", 0),
@@ -300,6 +345,7 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
             "a different scoring lean will not follow it.",
             "The figure is a rolling window average, not a same-day price (S31.3); the "
             "window length varies by format and is carried on adp_history.",
+            price_movement.ROLLING_WINDOW_LIMITATION,
             "Survival is computed per player independently. Runs on a position -- four "
             "backs going in six picks -- are correlated in reality and are not modelled.",
         ],
@@ -317,7 +363,9 @@ def run(processed_dir=PROCESSED_DIR) -> list[tuple[dict[str, Any], MethodArtifac
     for profile in real_profiles():
         # The season is mandatory here. Without it "the newest capture" spans
         # every backfilled season at once -- see config.draft_season().
-        adp = latest_adp(profile, processed_dir=processed_dir, season=draft_season(profile))
-        results = compute(adp, profile)
+        adp, movement = priced_board(
+            profile, processed_dir=processed_dir, season=draft_season(profile)
+        )
+        results = compute(adp, profile, movement=movement)
         out.append((results, export(results, profile)))
     return out

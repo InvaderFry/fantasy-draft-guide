@@ -242,3 +242,17 @@ def test_the_draft_season_follows_the_draft_date_when_there_is_one():
 
     assert draft_season({"id": "t", "draft_date": "2026-08-30"}) == 2026
     assert draft_season({"id": "t", "draft_date": "unknown"}) == dt.datetime.now(dt.UTC).year
+
+
+def test_the_candidate_carries_the_move_that_produced_its_price():
+    """S31.3 reaches the pick blocks, not just the tier board.
+
+    This is where it earns its place: the block at pick 43 is what somebody reads
+    with a clock running, and a price that moved half a round since the last
+    capture is a different price from the one printed beside it.
+    """
+    adp = _adp().with_columns(pl.Series("adp_delta", [-7.0, 0.5, None, 8.0, 0.0, None]))
+    results = survival.compute(adp, PROFILE, rounds=2)
+    first = results["by_slot"][0]["picks"][0]["candidates"][0]
+    assert first["adp_delta"] == -7.0
+    assert results["price_movement"]["available"] is False  # none was passed in
