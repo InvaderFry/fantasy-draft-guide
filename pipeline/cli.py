@@ -928,6 +928,11 @@ def refresh_check(
 
     problems: list[str] = []
 
+    # First, because everything after it reads the rendered pages or the
+    # artifacts behind them, and both read an edition that was never written as
+    # a clean one: nothing rendered means nothing blocked.
+    problems.extend(refresh.missing_sheets(edition_name, profiles, root))
+
     blocked = refresh.blocked_pages(edition_name, root)
     if blocked:
         # Aggregated: every sheet fails the same way when an artifact is missing,
@@ -947,7 +952,11 @@ def refresh_check(
             for p in refresh.sheets_dir(edition_name, root).glob("*.html")
             if p.name != "index.html"
         ]
-        typer.echo(f"refresh: {len(checked)} sheet(s) checked, none blocked where content is due")
+        due = [n for n in refresh.expected_sheets(profiles) if n != "index.html"]
+        typer.echo(
+            f"refresh: {len(checked)} sheet(s) checked of {len(due)} due, "
+            "none blocked where content is due"
+        )
 
     metrics = refresh.edition_metrics(arts, profiles)
     for pid, entry in metrics.items():

@@ -380,6 +380,16 @@ either kind of downgrade:
 |---|---|
 | **A blocked section** | any rendered sheet where TIERS, REGRESSION or SURVIVAL says `BLOCKED`. `NOT BUILT` is not a finding: TARGETS, DARTS and FALSE FRIENDS say so honestly and will until §79. |
 | **A board that thinned** | any tracked count down more than **20%** against the last run that passed — 493 projected players arriving as 40, or 183 priced arriving as 60. The floors cannot see this: the tier list is capped at twelve a position, so a tenth of a board still prints a full-looking page. |
+| **A page that is not there** | every filename the edition should carry — each seat, the slot-agnostic sheet, the chooser — counted against what §83's own renderer would write. |
+
+The third row exists because the first two share a blind spot: they read the
+pages that are present and the artifacts behind them, so an edition that
+rendered *nothing* was its healthiest possible state. Nothing rendered means
+nothing blocked, the counts come from the S16 artifacts rather than from the
+pages, and the run printed "0 sheet(s) checked, none blocked" and recorded
+itself as the board to beat. The expected set is read from `sheet`'s own
+`slots_to_render` and `slot_filename`, so the gate and the renderer cannot drift
+into disagreeing about what a complete edition is.
 
 The baseline lives in `artifacts/2026-draft/refresh_state.json`, written **only
 when the check passes**, which is what makes it a record of the last *good* board
