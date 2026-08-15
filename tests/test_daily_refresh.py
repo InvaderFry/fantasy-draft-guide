@@ -11,8 +11,10 @@ like one that ran this morning -- which is why the sheet carries the capture dat
 and why these assertions exist at all.
 """
 
+import re
 from pathlib import Path
 
+import pytest
 import yaml
 
 from pipeline.cli import MARKET_DEPENDENT_MODULES, research_modules
@@ -27,6 +29,10 @@ def _workflow() -> dict:
 
 def _run_script(job: str) -> str:
     return "\n".join(s.get("run", "") for s in _workflow()["jobs"][job]["steps"])
+
+
+def _step_names(job: str) -> list[str]:
+    return [s.get("name") or s.get("uses", "") for s in _workflow()["jobs"][job]["steps"]]
 
 
 def test_every_module_the_refresh_asks_for_exists():
@@ -71,9 +77,13 @@ def test_the_carried_forward_artifacts_are_committed():
 
 
 def test_the_refresh_writes_the_live_edition_and_not_a_dated_one():
-    """A dated edition would move the phone URL every morning."""
-    script = _run_script("sheets")
-    assert script.count(f"--edition {LIVE_EDITION}") == 2  # run-research and sheet
+    """A dated edition would move the phone URL every morning.
+
+    Every `--edition` in the job, not a count of them: the job gains steps, and a
+    count is a test that fails for the wrong reason when it does.
+    """
+    editions = set(re.findall(r"--edition (\S+)", _run_script("sheets")))
+    assert editions == {LIVE_EDITION}
 
 
 def test_a_failed_refresh_cannot_cost_a_capture_day():
@@ -118,3 +128,39 @@ def test_an_already_captured_day_does_not_fail_the_archive():
     script = _run_script("capture")
     assert "nothing new to commit" in script
     assert "::error::no snapshot files were produced" not in script
+
+
+def test_the_gate_stands_between_the_render_and_the_commit():
+    """The ordering IS the mechanism (S83).
+
+    `run-research` exits 0 on a blocked module -- for a dated edition a shut gate
+    is a finding -- so a morning the projection capture fails renders 26 sheets
+    reading BLOCKED and commits them over the good ones with nothing going red.
+    A failed step skips the commit, and that is the only thing standing between a
+    rotated API key and an unusable board at a draft table.
+    """
+    script = _run_script("sheets")
+    assert f"refresh-check --edition {LIVE_EDITION}" in script
+
+    names = _step_names("sheets")
+    render = next(i for i, n in enumerate(names) if "Refresh the draft board" in n)
+    gate = next(i for i, n in enumerate(names) if "degraded" in n)
+    commit = next(i for i, n in enumerate(names) if "Commit" in n)
+    assert render < gate < commit
+
+
+def test_the_committed_board_is_not_blocked():
+    """The live sheets, as they stand in the repository right now.
+
+    Turns "the board somebody will open at the draft is broken" into a red test on
+    every push, rather than a red scheduled run at 11:00 UTC that nobody reads
+    until the draft.
+    """
+    from research import refresh
+
+    sheets = WORKFLOW.parent.parent.parent / "artifacts" / LIVE_EDITION / "sheets"
+    pages = sorted(p for p in sheets.glob("*.html") if p.name != "index.html")
+    if not pages:
+        pytest.skip("no live sheets committed")
+    broken = {p.name: refresh.blocked_sections(p.read_text()) for p in pages}
+    assert not {k: v for k, v in broken.items() if v}

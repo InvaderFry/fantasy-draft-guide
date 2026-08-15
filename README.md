@@ -19,6 +19,7 @@ Built here:
 | ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires — followed by a second job that re-renders the sheets from it |
 | Preseason bundle | §84, §86 | the second capture program: nflverse depth charts, rosters and injuries archived before Week 1, on a cadence the code decides |
 | Price movement | §31.3 | what the archive is *for*: how each price has moved since the prior capture, marked on the board and in the pick blocks |
+| Refresh gate | §83 | the daily job refuses to publish a board worse than the one it would replace |
 | nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play, schedules |
 | ID normalization | §12 | `gsis_id` canonical, crosswalk + labelled name matching |
 | Canonical tables | §13 | `player_week`, `player_season` (+ outcomes), `team_season`, `adp_history`, `projection_snapshot`, `draft_pick` |
@@ -350,6 +351,49 @@ make sheet SLOT=7            # rewrites that seat only, leaves the other 11 alon
 
 Set `draft_slot: 7` in the profile instead if the order is drawn well in advance:
 the league then gets a single `half_ppr_12.html` and no per-slot fan-out.
+
+### What stops the refresh publishing a broken board
+
+The refresh runs unattended and nobody opens its output until the draft, which is
+the argument for it existing and also the reason it can quietly destroy the thing
+it maintains. Every step below works as designed:
+
+* `run-research` treats a blocked module as a **finding, not a failure**, and
+  exits 0 — correct, because §19.3 is blocked by design until its gates open;
+* `artifacts/2026-draft/methods/**` is gitignored bar the two carried-forward
+  artifacts, so a fresh runner has **no previous board to fall back on**;
+* a section with no artifact behind it renders `BLOCKED` — deliberately, because
+  a blank space on a draft sheet is worse;
+* the commit step fires on any change under `artifacts/2026-draft`.
+
+So the morning a projection key rotates, the job renders 26 pages whose TIERS and
+SURVIVAL read BLOCKED and commits them over the good ones, and nothing goes red.
+The index banner cannot see it either: it compares the **ADP** capture date, and
+ADP was fine.
+
+`research refresh-check` sits between the render and the commit, and **that
+ordering is the whole mechanism** — a failed step skips the commit. It refuses on
+either kind of downgrade:
+
+| | |
+|---|---|
+| **A blocked section** | any rendered sheet where TIERS, REGRESSION or SURVIVAL says `BLOCKED`. `NOT BUILT` is not a finding: TARGETS, DARTS and FALSE FRIENDS say so honestly and will until §79. |
+| **A board that thinned** | any tracked count down more than **20%** against the last run that passed — 493 projected players arriving as 40, or 183 priced arriving as 60. The floors cannot see this: the tier list is capped at twelve a position, so a tenth of a board still prints a full-looking page. |
+
+The baseline lives in `artifacts/2026-draft/refresh_state.json`, written **only
+when the check passes**, which is what makes it a record of the last *good* board
+rather than of the last board. Without that rule one bad morning becomes the
+standard every later morning is measured against.
+
+**When it reds, the right thing has already happened.** Yesterday's complete
+sheets are still committed, still openable from a phone, and they say on their
+own face that they are priced from an older capture. Stale-but-complete beats
+fresh-but-blocked: a sheet that admits it is two days old is one you can still
+draft from. Read the run log, fix the capture, and let the next refresh land.
+
+A test asserts the same thing about the sheets in the repository right now, so a
+broken board is a red test on every push rather than a red scheduled run nobody
+reads until draft day.
 
 ### The date to look at on the sheet
 

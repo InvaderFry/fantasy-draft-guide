@@ -7,6 +7,7 @@
     research run-research  run the S16 method modules (S47 stage 8)
     research sheet         render the S83 draft-day sheets
     research preseason-status  report the S84 preseason bundle (S84, S86)
+    research refresh-check     refuse to publish a degraded draft board (S83)
     research validate      re-hash snapshots and run the data/leakage checks
 
 Later stages -- evidence grading and the site -- are not implemented in this
@@ -800,6 +801,93 @@ def _preseason_report(today: dt.date | None = None) -> list[tuple[str, bool]]:
             )
         )
     return out
+
+
+@app.command("refresh-check")
+def refresh_check(
+    edition: Annotated[str, typer.Option(help="edition just rendered, e.g. 2026-draft")] = "",
+    write: Annotated[
+        bool, typer.Option(help="record this run as the board to be no worse than")
+    ] = True,
+) -> None:
+    """Refuse to publish a draft board worse than the one it replaces (S83).
+
+    Runs between the render and the commit. A blocked module exits 0 from
+    `run-research` on purpose -- for a dated edition it is a finding -- so the
+    knowledge that the LIVE board must not be blocked lives here, in the one
+    command allowed to red the job whose damage it prevents.
+
+    When this fails, nothing is committed and yesterday's complete sheets stay
+    where they are, already carrying the banner that says they are not today's.
+    """
+    from research import method as method_mod
+    from research import refresh
+    from research import sheet as sheet_mod
+
+    edition_name = edition or method_mod.default_edition()
+    # One root, looked up at call time and threaded through, so the whole command
+    # can be driven over a temporary edition in a test.
+    root = method_mod.ARTIFACT_DIR
+    profiles = [p for p in config.real_profiles() if config.validate_profile(p)]
+    arts = sheet_mod.load_artifacts(edition_name, root)
+
+    problems: list[str] = []
+
+    blocked = refresh.blocked_pages(edition_name, root)
+    if blocked:
+        # Aggregated: every sheet fails the same way when an artifact is missing,
+        # and twenty-six identical lines in a CI log bury the one thing that
+        # differs. Section, count, and a name to open.
+        by_section: dict[str, list[str]] = {}
+        for filename, sections in sorted(blocked.items()):
+            for name in sections:
+                by_section.setdefault(name, []).append(filename)
+        for name, files in by_section.items():
+            problems.append(
+                f"{name} is BLOCKED on {len(files)} sheet(s), e.g. {files[0]}"
+            )
+    if not blocked:
+        checked = [
+            p
+            for p in refresh.sheets_dir(edition_name, root).glob("*.html")
+            if p.name != "index.html"
+        ]
+        typer.echo(f"refresh: {len(checked)} sheet(s) checked, none blocked where content is due")
+
+    metrics = refresh.edition_metrics(arts, profiles)
+    for pid, entry in metrics.items():
+        typer.echo(
+            f"refresh: {pid} -- {entry.get('priced')} priced of {entry.get('board_rows')} "
+            f"on the board, {entry.get('survival_slots')} slot(s), "
+            f"capture {entry.get('adp_snapshot_date')}"
+        )
+
+    baseline = refresh.read_state(edition_name, root)
+    if baseline is None:
+        typer.echo("refresh: no previous good run to compare against -- floors only")
+    else:
+        problems.extend(refresh.regressions(metrics, baseline))
+
+    if problems:
+        for problem in problems:
+            typer.echo(f"refresh: {problem}", err=True)
+        typer.echo(
+            f"refusing to publish edition {edition_name}: the board this refresh produced is "
+            "worse than the one it would replace. Nothing has been committed, so the sheets "
+            "already published stand -- and they say on their own face that they are not "
+            "today's (S83). Fix the capture and let the next refresh land.",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    if write:
+        path = refresh.write_state(
+            edition_name,
+            metrics,
+            generated=dt.datetime.now(dt.UTC).date().isoformat(),
+            root=root,
+        )
+        typer.echo(f"refresh: recorded as the board to beat -> {path}")
 
 
 @app.command("preseason-status")

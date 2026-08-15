@@ -1,0 +1,196 @@
+"""The daily refresh must not publish a board worse than the one it replaces (S83, S84).
+
+Every piece of the refresh path works as designed, and together they can destroy
+the deliverable without anything going red:
+
+  * `run_research` treats a blocked module as a finding and exits 0 -- correct,
+    because S19.3 is blocked by design until its gates open;
+  * `artifacts/2026-draft/methods/**` is gitignored bar the two carried-forward
+    artifacts, so a fresh runner has no previous board to fall back on;
+  * `sheet.py` renders a section with no artifact behind it as BLOCKED --
+    deliberately, because a blank space on a draft sheet is worse;
+  * the workflow commits whatever changed under `artifacts/2026-draft`.
+
+So the morning a projection key rotates, the job renders 26 pages whose TIERS and
+SURVIVAL say BLOCKED and commits them over the good ones, at 11:00 UTC, with
+nobody looking until the draft. The index banner cannot see it either: it
+compares the ADP capture date, and ADP was fine.
+
+This module is the measurement that sits between the render and the commit. When
+it refuses, the job reds and yesterday's complete sheets stay where they are,
+already carrying the banner that says they are not today's. **Stale-but-complete
+beats fresh-but-blocked** -- a sheet that admits it is two days old is still a
+sheet somebody can draft from, and BLOCKED is not.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+from typing import Any
+
+from research.method import ARTIFACT_DIR
+
+# Sections that must carry content on the live board. TARGETS, DARTS and FALSE
+# FRIENDS are honestly NOT BUILT (S79) and say so on the page; only BLOCKED means
+# "this should have content and does not". AVOIDS is absent from the list because
+# it degrades to NOT BUILT rather than to BLOCKED and so can never trip this.
+SECTIONS_REQUIRING_CONTENT = ("TIERS", "REGRESSION", "SURVIVAL")
+
+# How far a tracked count may fall before the refresh is treated as a downgrade.
+#
+# Twenty percent, relative, committed here with its reasoning rather than fitted
+# to a run that has already happened (S80): a board that lost a fifth of its
+# priced players lost something structural, not a couple of retirements. This is
+# the half the floors cannot see -- 493 projected players arriving as 40, or 183
+# priced arriving as 60, still renders a full-looking page.
+MAX_DROP = 0.20
+
+STATE_FILENAME = "refresh_state.json"
+
+_SECTION = re.compile(r"<section><h3>(?P<name>[A-Z ]+?)\s*<span", re.S)
+_BLOCKED = "<strong>BLOCKED.</strong>"
+
+
+def blocked_sections(page: str) -> list[str]:
+    """Sections of a rendered sheet that say BLOCKED where content is expected."""
+    out = []
+    for chunk in page.split("<section>")[1:]:
+        m = _SECTION.match("<section>" + chunk)
+        if m is None:
+            continue
+        name = m.group("name").strip()
+        if name in SECTIONS_REQUIRING_CONTENT and _BLOCKED in chunk:
+            out.append(name)
+    return out
+
+
+def sheets_dir(edition: str, root: Path | None = None) -> Path:
+    return (root or ARTIFACT_DIR) / edition / "sheets"
+
+
+def blocked_pages(edition: str, root: Path | None = None) -> dict[str, list[str]]:
+    """Every rendered sheet in the edition that carries a blocked section."""
+    directory = sheets_dir(edition, root)
+    out: dict[str, list[str]] = {}
+    if not directory.exists():
+        return out
+    for path in sorted(directory.glob("*.html")):
+        if path.name == "index.html":  # a chooser, it carries no sections
+            continue
+        blocked = blocked_sections(path.read_text())
+        if blocked:
+            out[path.name] = blocked
+    return out
+
+
+def edition_metrics(
+    artifacts: dict[str, dict[str, Any]], profiles: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """What this refresh produced, per league. Read, never recomputed.
+
+    Every number here already exists in the S16 artifacts the sheet was rendered
+    from; this only lifts the ones whose collapse would not be visible on the
+    page. A tier board with a tenth of its players prints twelve names a position
+    exactly like a healthy one -- the tier list is capped at twelve.
+    """
+    out: dict[str, Any] = {}
+    for profile in profiles:
+        pid = profile["id"]
+        entry: dict[str, Any] = {}
+        tiers = (artifacts.get(f"tiers_and_replacement_level__{pid}") or {}).get(
+            "primary_results"
+        )
+        if tiers:
+            coverage = tiers.get("adp_coverage") or {}
+            entry["board_rows"] = coverage.get("board_rows")
+            entry["priced"] = coverage.get("priced")
+            entry["priced_share"] = coverage.get("priced_share")
+            entry["adp_snapshot_date"] = coverage.get("adp_snapshot_date")
+            entry["tier_players"] = {
+                pos: len(block.get("players") or [])
+                for pos, block in (tiers.get("positions") or {}).items()
+            }
+        survival = (artifacts.get(f"survival_probability__{pid}") or {}).get("primary_results")
+        if survival:
+            entry["survival_slots"] = len(survival.get("by_slot") or [])
+            entry["players_priced"] = survival.get("players_priced")
+            entry["players_with_spread"] = survival.get("players_with_spread")
+        out[pid] = entry
+    return out
+
+
+# Counts whose fall means the board thinned. `priced_share` is deliberately not
+# here: it moves when the provider adds players the market has not quoted, which
+# is a wider board rather than a worse one.
+TRACKED = ("board_rows", "priced", "survival_slots", "players_priced", "players_with_spread")
+
+
+def regressions(metrics: dict[str, Any], baseline: dict[str, Any] | None) -> list[str]:
+    """What fell by more than MAX_DROP since the last refresh that passed.
+
+    A profile the baseline does not know is skipped rather than failed: adding a
+    league is not a regression, and neither is dropping one.
+    """
+    if not baseline:
+        return []
+    out = []
+    for pid, now in metrics.items():
+        before = (baseline.get("profiles") or {}).get(pid)
+        if not before:
+            continue
+        for key in TRACKED:
+            out.extend(_drop(pid, key, before.get(key), now.get(key)))
+        was = before.get("tier_players") or {}
+        for pos, count in (now.get("tier_players") or {}).items():
+            out.extend(_drop(pid, f"tier_players.{pos}", was.get(pos), count))
+    return out
+
+
+def _drop(pid: str, key: str, before: Any, now: Any) -> list[str]:
+    if not isinstance(before, (int, float)) or not before:
+        return []
+    if not isinstance(now, (int, float)):
+        return [f"{pid}: {key} was {before} and this refresh produced nothing"]
+    if now >= before * (1 - MAX_DROP):
+        return []
+    return [f"{pid}: {key} fell {before} -> {now} ({1 - now / before:.0%} down)"]
+
+
+def state_path(edition: str, root: Path | None = None) -> Path:
+    return (root or ARTIFACT_DIR) / edition / STATE_FILENAME
+
+
+def read_state(edition: str, root: Path | None = None) -> dict[str, Any] | None:
+    path = state_path(edition, root)
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError:
+        # A corrupt baseline must not red the refresh forever, and it must not be
+        # silently trusted either. Treated as no baseline; the floors still hold.
+        return None
+
+
+def write_state(
+    edition: str, metrics: dict[str, Any], *, generated: str, root: Path | None = None
+) -> Path:
+    """Record this refresh as the one to be no worse than.
+
+    Written only on a run that passed, which is what makes the file a record of
+    the last GOOD board rather than of the last board -- otherwise one bad
+    morning becomes the new baseline and the degradation is permanent.
+    """
+    path = state_path(edition, root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(
+            {"edition": edition, "checked": generated, "profiles": metrics},
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+    return path
