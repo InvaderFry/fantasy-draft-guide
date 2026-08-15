@@ -705,8 +705,7 @@ def write(
             seats_by_profile[profile["id"]] = []
             continue
 
-        seats = slots_to_render(profile, slot)
-        for seat in seats:
+        for seat in slots_to_render(profile, slot):
             path = directory / slot_filename(profile["id"], seat)
             path.write_text(render(edition, profile=profile, slot=seat, artifacts=arts))
             written.append(path)
@@ -717,7 +716,18 @@ def write(
             path = directory / f"{profile['id']}.html"
             path.write_text(render(edition, profile=profile, artifacts=arts))
             written.append(path)
-            seats_by_profile[profile["id"]] = seats
+
+        # Every seat this profile HAS a page for, not the one this call
+        # rewrote. The index is rebuilt either way, and read from the seats
+        # written here it lost the other eleven links on `--slot 7` -- the
+        # draft-hour path, so the chooser broke in the hour it exists for.
+        # Filtered by what is on disk so a targeted refresh into an empty
+        # directory links only the page it just wrote, never a dead file.
+        seats_by_profile[profile["id"]] = [
+            seat
+            for seat in slots_to_render(profile)
+            if (directory / slot_filename(profile["id"], seat)).exists()
+        ]
 
     if profiles and any(p is not None for p in profiles):
         written.append(write_index(directory, edition, profiles, seats_by_profile))
