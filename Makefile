@@ -1,4 +1,4 @@
-.PHONY: setup ingest ids tables research sheet validate test lint snapshot all
+.PHONY: setup ingest ids tables research sheet validate test lint snapshot preseason all
 
 SEASONS ?= 2012-2025
 
@@ -19,6 +19,13 @@ tables:
 # Fantasy Football Calculator.
 snapshot:
 	uv run research snapshot --sources ffc,projections
+
+# S84's second capture program: the preseason state, taken once before Week 1.
+# Normally run by GitHub Actions daily; the command itself decides whether today
+# is a capture day (pipeline/preseason.py) and exits 0 when it is not.
+# `research preseason-status` reports what the archive holds.
+preseason:
+	uv run research snapshot --sources nflverse-preseason
 
 research:
 	uv run research run-research

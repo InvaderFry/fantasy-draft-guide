@@ -132,6 +132,22 @@ CORE_DATASETS = (
 )
 STATIC_DATASETS = ("players", "draft_picks", "combine")
 
+# S84's second capture: "also capture, once, before Week 1". These four files
+# describe the preseason state -- who is on which roster, at what depth, and
+# carrying which designation -- and upstream rewrites each of them all season.
+# What the 2026 chart said in August is observable in August and is nobody's
+# guarantee in January, which is why it is archived rather than re-downloaded.
+PRESEASON_DATASETS = ("depth_charts", "rosters", "weekly_rosters", "injuries")
+
+
+@dataclass(frozen=True)
+class Unavailable:
+    """A dataset the source did not serve, kept so a skip can be reported by name."""
+
+    dataset: str
+    season: int | None
+    error: str
+
 
 class NflverseAdapter:
     """Fetches nflverse release assets for a season range."""
@@ -151,6 +167,8 @@ class NflverseAdapter:
             raise ValueError(f"unknown nflverse datasets: {unknown}. Known: {sorted(DATASETS)}")
         self.datasets = [DATASETS[n] for n in names]
         self.meta = source(SOURCE_NAME)
+        # Populated by `fetch(skip_missing=True)`; see its docstring.
+        self.unavailable: list[Unavailable] = []
 
     def raw_dir(self) -> Path:
         return RAW_DIR / "nflverse"
@@ -197,15 +215,31 @@ class NflverseAdapter:
             f"no location served {ds.name} for season {season}. Tried:\n  " + "\n  ".join(errors)
         )
 
-    def fetch(self) -> list[Fetched]:
+    def fetch(self, *, skip_missing: bool = False) -> list[Fetched]:
         """Adapter protocol: return payloads for snapshotting.
 
-        Used for the small static tables (players, draft_picks, combine) that
-        an edition should pin. Per-season bulk files go through `download`.
+        Used for the small static tables (players, draft_picks, combine) that an
+        edition should pin, and for the S84 preseason bundle. Per-season bulk
+        files go through `download`.
+
+        ``skip_missing`` is for a bundle captured on a date the source has not
+        finished publishing for. nflverse serves `injuries_{season}` only once
+        the season's injury reports begin, so in August a 404 there is a fact
+        about the source and not a broken capture -- one absent file must not
+        cost the three that are available, because those are the ones that
+        expire. Misses land on ``self.unavailable`` for the caller to report;
+        they are never silent.
         """
+        self.unavailable = []
         out: list[Fetched] = []
         for ds, season in self.targets():
-            data, url = self._fetch_first(ds, season)
+            try:
+                data, url = self._fetch_first(ds, season)
+            except FetchError as exc:
+                if not skip_missing:
+                    raise
+                self.unavailable.append(Unavailable(ds.name, season, str(exc)))
+                continue
             out.append(
                 Fetched(
                     filename=ds.local_name(season),

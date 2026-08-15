@@ -73,6 +73,43 @@ questions:
       no live capture before that date and those days of intra-summer price
       movement are not purchasable retroactively (S84).
 
+  - id: nflverse_preseason_injuries_published
+    question: >
+      Does nflverse publish injury designations for a season before that
+      season's Week 1, or does injuries_{season}.parquet only begin once the
+      regular season does? S84's preseason bundle names "preseason injury
+      designations" as one of the four things to capture before Week 1, and a
+      thing that is never published cannot be captured.
+    type: source_resolution           # not a statistical question
+    blocks:
+      - S15.1 availability decomposition
+      - S84 preseason bundle
+      - S86 role signals knowable at the decision date
+    decision_change: >
+      Whether an injury designation carried into the draft is a feature the
+      2027 build can use at the 2026 decision date, or whether the earliest
+      designation any season has is dated after every draft -- in which case
+      S15.1 availability has no preseason input at all and must say so rather
+      than quietly starting from Week 1.
+    resolution_method: >
+      The preseason-bundle workflow requests injuries_{season} on every capture
+      day between the decision date and Week 1. A 404 is recorded by name in the
+      run log; a payload lands in data/snapshots/<date>/ and its earliest
+      designation date answers the question from data. Both are answers, and the
+      capture is written not to treat the first as a failure.
+    status: OPEN
+    evidence_so_far: >
+      2026-08-15: injuries_2026.parquet 404s at the release asset URL while
+      depth_charts_2026, roster_2026 and roster_weekly_2026 all serve. That is
+      consistent with the file being created when the season's first injury
+      report is filed, but one date two weeks before Week 1 does not distinguish
+      "not yet" from "not ever", which is why the capture keeps asking.
+    kill_rule: >
+      If no injuries file exists for the season by the day before Week 1, the
+      question is answered NO for 2026: record it, and let S15.1 state that
+      preseason injury designations are unavailable rather than modelling
+      around an absence nobody wrote down.
+
   - id: team_scoring_regression
     question: >
       Do team touchdown totals regress toward a yardage/opportunity-implied

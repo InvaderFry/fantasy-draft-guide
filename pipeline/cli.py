@@ -6,6 +6,7 @@
     research build-tables  build the canonical tables (S13)
     research run-research  run the S16 method modules (S47 stage 8)
     research sheet         render the S83 draft-day sheets
+    research preseason-status  report the S84 preseason bundle (S84, S86)
     research validate      re-hash snapshots and run the data/leakage checks
 
 Later stages -- evidence grading and the site -- are not implemented in this
@@ -14,6 +15,7 @@ chunk. See S79 Steps 4+.
 
 from __future__ import annotations
 
+import dataclasses
 import datetime as dt
 import json
 import sys
@@ -23,7 +25,7 @@ from typing import Annotated, Any
 import polars as pl
 import typer
 
-from pipeline import config, snapshot
+from pipeline import config, preseason, snapshot
 from pipeline.ingest import fantasypros, ffc_adp, nflverse, projections_csv
 from pipeline.ingest.base import Fetched
 from pipeline.normalize import player_ids
@@ -49,10 +51,21 @@ def _parse_seasons(spec: str) -> list[int]:
 # the `snapshot` module it calls into.
 def snapshot_(
     sources: Annotated[
-        str, typer.Option("--sources", help="comma list: ffc,projections,nflverse-static")
+        str,
+        typer.Option(
+            "--sources",
+            help="comma list: ffc,projections,nflverse-static,nflverse-preseason",
+        ),
     ] = "ffc",
     date: Annotated[str, typer.Option(help="snapshot date, default today (UTC)")] = "",
     season: Annotated[int, typer.Option(help="season the capture describes")] = 0,
+    force: Annotated[
+        bool,
+        typer.Option(
+            "--force",
+            help="capture the S84 preseason bundle even on a day its cadence says to skip",
+        ),
+    ] = False,
 ) -> None:
     """Capture raw sources into an immutable dated snapshot (S65, S84).
 
@@ -80,6 +93,11 @@ def snapshot_(
             payloads = nflverse.NflverseAdapter(
                 seasons=[year], datasets=list(nflverse.STATIC_DATASETS)
             ).fetch()
+        elif name == "nflverse-preseason":
+            payloads = _preseason_bundle(year, snap_date=snap_date, force=force)
+            if payloads is None:
+                held.setdefault("not_due", []).append("nflverse-preseason")
+                continue
         else:
             raise typer.BadParameter(f"unknown source '{name}'")
 
@@ -120,7 +138,7 @@ def snapshot_(
 
 # Categories that account for an unwritten payload without a day being lost. The
 # capture either is already in hand or does not exist yet at the source.
-BENIGN_HOLDS = ("already_captured", "superseded", "unchanged", "not_yet_published")
+BENIGN_HOLDS = ("already_captured", "superseded", "unchanged", "not_yet_published", "not_due")
 
 
 def _classify(
@@ -213,6 +231,8 @@ def _report_nothing_written(
         parts.append(f"{len(held['unchanged'])} unchanged at the source")
     if held.get("not_yet_published"):
         parts.append(f"{len(held['not_yet_published'])} not yet published for this date")
+    if held.get("not_due"):
+        parts.append(f"{len(held['not_due'])} not due today")
     if skipped:
         parts.append(f"skipped: {', '.join(skipped)}")
 
@@ -236,6 +256,70 @@ def _as_date(value: Any) -> dt.date | None:
         return dt.date.fromisoformat(value) if value else None
     except (TypeError, ValueError):
         return None
+
+
+def _preseason_bundle(
+    season: int, *, snap_date: dt.date, force: bool
+) -> list[Fetched] | None:
+    """S84's second capture: the preseason state, taken once before Week 1.
+
+    Returns None when today is not a capture day, which is a report and not a
+    failure -- the cadence exists so this job can run daily without adding 3 MB a
+    day to the archive. `pipeline.preseason` holds the policy; this function only
+    fetches what the policy asked for and says what the source did not serve.
+    """
+    status = preseason.bundle_status(season)
+    opener = preseason.season_opener(season, allow_fetch=True)
+    reason = preseason.capture_due(
+        snap_date, last_capture=status.last_capture, decision=status.decision, opener=opener
+    )
+    if reason is None and force:
+        reason = "forced"
+    if reason is None:
+        last = status.last_capture
+        closed = preseason.window_closed(snap_date, opener)
+        why = (
+            f"the season opened {opener} and there is no preseason left to capture"
+            if closed
+            else f"last capture {last}, decision date {status.decision}, "
+            f"week 1 {opener or 'unknown'}"
+        )
+        typer.echo(f"preseason bundle: not due on {snap_date} -- {why} (S84).")
+        return None
+
+    # The static tables are pinned once (S65), not re-filed weekly: they are 4.5 MB
+    # and they do not describe the preseason, they identify the players in it.
+    static = [
+        name
+        for name in nflverse.STATIC_DATASETS
+        if not status.captures.get(nflverse.DATASETS[name].local_name(None))
+    ]
+    datasets = [*nflverse.PRESEASON_DATASETS, *static]
+    typer.echo(
+        f"preseason bundle: capturing {snap_date} ({reason}) -- {', '.join(datasets)} (S84)"
+    )
+
+    adapter = nflverse.NflverseAdapter(seasons=[season], datasets=datasets)
+    payloads = adapter.fetch(skip_missing=True)
+    for miss in adapter.unavailable:
+        # Named, never silent. In August `injuries_{season}` is genuinely not
+        # published yet -- that is an answer about the source (see
+        # `nflverse_preseason_injuries_published` in research/questions.yaml), and
+        # it must not cost the files that are available.
+        typer.echo(f"preseason bundle: {miss.dataset} not served -- {miss.error}", err=True)
+
+    return [
+        dataclasses.replace(
+            f,
+            extra={
+                **(f.extra or {}),
+                "capture_reason": reason,
+                "decision_date": status.decision.isoformat(),
+                "week1_start": opener.isoformat() if opener else None,
+            },
+        )
+        for f in payloads
+    ]
 
 
 def _fetch_projections(season: int) -> list | None:
@@ -621,6 +705,123 @@ def draft_review(
         typer.echo(f"{artifact.method_id}: {results['n']} held pick(s) -> {path}")
 
 
+def _preseason_report(today: dt.date | None = None) -> list[tuple[str, bool]]:
+    """What the S84 preseason bundle holds, and whether that is still acceptable.
+
+    Reads the archive only -- no network -- so `make validate` works offline.
+
+    Two boundaries, not one. Before the decision date an uncaptured bundle is work
+    not yet due. Between the decision date and Week 1 it is an actionable alarm --
+    a capture on August 30 describes very nearly the roster August 29 did, so the
+    fix is to run it. From Week 1 it is neither: nflverse has begun rewriting these
+    files for the season and no run recovers what they said in August, so it is
+    reported as a permanent gap rather than as a job to redo forever.
+    """
+    today = today or dt.datetime.now(dt.UTC).date()
+    # Same rule as `snapshot_`: the season being captured is the current year
+    # unless a caller says otherwise.
+    season = today.year
+    try:
+        status = preseason.bundle_status(season)
+    except config.ConfigError as exc:
+        return [(f"preseason bundle: {exc}", False)]
+
+    held = [
+        f"{name} {dates[-1]}" if dates else f"{name} NOT CAPTURED"
+        for name, dates in status.captures.items()
+    ]
+    week1 = status.opener.isoformat() if status.opener else "unknown (no games.csv on disk)"
+    out = [(f"preseason bundle ({season}): {', '.join(held)}; week 1 {week1} (S84)", True)]
+
+    if status.has_decision_date_capture:
+        out.append((f"preseason bundle: decision-date capture ({status.decision}) present", True))
+    elif today <= status.decision:
+        out.append(
+            (
+                f"preseason bundle: no decision-date capture yet -- due {status.decision}",
+                True,
+            )
+        )
+    elif preseason.window_closed(today, status.opener):
+        out.append(
+            (
+                f"preseason bundle: the {season} decision date ({status.decision}) passed "
+                f"with no capture on it, and week 1 opened {status.opener}. The preseason "
+                f"state as the {season} draft saw it is gone; {season} enters next "
+                "edition's research with the missing preseason context S84 exists to "
+                "prevent. Recorded, not actionable.",
+                True,
+            )
+        )
+    else:
+        out.append(
+            (
+                f"preseason bundle: NO capture on the {season} decision date "
+                f"({status.decision}), and it is now {today}. S6.1 dates every {season} "
+                "feature to that day. Capture now: a bundle taken this week still "
+                "describes very nearly that roster, and once week 1 opens nothing does "
+                "(S84).",
+                False,
+            )
+        )
+
+    coverage = preseason.depth_chart_coverage(season)
+    if coverage is None:
+        return out
+    if coverage.usable:
+        out.append(
+            (
+                f"preseason bundle: depth chart captured {coverage.captured} carries "
+                f"{coverage.rows:,} rows published on or before {status.decision}, "
+                f"latest {coverage.latest_chart} (S86)",
+                True,
+            )
+        )
+    elif coverage.error:
+        out.append(
+            (
+                f"preseason bundle: the depth chart captured {coverage.captured} does "
+                f"not read as parquet -- {coverage.error}. The manifest hash proves "
+                "these are the bytes that were fetched, not that they are a depth "
+                "chart (S84).",
+                False,
+            )
+        )
+    else:
+        # Captured cleanly and worth nothing to S86 -- the same shape of defect as
+        # a projection stat map that maps onto the wrong columns and still computes.
+        out.append(
+            (
+                f"preseason bundle: the depth chart captured {coverage.captured} holds "
+                f"no chart published on or before {status.decision}, so "
+                "`depth_chart_rank_preseason` stays null for the season the capture "
+                "was taken for (S86, S6.1).",
+                False,
+            )
+        )
+    return out
+
+
+@app.command("preseason-status")
+def preseason_status(
+    date: Annotated[str, typer.Option(help="evaluate as of this date, default today (UTC)")] = "",
+) -> None:
+    """Report the S84 preseason bundle, and fail while the gap is still fixable.
+
+    Separate from `validate` on purpose: this is the one check that should red a
+    job, and the job it should red is the one that captures the bundle -- not the
+    ADP archive, which runs `validate` between capturing a day of price movement
+    and committing it.
+    """
+    today = dt.date.fromisoformat(date) if date else dt.datetime.now(dt.UTC).date()
+    failed = False
+    for message, ok in _preseason_report(today):
+        typer.echo(message, err=not ok)
+        failed = failed or not ok
+    if failed:
+        raise typer.Exit(code=1)
+
+
 @app.command()
 def validate() -> None:
     """Re-hash snapshots and run schema + leakage checks."""
@@ -654,6 +855,13 @@ def validate() -> None:
         typer.echo(f"league profiles: {exc}", err=True)
 
     typer.echo(f"projections: {_projection_status()}")
+
+    # Reported, never failed here. `validate` runs inside the ADP archive job
+    # between the capture and the commit, so anything that exits non-zero from it
+    # is a reason a captured day of price movement does not get committed (S84).
+    # `research preseason-status` is the gate, and it runs in its own workflow.
+    for message, _ok in _preseason_report():
+        typer.echo(message)
 
     from pipeline.features import checks
 

@@ -1,0 +1,105 @@
+# S84's second capture program: the preseason bundle.
+#
+#   Also capture, once, before Week 1:
+#     preseason depth charts (S86), preseason injury designations,
+#     final preseason ADP for every format, projection snapshots
+#
+# ADP and projections are captured daily by adp-archive.yml, so their final
+# preseason value is that job's last run before Week 1. This one captures the
+# nflverse half, which is archived nowhere else: those files live in data/raw/
+# (gitignored, re-downloadable) and upstream rewrites every one of them across
+# the season. What the 2026 depth chart said in August is observable in August.
+#
+# A SEPARATE WORKFLOW, not another job in adp-archive.yml, for the reason that
+# file already gives for splitting its sheets job out: a day of ADP movement is
+# unrecoverable and must not share a failure with anything that is not. Nothing
+# here can red the job that captures the prices.
+
+name: Preseason bundle
+
+on:
+  schedule:
+    # Daily, and deliberately not at the archive's hours -- both jobs commit to
+    # main and there is no reason to make them race. The command decides whether
+    # today is a capture day (pipeline/preseason.py): the decision date always,
+    # the day before week 1 always, otherwise at most weekly. A day that is not
+    # a capture day reports why and exits 0, which is what makes a daily cron
+    # affordable at ~3 MB a capture.
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+    inputs:
+      season:
+        description: "Season the capture describes (default: current year)"
+        required: false
+        type: string
+      force:
+        description: "Capture even on a day the cadence would skip"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: preseason-bundle
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      # main, explicitly: the archive lands on the default branch whatever ref a
+      # manual dispatch was launched from.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install project
+        run: uv sync
+
+      - name: Capture the preseason bundle
+        # nflverse serves `injuries_{season}` only once the season's injury
+        # reports begin, so in August that asset 404s. The capture reports it by
+        # name and keeps the three that ARE published -- those are the ones that
+        # expire (see `nflverse_preseason_injuries_published` in
+        # research/questions.yaml).
+        run: |
+          uv run research snapshot \
+            --sources nflverse-preseason \
+            ${{ inputs.season && format('--season {0}', inputs.season) || '' }} \
+            ${{ inputs.force && '--force' || '' }}
+
+      - name: Verify hashes
+        run: uv run research validate
+
+      - name: Commit the bundle
+        run: |
+          if [ -z "$(git status --porcelain data/snapshots)" ]; then
+            echo "nothing new to capture - the capture step reported why and exited 0"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/snapshots
+          git commit -m "Preseason bundle: $(date -u +%Y-%m-%d) [skip ci]"
+          for attempt in 1 2 3 4; do
+            git pull --rebase origin main && git push origin main && exit 0
+            sleep $((2 ** attempt))
+          done
+          exit 1
+
+      # Last, and after the commit, because this is the step allowed to fail.
+      # It reds the run from the day after the decision date until week 1 opens
+      # -- the window in which a missed capture is still worth taking, since a
+      # bundle taken that week describes very nearly the roster the draft saw.
+      # From week 1 it stops failing: nflverse has begun rewriting these files
+      # and no run recovers what they said in August, so it is reported as a
+      # permanent gap rather than as a job to redo forever.
+      - name: Check the decision-date capture
+        run: uv run research preseason-status
