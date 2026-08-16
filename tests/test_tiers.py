@@ -12,6 +12,7 @@ import polars as pl
 import pytest
 
 from pipeline import config
+from research.foundations import provider_agreement as agreement_mod
 from research.foundations import tiers
 
 # 12-team, 2RB/3WR/1TE/1QB + 1 FLEX -- the shape of both real profiles.
@@ -444,8 +445,13 @@ def test_compute_produces_a_tiered_board_with_replacement_and_coverage():
 def test_one_provider_reports_that_it_has_no_error_bar():
     """S38.1's number is a spread between providers. With one there is none, and
     saying so beats a board that looks as certain as a consensus."""
-    dispersion = tiers.provider_dispersion(tiers.board(PROFILE, frame=_board()))
+    results = tiers.compute(tiers.board(PROFILE, frame=_board()), PROFILE)
+    dispersion = results["provider_dispersion"]
     assert dispersion["measurable"] is False
+    assert dispersion["reason"] == agreement_mod.NO_SECOND_PROVIDER
+    # ...and no player carries a label that would print as a mark.
+    rb = results["positions"]["RB"]["players"]
+    assert all(p["provider_agreement"] is None for p in rb)
 
 
 def test_the_artifact_claims_no_more_than_descriptive():
@@ -454,3 +460,111 @@ def test_the_artifact_claims_no_more_than_descriptive():
     assert artifact.claim_type == "DESCRIPTIVE"
     assert artifact.method_id.endswith("fixture_12")
     assert "evidence_grade" not in artifact.to_dict()
+
+
+# -- which provider the board is drawn from (S38.1) --------------------------
+
+
+def _relabel(frame: pl.DataFrame, provider: str) -> pl.DataFrame:
+    return frame.with_columns(pl.lit(provider).alias("provider_id"))
+
+
+def test_a_second_provider_cannot_take_over_the_board_by_sorting_first(monkeypatch):
+    """The defect S38.1's second capture would otherwise have introduced.
+
+    `chosen_provider` used to return `sorted(providers)[0]`. Archiving any
+    provider whose id sorts before the incumbent would have redrawn every tier,
+    every replacement level and every VOR on 26 sheets from a board nobody chose
+    -- and no row count falls, so `refresh-check`'s thinning gate is blind to it.
+    """
+    monkeypatch.setattr(tiers, "board_provider", lambda: "fantasypros")
+    incumbent = _relabel(_board(), "fantasypros")
+    usurper = _relabel(_board(), "aaa_sorts_first")
+
+    assert tiers.chosen_provider(pl.concat([incumbent, usurper])) == "fantasypros"
+
+
+def test_a_board_computed_beside_a_second_provider_is_the_same_board(monkeypatch):
+    """S38.1 and S80: the second provider is CARRIED, never blended in.
+
+    The value metric is `projected_points - replacement_points` and it must be
+    computed as if the other provider's rows were not in the frame. This is the
+    guarantee that would fail silently -- a board subtly shifted by a provider
+    nobody chose to rank on looks exactly like a board, and every number on it is
+    plausible.
+    """
+    monkeypatch.setattr(tiers, "board_provider", lambda: "fantasypros")
+    board = _relabel(_board(), "fantasypros")
+    # A second opinion that disagrees about everything, so blending could not
+    # possibly leave the arithmetic untouched.
+    other = _relabel(_board(points=lambda pos, i: 100 + i * 3), "other")
+
+    alone = tiers.compute(board, PROFILE)
+    beside = tiers.compute(board, PROFILE, other=other)
+
+    assert alone["replacement_points"] == beside["replacement_points"]
+    assert alone["positional_demand"] == beside["positional_demand"]
+    for pos in tiers.POSITIONS:
+        mine = alone["positions"][pos]["players"]
+        theirs = beside["positions"][pos]["players"]
+        assert [p["value_over_replacement"] for p in mine] == [
+            p["value_over_replacement"] for p in theirs
+        ]
+        assert [p["tier"] for p in mine] == [p["tier"] for p in theirs]
+        assert [p["player"] for p in mine] == [p["player"] for p in theirs]
+    # ...and the only thing that changed is the label carried beside the value.
+    assert all(p["provider_agreement"] is None for p in alone["positions"]["RB"]["players"])
+    assert any(
+        p["provider_agreement"] is not None for p in beside["positions"]["RB"]["players"]
+    )
+
+
+def test_the_second_providers_label_reaches_the_player_it_describes(monkeypatch):
+    """A mark against the wrong row is worse than no mark."""
+    monkeypatch.setattr(tiers, "board_provider", lambda: "fantasypros")
+    board = _relabel(_named_board(n=3), "fantasypros")
+    # Breece Hall is the disagreement: 295 against 200 is a cv well past S38.1's
+    # 0.15. The other two are within a point.
+    other = _relabel(
+        _named_board(n=3).with_columns(
+            pl.when(pl.col("source_player_name") == "Breece Hall")
+            .then(pl.lit(200.0))
+            .otherwise(pl.col("projected_points"))
+            .alias("projected_points")
+        ),
+        "other",
+    )
+
+    results = tiers.compute(board, PROFILE, other=other)
+    labels = {
+        p["player"]: p["provider_agreement"] for p in results["positions"]["RB"]["players"]
+    }
+    assert labels["Breece Hall"] == agreement_mod.LOW
+    assert labels["Bijan Robinson"] == agreement_mod.HIGH
+    assert results["provider_dispersion"]["measurable"] is True
+    assert results["provider_dispersion"]["range_points"]["low"] == 200.0
+
+
+def test_several_unconfigured_providers_refuse_rather_than_pick_one(monkeypatch):
+    """Picking one of several unconfigured boards is the original defect renamed."""
+    monkeypatch.setattr(tiers, "board_provider", lambda: "fantasypros")
+    frame = pl.concat([_relabel(_board(), "cbs"), _relabel(_board(), "espn")])
+
+    with pytest.raises(tiers.BlockedError) as exc:
+        tiers.chosen_provider(frame)
+    assert "board_provider" in str(exc.value)
+
+
+def test_a_lone_unconfigured_provider_draws_the_board_and_says_so(monkeypatch):
+    """S83: stale-but-complete beats fresh-but-blocked.
+
+    Refusing here would render TIERS as BLOCKED across 26 sheets because a
+    provider was renamed. The board is drawn from the only archive there is and
+    the substitution is recorded, so it is readable rather than assumed.
+    """
+    monkeypatch.setattr(tiers, "board_provider", lambda: "fantasypros")
+    results = tiers.compute(_relabel(_board(), "fixture"), PROFILE)
+
+    assert results["provider"] == "fixture"
+    assert results["provider_selection"]["substituted"] is True
+    assert results["provider_selection"]["configured"] == "fantasypros"

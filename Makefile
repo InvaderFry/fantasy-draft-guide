@@ -1,5 +1,5 @@
 .PHONY: setup ingest ids tables research sheet fit validate test lint snapshot preseason \
-	draft-check draft-record draft-review all
+	projections-manual draft-check draft-record draft-review all
 
 SEASONS ?= 2012-2025
 
@@ -27,6 +27,17 @@ snapshot:
 # `research preseason-status` reports what the archive holds.
 preseason:
 	uv run research snapshot --sources nflverse-preseason
+
+# S38.1's second opinion. A manual provider export is a ONE-TIME preseason
+# capture, not a daily series: declare it under `projection_providers` in
+# config/sources.yaml, drop the file in data/raw/projections/, and run this once.
+# The dated snapshot it writes is the archival copy -- data/raw/ is gitignored,
+# so the snapshot is the only copy that survives a fresh checkout.
+#
+# Deliberately NOT part of the daily `snapshot` target: that one runs on a
+# runner, where data/raw/ does not exist.
+projections-manual:
+	uv run research snapshot --sources projections-manual
 
 research:
 	uv run research run-research

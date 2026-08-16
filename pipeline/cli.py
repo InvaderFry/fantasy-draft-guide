@@ -57,7 +57,10 @@ def snapshot_(
         str,
         typer.Option(
             "--sources",
-            help="comma list: ffc,projections,nflverse-static,nflverse-preseason",
+            help=(
+                "comma list: ffc,projections,projections-manual,nflverse-static,"
+                "nflverse-preseason"
+            ),
         ),
     ] = "ffc",
     date: Annotated[str, typer.Option(help="snapshot date, default today (UTC)")] = "",
@@ -91,6 +94,11 @@ def snapshot_(
             payloads = _fetch_projections(year)
             if payloads is None:
                 skipped.append("projections")
+                continue
+        elif name == "projections-manual":
+            payloads = _fetch_manual_projections()
+            if payloads is None:
+                skipped.append("projections-manual")
                 continue
         elif name == "nflverse-static":
             payloads = nflverse.NflverseAdapter(
@@ -348,6 +356,41 @@ def _fetch_projections(season: int) -> list | None:
     return adapter.fetch()
 
 
+def _fetch_manual_projections() -> list | None:
+    """The declared manual providers, captured *alongside* S11's live path.
+
+    `_fetch_projections` above is S11's FALLBACK ORDER: FantasyPros API first,
+    manual CSV only if the key is missing. That is the right rule for "give me a
+    projection source", and it is the wrong rule for S38.1, which needs a SECOND
+    opinion rather than a substitute one. With the key set -- it is a repository
+    secret, so it always is on the runner -- the fallback chain never reaches the
+    manual adapter, and the board can only ever have one provider on it.
+
+    Hence a separate source name rather than a wider `projections`:
+
+    * the daily archive job runs `--sources ffc,projections`, and the manual
+      export lives in gitignored `data/raw/`. Folding this in would raise
+      FileNotFoundError on a fresh runner checkout every single morning, which is
+      a lost day of ADP (S84) to buy nothing;
+    * a manual export is a ONE-TIME preseason capture, the same cadence as the
+      S84 bundle and the opposite of the daily price series;
+    * `_classify`'s `unchanged` rule already makes a second run of identical bytes
+      a benign no-op, so the command stays safe to re-run.
+
+    None means no provider is declared -- a reportable skip, not an error, for the
+    same reason `_fetch_projections` gives.
+    """
+    adapter = projections_csv.ProjectionCsvAdapter()
+    if not adapter.providers:
+        typer.echo(
+            "projections-manual: no providers declared under `projection_providers` in "
+            "config/sources.yaml -- nothing to capture. S38.1 cross-provider spread "
+            "stays unmeasurable until a second provider is declared (S11 option 1B)."
+        )
+        return None
+    return adapter.fetch()
+
+
 app.command("snapshot")(snapshot_)
 
 
@@ -495,6 +538,62 @@ def sheet(
     for path in paths:
         typer.echo(f"wrote {path}")
     typer.echo(f"{len(paths)} file(s)")
+
+
+def _projection_archive_status() -> list[str]:
+    """What the archive actually holds per provider, and whether S38.1 can run.
+
+    `_projection_status` answers "which of S11's two paths is live", which was the
+    right question while they were alternatives. S38.1 makes the question "how
+    many providers are in the archive", because one of them is a board and two of
+    them are a board with an error bar.
+
+    Reports and never fails. `validate` runs inside the archive job between
+    capturing a day of price movement and committing it, so anything that exits
+    non-zero from here is a reason a captured day never lands (S84).
+    """
+    from research.foundations import provider_agreement
+
+    path = config.PROCESSED_DIR / "projection_snapshot.parquet"
+    if not path.exists():
+        return ["projection_snapshot is not built, so the archive cannot be described"]
+
+    import polars as pl
+
+    from pipeline.features import projections as projection_table
+
+    held = projection_table.vintages(pl.read_parquet(path))
+    if not held:
+        return ["no capture has landed in projection_snapshot yet (S11)"]
+
+    board = config.board_provider()
+    out = [
+        f"board drawn from `{board}` (config/sources.yaml board_provider)"
+        + ("" if board in held else " -- NOT IN THE ARCHIVE")
+    ]
+    out.append(
+        "archived: " + ", ".join(f"{p} newest {d}" for p, d in sorted(held.items()))
+    )
+    others = {p: d for p, d in held.items() if p != board}
+    if not others:
+        out.append(
+            "one provider, so S38.1 cross-provider spread is unmeasurable -- the board "
+            "carries no error bar. Declare a second under `projection_providers` and "
+            "run `research snapshot --sources projections-manual`."
+        )
+    elif board in held:
+        newest_other = max(others.values())
+        gap = abs((held[board] - newest_other).days)
+        verdict = (
+            "S38.1 agreement is reported"
+            if gap <= provider_agreement.MAX_VINTAGE_GAP_DAYS
+            else (
+                f"S38.1 agreement is SUPPRESSED past {provider_agreement.MAX_VINTAGE_GAP_DAYS} "
+                "days -- re-export the second provider"
+            )
+        )
+        out.append(f"newest captures {gap} day(s) apart; {verdict}")
+    return out
 
 
 def _projection_status() -> str:
@@ -1282,6 +1381,8 @@ def validate() -> None:
         typer.echo(f"league profiles: {exc}", err=True)
 
     typer.echo(f"projections: {_projection_status()}")
+    for line in _projection_archive_status():
+        typer.echo(f"projections: {line}")
 
     # Reported, never failed here. `validate` runs inside the ADP archive job
     # between the capture and the commit, so anything that exits non-zero from it

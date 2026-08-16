@@ -252,6 +252,19 @@ def projection_providers() -> dict[str, Any]:
     return load_yaml(CONFIG_DIR / "sources.yaml").get("projection_providers") or {}
 
 
+DEFAULT_BOARD_PROVIDER = "fantasypros"
+
+
+def board_provider() -> str:
+    """Which archived provider S19.3 draws the tier board from (S38.1).
+
+    Configuration rather than inference. The board used to be drawn from
+    whichever provider_id sorted first, which is a rule that works exactly as
+    long as there is only one of them -- and S38.1 exists to add a second.
+    """
+    return load_yaml(CONFIG_DIR / "sources.yaml").get("board_provider") or DEFAULT_BOARD_PROVIDER
+
+
 def fantasypros_config() -> dict[str, Any]:
     """The FantasyPros API block (S11 option 1).
 

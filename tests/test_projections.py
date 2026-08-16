@@ -13,7 +13,7 @@ import json
 import polars as pl
 import pytest
 
-from pipeline import config
+from pipeline import cli, config
 from pipeline.features import projections
 from pipeline.features.assertions import AS_OF_COLUMNS
 from pipeline.features.schema import OUTCOME_COLUMNS, PROJECTION_SNAPSHOT_COLUMNS
@@ -395,3 +395,59 @@ def test_the_repository_scorer_reproduces_the_providers_own_half_ppr_total():
     scored = score_frame(pl.DataFrame(rows), profile, alias="projected_points")
     published_half_ppr = LIVE_PAYLOAD["players"][0]["stats"]["points_half"]
     assert scored["projected_points"][0] == pytest.approx(published_half_ppr, abs=0.01)
+
+
+# -- what `validate` says about the provider roster (S38.1) ------------------
+
+
+def _archive(tmp_path, rows):
+    frame = pl.DataFrame(rows).with_columns(
+        pl.col("snapshot_date").cast(pl.Date), pl.lit(2026).alias("season")
+    )
+    frame.write_parquet(tmp_path / "projection_snapshot.parquet")
+    return tmp_path
+
+
+def test_validate_says_the_board_carries_no_error_bar_with_one_provider(tmp_path, monkeypatch):
+    """The state this repository was in until S38.1, reported where somebody looks."""
+    monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(
+        tmp_path, [{"provider_id": "fantasypros", "snapshot_date": dt.date(2026, 8, 16)}]
+    ))
+    monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
+
+    lines = " ".join(cli._projection_archive_status())
+    assert "one provider" in lines
+    assert "no error bar" in lines
+
+
+def test_validate_reports_the_gap_between_two_providers_captures(tmp_path, monkeypatch):
+    monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(tmp_path, [
+        {"provider_id": "fantasypros", "snapshot_date": dt.date(2026, 8, 16)},
+        {"provider_id": "fftoday", "snapshot_date": dt.date(2026, 8, 14)},
+    ]))
+    monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
+
+    lines = " ".join(cli._projection_archive_status())
+    assert "2 day(s) apart" in lines
+    assert "agreement is reported" in lines
+
+
+def test_validate_says_when_the_second_provider_has_aged_out(tmp_path, monkeypatch):
+    """A suppressed comparison that reported nothing would look like agreement."""
+    monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(tmp_path, [
+        {"provider_id": "fantasypros", "snapshot_date": dt.date(2026, 8, 16)},
+        {"provider_id": "fftoday", "snapshot_date": dt.date(2026, 7, 1)},
+    ]))
+    monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
+
+    lines = " ".join(cli._projection_archive_status())
+    assert "SUPPRESSED" in lines
+
+
+def test_validate_flags_a_configured_board_provider_that_never_landed(tmp_path, monkeypatch):
+    monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(
+        tmp_path, [{"provider_id": "fftoday", "snapshot_date": dt.date(2026, 8, 16)}]
+    ))
+    monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
+
+    assert "NOT IN THE ARCHIVE" in " ".join(cli._projection_archive_status())

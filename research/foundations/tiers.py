@@ -40,6 +40,7 @@ import polars as pl
 from pipeline.config import (
     PROCESSED_DIR,
     ConfigError,
+    board_provider,
     draft_season,
     projection_source_available,
     real_profiles,
@@ -48,6 +49,7 @@ from pipeline.features import projections as projection_table
 from pipeline.normalize.names import name_position_key
 from pipeline.scoring import score_frame
 from research.foundations import price_movement
+from research.foundations import provider_agreement as agreement_mod
 from research.foundations import survival as survival_mod
 from research.method import MethodArtifact
 
@@ -327,45 +329,148 @@ def attach_adp(
     return joined, _adp_coverage(joined.height, priced, captured, adp.height)
 
 
-def chosen_provider(frame: pl.DataFrame) -> str:
-    """Which provider the board is drawn from, when several are archived.
+def provider_selection(frame: pl.DataFrame) -> dict[str, Any]:
+    """Which provider the board is drawn from, and whether that was the choice.
 
     S38.1 forbids averaging providers into a consensus row, because the spread
     between them is the only proxy for projection uncertainty we have. So one is
     picked by name and the spread is reported alongside, rather than a mean being
     computed and the spread thrown away.
+
+    **Picked from configuration, not from the data.** This used to be the
+    alphabetically first provider present, which is correct exactly while there is
+    one of them -- and S38.1's whole purpose is to archive a second. A provider
+    whose id sorts before the incumbent (`cbs`, `espn`, `4for4`) would have
+    rebuilt every tier, every replacement level and every VOR across 26 sheets
+    from a board nobody chose, on the morning it first landed. No row count falls,
+    so `refresh-check`'s thinning gate cannot see it either.
+
+    Three states, and only one of them is worth refusing over:
+
+    * the configured provider is archived -- draw the board from it;
+    * it is not, and it is the only one archived -- draw the board from what
+      there is and RECORD the substitution. Refusing here would block S19.3
+      outright, and a BLOCKED tier section is the worst outcome this sheet has
+      (S83): stale-but-complete beats fresh-but-blocked. The substitution is
+      named on the artifact so it is readable rather than assumed;
+    * it is not, and several are archived -- refuse. This is the ambiguous case,
+      and picking one of several unconfigured boards is the original defect
+      wearing a different hat.
     """
     providers = sorted(frame["provider_id"].unique().drop_nulls().to_list())
-    return providers[0] if providers else "unknown"
-
-
-def provider_dispersion(frame: pl.DataFrame) -> dict[str, Any]:
-    """Cross-provider spread on projected points (S38.1).
-
-    The number S38.1 exists to preserve. With one provider archived there is no
-    spread to report, and that absence is itself worth stating: a board built on
-    a single provider carries none of its own uncertainty.
-    """
-    providers = sorted(frame["provider_id"].unique().drop_nulls().to_list())
-    if len(providers) < 2:
-        return {
-            "providers": providers,
-            "measurable": False,
-            "note": (
-                "one provider archived, so projection uncertainty cannot be estimated "
-                "from cross-provider spread (S38.1). The board carries no error bar."
-            ),
-        }
-    spread = (
-        frame.group_by(["source_player_name", "position"])
-        .agg(pl.col("projected_points").std().alias("sd"))
-        .filter(pl.col("sd").is_not_null())
+    configured = board_provider()
+    if not providers:
+        return {"provider": "unknown", "configured": configured, "substituted": False,
+                "archived": []}
+    if configured in providers:
+        return {"provider": configured, "configured": configured, "substituted": False,
+                "archived": providers}
+    if len(providers) == 1:
+        return {"provider": providers[0], "configured": configured, "substituted": True,
+                "archived": providers}
+    raise BlockedError(
+        f"config/sources.yaml names `board_provider: {configured}`, which is not in the "
+        f"projection archive -- it holds {providers}. S19.3 will not pick one of several "
+        "unconfigured providers: every tier, replacement level and VOR would change with "
+        "nothing announcing it (S38.1). Capture the named provider, or set "
+        "`board_provider` deliberately."
     )
+
+
+def chosen_provider(frame: pl.DataFrame) -> str:
+    """The provider id the board is drawn from. See `provider_selection`."""
+    return provider_selection(frame)["provider"]
+
+
+def second_opinion(
+    frame: pl.DataFrame,
+    profile: dict[str, Any],
+    *,
+    board_provider_id: str,
+    season: int | None = None,
+) -> tuple[pl.DataFrame, pl.DataFrame]:
+    """The other provider's board, and the board provider's own, at a shared date.
+
+    S38.1's comparison has to be between two captures of the same day or it
+    measures the days. The shared date is the older of the two providers' newest
+    captures -- a manual export is taken once and the API board daily, so it is
+    almost always the export's -- and each provider is then read at its newest
+    capture at or before it.
+
+    Returns two empty frames when there is no second provider, which is the state
+    CI is in and the state this repository was in until S38.1 was built.
+    """
+    empty = frame.clear()
+    if "provider_id" not in frame.columns:
+        return empty, empty
+    held = projection_table.vintages(frame)
+    others = {p: d for p, d in held.items() if p != board_provider_id}
+    if not others or board_provider_id not in held:
+        return empty, empty
+
+    other_id, other_newest = max(others.items(), key=lambda kv: kv[1])
+    shared = min(held[board_provider_id], other_newest)
+
+    def at(provider: str) -> pl.DataFrame:
+        rows = projection_table.latest(
+            frame.filter(pl.col("provider_id") == provider),
+            season=season,
+            on_or_before=shared,
+        )
+        if not rows.height:
+            return empty
+        rows = rows.filter(pl.col("position").is_in(list(POSITIONS)))
+        return score_frame(rows, profile, alias="projected_points")
+
+    return at(other_id), at(board_provider_id)
+
+
+def provider_dispersion(labelled: pl.DataFrame, meta: dict[str, Any]) -> dict[str, Any]:
+    """S38.1's cross-provider spread, as the artifact carries it.
+
+    The number S38.1 exists to preserve, and it is a floor rather than an
+    estimate: two providers can agree closely and both be wrong. With one provider
+    archived there is no spread at all, and that absence is itself worth stating --
+    a board built on a single provider carries none of its own uncertainty.
+
+    This used to compute the spread itself, grouping by `source_player_name`. That
+    works exactly while there is one provider: two of them spell differently
+    ("Marvin Harrison Jr." against "Marvin Harrison"), so it would have compared
+    only the subset agreeing about punctuation and reported that subset's size as
+    coverage. The join now happens once, on S12's id with a normalized-name
+    fallback, in `provider_agreement`.
+    """
+    if not meta.get("measurable"):
+        return meta
+    ranges = (
+        labelled.filter(pl.col("provider_agreement").is_not_null())
+        .select("projected_points", "other_projected_points")
+    )
+    lo = [
+        min(a, b)
+        for a, b in zip(
+            ranges["projected_points"].to_list(),
+            ranges["other_projected_points"].to_list(),
+            strict=True,
+        )
+    ]
+    hi = [
+        max(a, b)
+        for a, b in zip(
+            ranges["projected_points"].to_list(),
+            ranges["other_projected_points"].to_list(),
+            strict=True,
+        )
+    ]
     return {
-        "providers": providers,
-        "measurable": True,
-        "median_sd_points": round(float(spread["sd"].median() or 0.0), 2),
-        "players_compared": spread.height,
+        **meta,
+        # S38.1's "Provider range 186 - 241", over the board rather than per player:
+        # the sheet has no room for a range on every row, and the artifact is where
+        # the numbers live.
+        "range_points": {
+            "low": round(min(lo), 1) if lo else None,
+            "high": round(max(hi), 1) if hi else None,
+        },
     }
 
 
@@ -470,10 +575,24 @@ def compute(
     *,
     adp: pl.DataFrame | None = None,
     movement: dict[str, Any] | None = None,
+    other: pl.DataFrame | None = None,
+    board_at_comparison: pl.DataFrame | None = None,
 ) -> dict[str, Any]:
-    provider = chosen_provider(frame)
+    selection = provider_selection(frame)
+    provider = selection["provider"]
     single = frame.filter(pl.col("provider_id") == provider)
     single, adp_coverage = attach_adp(single, adp)
+    # S38.1's second opinion, carried the same way the market price is: attached
+    # to the row, never folded into the number. Everything below reads `single`'s
+    # own `projected_points`, so the board is arithmetically identical to the one
+    # this repository built before a second provider existed.
+    single, agreement = agreement_mod.with_agreement(
+        single,
+        other if other is not None else single.clear(),
+        profile=profile,
+        board_as_of=single["snapshot_date"].max() if single.height else None,
+        board_at_comparison=board_at_comparison,
+    )
 
     ranked = {
         pos: single.filter(pl.col("position") == pos)["projected_points"].to_list()
@@ -507,8 +626,11 @@ def compute(
                     # it was at the prior capture; read it through
                     # price_movement.direction(), never by testing the sign.
                     "adp_delta": None if delta is None else round(float(delta), 1),
+                    # S38.1. `null` means the second provider does not price him,
+                    # which is not the same as the two agreeing about him.
+                    "provider_agreement": agree_label,
                 }
-                for name, team, points, value, tier, price, pos_rank, delta in zip(
+                for name, team, points, value, tier, price, pos_rank, delta, agree_label in zip(
                     rows["source_player_name"].to_list(),
                     rows["team"].to_list(),
                     rows["projected_points"].to_list(),
@@ -517,6 +639,7 @@ def compute(
                     rows["adp"].to_list(),
                     rows["position_adp"].to_list(),
                     rows["adp_delta"].to_list(),
+                    rows["provider_agreement"].to_list(),
                     strict=True,
                 )
             ],
@@ -527,11 +650,12 @@ def compute(
         "profile_label": profile.get("label"),
         "teams": profile.get("teams"),
         "provider": provider,
+        "provider_selection": selection,
         "tier_break_multiple": TIER_BREAK_MULTIPLE,
         "positional_demand": demand,
         "replacement_points": replacement,
         "positions": positions,
-        "provider_dispersion": provider_dispersion(frame),
+        "provider_dispersion": provider_dispersion(single, agreement),
         "coverage": projection_table.coverage(frame),
         "adp_coverage": adp_coverage,
         "price_movement": movement or price_movement.unavailable("movement was not computed"),
@@ -553,6 +677,11 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
             "starters": profile.get("starters"),
             "flex_eligible": profile.get("flex_eligible"),
             "provider": results.get("provider"),
+            "provider_selection": results.get("provider_selection"),
+            "providers_archived": (results.get("provider_dispersion") or {}).get("providers"),
+            "agreement_as_of": (results.get("provider_dispersion") or {}).get(
+                "comparison_as_of"
+            ),
             "adp_snapshot_date": (results.get("adp_coverage") or {}).get("adp_snapshot_date"),
             "price_movement_since": (results.get("price_movement") or {}).get(
                 "prior_snapshot_date"
@@ -578,6 +707,7 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
             "Players with no ID match leave the board; they skew fringe, so replacement "
             "level sits slightly high and every value is slightly compressed (see coverage).",
             price_movement.ROLLING_WINDOW_LIMITATION,
+            agreement_mod.DISPERSION_LIMITATION,
             "ADP is carried beside the value, never inside it: the S19.3 metric is computed "
             "as if the price column were absent. It is the Fantasy Football Calculator "
             "mock-draft population rather than the league being drafted (S10B), and it is a "
@@ -592,6 +722,12 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
     )
 
 
+def _archive(processed_dir=PROCESSED_DIR) -> pl.DataFrame:
+    """Every archived projection capture, uncollapsed. Empty when unbuilt."""
+    path = processed_dir / "projection_snapshot.parquet"
+    return pl.read_parquet(path) if path.exists() else pl.DataFrame()
+
+
 def run(processed_dir=PROCESSED_DIR) -> list[tuple[dict[str, Any], MethodArtifact]]:
     """One board per real league profile (S83 generates the sheet per profile too)."""
     problems = blockers(processed_dir)
@@ -602,8 +738,26 @@ def run(processed_dir=PROCESSED_DIR) -> list[tuple[dict[str, Any], MethodArtifac
     out = []
     for profile in real_profiles():
         # Same rule as survival: a board must be one season's board.
-        frame = board(profile, processed_dir=processed_dir, season=draft_season(profile))
+        season = draft_season(profile)
+        frame = board(profile, processed_dir=processed_dir, season=season)
         adp, movement = market_price(profile, processed_dir=processed_dir)
-        results = compute(frame, profile, adp=adp, movement=movement)
+        # S38.1's second opinion is read from the raw archive rather than from
+        # `frame`: `board` has already collapsed each provider to its own newest
+        # capture, and the comparison needs both providers as they stood on a
+        # shared day.
+        other, board_then = second_opinion(
+            _archive(processed_dir),
+            profile,
+            board_provider_id=provider_selection(frame)["provider"],
+            season=season,
+        )
+        results = compute(
+            frame,
+            profile,
+            adp=adp,
+            movement=movement,
+            other=other,
+            board_at_comparison=board_then,
+        )
         out.append((results, export(results, profile)))
     return out
