@@ -5,8 +5,8 @@ the deliverable without anything going red:
 
   * `run_research` treats a blocked module as a finding and exits 0 -- correct,
     because S19.3 is blocked by design until its gates open;
-  * `artifacts/2026-draft/methods/**` is gitignored bar the two carried-forward
-    artifacts, so a fresh runner has no previous board to fall back on;
+  * `run_research` writes nothing for a blocked module, so whatever artifacts are
+    already on disk are what `sheet.py` then renders;
   * `sheet.py` renders a section with no artifact behind it as BLOCKED --
     deliberately, because a blank space on a draft sheet is worse;
   * the workflow commits whatever changed under `artifacts/2026-draft`.
@@ -15,6 +15,19 @@ So the morning a projection key rotates, the job renders 26 pages whose TIERS an
 SURVIVAL say BLOCKED and commits them over the good ones, at 11:00 UTC, with
 nobody looking until the draft. The index banner cannot see it either: it
 compares the ADP capture date, and ADP was fine.
+
+**That morning now fails a second way, and the second is quieter than the first.**
+The live board's method artifacts used to be gitignored, so a fresh runner started
+with nothing and a blocked module produced BLOCKED pages -- loud, and caught by the
+scan below. They are committed now (S76 cannot audit a board that survived
+nowhere), so the runner checks out YESTERDAY's artifacts, a blocked module leaves
+them untouched, and `sheet.py` renders 26 complete pages from them. Nothing is
+blocked, no count has fallen, and the gate as originally written passes a board
+that is silently a day old. `stale_boards` is the check that closes it: the
+rendered board's ADP capture date against the newest capture in the S84 archive.
+Equal is correct and common -- FFC publishes once a day and a day already in hand
+is not a failure. Behind is the refresh having failed to pick up a capture that is
+sitting in the repository, which is the signature of exactly this.
 
 There is a third way to lose the board, and it is the quiet one: not rendering
 it. A blocked-section scan reads the pages that exist and the counts come from
@@ -36,6 +49,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from pipeline import archive
+from pipeline.config import UnknownFormatError, draft_season, profile_adp_format
 from research.method import ARTIFACT_DIR
 
 # Sections that must carry content on the live board. TARGETS, DARTS and FALSE
@@ -207,6 +222,54 @@ def _drop(pid: str, key: str, before: Any, now: Any) -> list[str]:
     if now >= before * (1 - MAX_DROP):
         return []
     return [f"{pid}: {key} fell {before} -> {now} ({1 - now / before:.0%} down)"]
+
+
+def stale_boards(
+    metrics: dict[str, Any],
+    profiles: list[dict[str, Any]],
+    *,
+    snapshot_root: Path | None = None,
+) -> list[str]:
+    """Leagues whose rendered board is older than a capture already in the archive.
+
+    The one failure the count floors and the blocked-section scan both miss. A
+    board re-rendered from yesterday's artifacts is complete, is the right shape,
+    and carries every number the baseline expects -- it is only wrong about which
+    day it is.
+
+    Read from the archive rather than from the clock. "Older than today" would red
+    every morning FFC has not published yet, which is a day in hand and not a day
+    lost (the capture job draws the same distinction). Older than the newest
+    capture the repository actually holds means the price was there to be read and
+    this refresh did not read it.
+
+    A profile whose format has no captures at all is skipped: that is the archive
+    failing, which `archive-status` reports and this gate would only double. So is
+    one whose format cannot be derived -- S14 owns that, `config.adp_capture_formats`
+    asserts it over every profile, and a gate that red on it would report the same
+    defect in a place nobody would think to look for it.
+    """
+    out = []
+    for profile in profiles:
+        pid = profile["id"]
+        board = (metrics.get(pid) or {}).get("adp_snapshot_date")
+        if not board:
+            continue  # no tier artifact at all; the blocked scan owns that case
+        try:
+            key = (profile_adp_format(profile), int(profile["teams"]))
+        except UnknownFormatError:
+            continue
+        dates = archive.series(draft_season(profile), snapshot_root).get(key)
+        if not dates:
+            continue
+        newest = dates[-1]
+        if str(board) < newest.isoformat():
+            out.append(
+                f"{pid}: board priced off {board} while the archive holds "
+                f"{newest.isoformat()} -- this refresh rendered a board older than "
+                "the capture it was given"
+            )
+    return out
 
 
 def state_path(edition: str, root: Path | None = None) -> Path:

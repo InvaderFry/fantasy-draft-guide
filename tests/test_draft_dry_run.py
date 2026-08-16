@@ -23,10 +23,11 @@ import polars as pl
 import pytest
 from typer.testing import CliRunner
 
-from pipeline import cli, snapshot
+from pipeline import cli, config, snapshot
 from pipeline.features import draft_pick
 from pipeline.normalize.names import match_key, name_position_key
-from research import draft_record
+from research import draft_record, freeze
+from research import method as method_mod
 from research.foundations import survival as survival_mod
 
 runner = CliRunner()
@@ -175,6 +176,49 @@ def survival_artifact() -> dict:
     }
 
 
+LIVE = "2026-draft"
+FROZEN = f"{LIVE}-{PROFILE_ID}-{DRAFT_DAY.isoformat()}"
+
+
+def live_board(artifacts, *, capture: str = "2026-08-29", checked: str = "2026-08-29"):
+    """The live edition as the daily refresh leaves it (S83).
+
+    Every real profile's survival artifact, not just the one drafting. The freeze
+    copies an edition rather than a slice of one, and `freeze.required_artifacts`
+    reads the real profile list -- a fixture carrying one league would pass a
+    check the draft never runs.
+    """
+    methods = artifacts / LIVE / "methods"
+    methods.mkdir(parents=True, exist_ok=True)
+    sheets = artifacts / LIVE / "sheets"
+    sheets.mkdir(parents=True, exist_ok=True)
+    (sheets / "index.html").write_text("<html>chooser</html>")
+
+    for profile in config.real_profiles():
+        pid = profile["id"]
+        artifact = survival_artifact()
+        artifact["method_id"] = f"{survival_mod.METHOD_ID}__{pid}"
+        artifact["primary_results"]["adp_snapshot_date"] = capture
+        (methods / f"{survival_mod.METHOD_ID}__{pid}.json").write_text(
+            json.dumps(artifact)
+        )
+        (sheets / f"{pid}__slot{SLOT:02d}.html").write_text("<html>sheet</html>")
+
+    (artifacts / LIVE / "refresh_state.json").write_text(
+        json.dumps(
+            {
+                "edition": LIVE,
+                "checked": checked,
+                "profiles": {
+                    p["id"]: {"adp_snapshot_date": capture}
+                    for p in config.real_profiles()
+                },
+            }
+        )
+    )
+    return artifacts / LIVE
+
+
 @pytest.fixture
 def draft_night(tmp_path, monkeypatch):
     """A draft night in a temporary directory: paste on disk, archive redirected."""
@@ -188,21 +232,37 @@ def draft_night(tmp_path, monkeypatch):
         cli.player_ids, "load_player_ids", lambda *a, **k: crosswalk()
     )
 
-    methods = tmp_path / "artifacts" / "2026-draft" / "methods"
-    methods.mkdir(parents=True)
-    (methods / f"{survival_mod.METHOD_ID}__{PROFILE_ID}.json").write_text(
-        json.dumps(survival_artifact())
-    )
-    return {"paste": paste, "snapshots": snapshots, "artifacts": tmp_path / "artifacts"}
+    artifacts = tmp_path / "artifacts"
+    processed = tmp_path / "processed"
+    processed.mkdir()
+    # The CLI reads both at call time, which is what makes the whole draft-night
+    # path drivable without touching the repository's own artifacts.
+    monkeypatch.setattr(method_mod, "ARTIFACT_DIR", artifacts)
+    monkeypatch.setattr(draft_record, "ARTIFACT_DIR", artifacts)
+    monkeypatch.setattr(draft_record, "PROCESSED_DIR", processed)
+    live_board(artifacts)
+    return {
+        "paste": paste,
+        "snapshots": snapshots,
+        "artifacts": artifacts,
+        "processed": processed,
+    }
 
 
-def record(paste, *, extra=()):
+def record(paste, *, extra=(), profile=PROFILE_ID, day=DRAFT_DAY):
     return runner.invoke(
         cli.app,
-        ["draft-record", "--profile", PROFILE_ID, "--slot", str(SLOT),
+        ["draft-record", "--profile", profile, "--slot", str(SLOT),
          "--picks", str(paste), "--season", str(SEASON),
-         "--date", DRAFT_DAY.isoformat(), *extra],
+         "--date", day.isoformat(), *extra],
     )
+
+
+def build_table(draft_night):
+    """The step between recording and reviewing, as the operator runs it."""
+    log = draft_pick.build(draft_night["snapshots"], crosswalk=crosswalk())
+    log.write_parquet(draft_night["processed"] / "draft_pick.parquet")
+    return log
 
 
 # -- the rehearsal ---------------------------------------------------------
@@ -333,3 +393,177 @@ def test_the_record_cannot_be_taken_twice_on_one_date(draft_night):
     second = record(draft_night["paste"])
     assert second.exit_code == 1
     assert "overwrite" in second.output.lower() or "exists" in second.output.lower()
+
+
+# -- the board the draft was made from (S7, S76) ---------------------------
+
+
+def test_the_dry_run_reports_the_board_it_would_freeze(draft_night):
+    """The rehearsal has to show the board, not just the paste.
+
+    Everything else `--dry-run` reports is about the 168 lines. The board is the
+    other half of the pairing and the half that expires: the live edition is
+    regenerated in place every morning, so a rehearsal that does not mention it
+    cannot surface the one problem that stops being fixable overnight.
+    """
+    result = record(draft_night["paste"], extra=["--dry-run"])
+    assert result.exit_code == 0, result.output
+    assert f"would freeze {LIVE} -> {FROZEN}" in result.output
+    assert "priced off 2026-08-29" in result.output
+    assert "dry run: nothing written" in result.output
+    assert not (draft_night["artifacts"] / FROZEN).exists()
+
+
+def test_a_board_the_audit_could_not_read_is_refused_before_the_draft_is_frozen(
+    draft_night
+):
+    """A directory that exists is not a board.
+
+    The freeze checks for the artifact `draft_record` will open, so a freeze that
+    succeeds means a review that can run. Finding this on draft night is finding
+    it while the board is still recoverable; finding it in November is finding it
+    after the only copy was overwritten.
+    """
+    (
+        draft_night["artifacts"] / LIVE / "methods"
+        / f"{survival_mod.METHOD_ID}__{PROFILE_ID}.json"
+    ).unlink()
+    result = record(draft_night["paste"], extra=["--dry-run"])
+    assert result.exit_code == 1
+    assert "cannot freeze the board" in result.output
+    assert not draft_night["snapshots"].exists()
+
+
+def test_a_board_refreshed_past_the_draft_is_refused_and_nothing_is_recorded(
+    draft_night
+):
+    """The quiet failure this whole path exists to close.
+
+    A board priced after the draft still pairs, still fills every calibration
+    bucket, and is measuring quotes nobody was shown. The refusal fires in the
+    dry run too -- after the record is frozen is too late, because S84 will not
+    accept a second one on the same date.
+    """
+    live_board(draft_night["artifacts"], capture="2026-09-02", checked="2026-09-02")
+    for extra in (["--dry-run"], []):
+        result = record(draft_night["paste"], extra=extra)
+        assert result.exit_code == 1, result.output
+        assert "is priced off 2026-09-02, which is after the draft" in result.output
+        assert "freeze-edition" in result.output
+    assert not draft_night["snapshots"].exists()
+    assert not (draft_night["artifacts"] / FROZEN).exists()
+
+
+def test_recording_the_draft_freezes_the_board_and_names_it_in_the_record(draft_night):
+    """The record points at a board that will still be there in November."""
+    assert record(draft_night["paste"]).exit_code == 0
+
+    frozen = draft_night["artifacts"] / FROZEN
+    live = draft_night["artifacts"] / LIVE
+    quoted = f"methods/{survival_mod.METHOD_ID}__{PROFILE_ID}.json"
+    assert (frozen / quoted).read_bytes() == (live / quoted).read_bytes()
+    assert (frozen / "sheets" / "index.html").exists()
+    assert freeze.provenance(FROZEN, draft_night["artifacts"])["source_edition"] == LIVE
+
+    manifest = json.loads(
+        (draft_night["snapshots"] / DRAFT_DAY.isoformat() / "manifest.json").read_text()
+    )
+    entry = manifest["files"][f"draft_{PROFILE_ID}_{SEASON}.json"]
+    assert entry["board_edition"] == FROZEN
+
+
+def test_the_next_mornings_refresh_does_not_reach_the_frozen_board(draft_night):
+    """The whole point: 11:00 UTC comes and the audit's input does not move."""
+    assert record(draft_night["paste"]).exit_code == 0
+    quoted = (
+        draft_night["artifacts"] / FROZEN / "methods"
+        / f"{survival_mod.METHOD_ID}__{PROFILE_ID}.json"
+    )
+    before = quoted.read_bytes()
+
+    live_board(draft_night["artifacts"], capture="2026-08-31", checked="2026-08-31")
+    assert quoted.read_bytes() == before
+
+    with pytest.raises(freeze.FrozenEditionExistsError):
+        freeze.freeze(LIVE, FROZEN, root=draft_night["artifacts"])
+    assert quoted.read_bytes() == before
+
+
+def test_draft_review_runs_through_the_cli_against_the_board_the_record_names(
+    draft_night
+):
+    """paste -> record -> draft_pick -> review, with no --edition anywhere.
+
+    The edition is the assertion. `default_edition()` would resolve to today's
+    dated name, a directory that does not exist; reading it back off the record
+    is what makes a bare `research draft-review` audit the right board.
+    """
+    assert record(draft_night["paste"]).exit_code == 0
+    build_table(draft_night)
+
+    result = runner.invoke(cli.app, ["draft-review"])
+    assert result.exit_code == 0, result.output
+    assert FROZEN in result.output
+
+    written = (
+        draft_night["artifacts"] / FROZEN / "methods"
+        / f"draft_record__{PROFILE_ID}__{SEASON}.json"
+    )
+    assert written.exists()
+    audit = json.loads(written.read_text())["primary_results"]
+    assert audit["edition"] == FROZEN
+    assert audit["draft_slot"] == SLOT
+    assert audit["pairing"]["unmatched"] == 0
+
+
+def test_two_leagues_drafting_on_two_nights_are_each_audited_against_their_own_board(
+    draft_night
+):
+    """The reason the edition is resolved per profile and not once per run.
+
+    Both leagues drafted, a day apart, off boards priced a day apart. One edition
+    for the run would audit at least one of them against a board it never saw --
+    and it would not look like an error, because the other league's board pairs
+    perfectly well.
+    """
+    assert record(draft_night["paste"]).exit_code == 0
+
+    second_day = DRAFT_DAY + dt.timedelta(days=1)
+    live_board(draft_night["artifacts"], capture="2026-08-30", checked="2026-08-30")
+    assert record(
+        draft_night["paste"], profile="ppr_12", day=second_day
+    ).exit_code == 0
+
+    build_table(draft_night)
+    result = runner.invoke(cli.app, ["draft-review"])
+    assert result.exit_code == 0, result.output
+
+    other = f"{LIVE}-ppr_12-{second_day.isoformat()}"
+    assert FROZEN in result.output and other in result.output
+    for edition, pid, capture in (
+        (FROZEN, PROFILE_ID, "2026-08-29"),
+        (other, "ppr_12", "2026-08-30"),
+    ):
+        audit = json.loads(
+            (
+                draft_night["artifacts"] / edition / "methods"
+                / f"draft_record__{pid}__{SEASON}.json"
+            ).read_text()
+        )["primary_results"]
+        assert audit["edition"] == edition
+        assert audit["adp_snapshot_date"] == capture
+
+
+def test_a_review_against_a_board_priced_after_the_draft_is_refused(draft_night):
+    """The guard for everyone who does not go through `draft-record`.
+
+    Passing `--edition 2026-draft` by hand a week later is the obvious thing to
+    try, and it is the thing that silently audits the wrong board.
+    """
+    assert record(draft_night["paste"]).exit_code == 0
+    build_table(draft_night)
+    live_board(draft_night["artifacts"], capture="2026-09-05", checked="2026-09-05")
+
+    result = runner.invoke(cli.app, ["draft-review", "--edition", LIVE])
+    assert result.exit_code == 1
+    assert "which is after the draft on 2026-08-30" in result.output

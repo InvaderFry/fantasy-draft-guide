@@ -1,4 +1,5 @@
-.PHONY: setup ingest ids tables research sheet validate test lint snapshot preseason all
+.PHONY: setup ingest ids tables research sheet validate test lint snapshot preseason \
+	draft-check draft-record draft-review all
 
 SEASONS ?= 2012-2025
 
@@ -39,6 +40,32 @@ research:
 # regenerates one seat against the freshest ADP if a machine is to hand.
 sheet:
 	uv run research sheet $(if $(SLOT),--slot $(SLOT),)
+
+# S76's audit trail, in the order it has to happen. PROFILE, SLOT and PICKS are
+# required; DATE defaults to today.
+#
+# The rehearsal, and it is not optional. S84 refuses a second record on the same
+# date, so this is the only chance to find a line the parser skipped or a name
+# S12 cannot resolve -- both parse cleanly and then pair with nothing, which
+# reads as a well calibrated approximation rather than as a fault. It also
+# reports the board it would freeze, and reds on everything the real run reds on.
+draft-check:
+	uv run research draft-record --profile $(PROFILE) --slot $(SLOT) --picks $(PICKS) \
+		$(if $(DATE),--date $(DATE),) --dry-run
+
+# Run it the same night. The freeze is why: `2026-draft` is regenerated in place
+# at 11:00 UTC, so the survival artifact this draft was priced against is gone by
+# breakfast, and it cannot be rebuilt -- nothing pins an as-of date, so a rebuild
+# quotes prices the sheet never carried and pairs against them without complaint.
+draft-record:
+	uv run research draft-record --profile $(PROFILE) --slot $(SLOT) --picks $(PICKS) \
+		$(if $(DATE),--date $(DATE),)
+	uv run research build-tables --tables draft_pick
+
+# No --edition. The record names the frozen board it was taken against, per
+# league, which is the only board the pairing means anything against.
+draft-review:
+	uv run research draft-review
 
 validate:
 	uv run research validate

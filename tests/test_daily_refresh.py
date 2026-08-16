@@ -63,17 +63,32 @@ def test_the_refresh_does_not_rerun_the_season_modules():
         assert module not in script
 
 
-def test_the_carried_forward_artifacts_are_committed():
-    """If they were ignored, REGRESSION would print BLOCKED every morning.
+def test_the_live_boards_artifacts_are_all_committed():
+    """`sheet.write()` renders whatever is in the edition's methods directory.
 
-    `sheet.write()` renders whatever is in the edition's methods directory. An
-    artifact the refresh does not regenerate has to survive in the checkout, and
-    the only thing making that true is the negation in .gitignore.
+    This used to assert two negations in .gitignore, because the carried-forward
+    artifacts were the only ones exempt from an ignore rule over the directory.
+    The whole directory is committed now -- S76's audit reads the board after the
+    draft and the live edition is regenerated in place, so an artifact that lives
+    only inside a runner is one the audit can never see (research/freeze.py).
+
+    Asserted as "no rule matches the directory" rather than as "the two negations
+    are present", because that is the property actually relied on: every artifact
+    the refresh writes has to reach the checkout, not just the two it does not
+    regenerate.
     """
-    ignore = (WORKFLOW.parent.parent.parent / ".gitignore").read_text()
-    season_modules = set(research_modules()) - set(MARKET_DEPENDENT_MODULES)
-    for module in season_modules:
-        assert f"!artifacts/{LIVE_EDITION}/methods/{module}.json" in ignore
+    root = WORKFLOW.parent.parent.parent
+    ignore = (root / ".gitignore").read_text()
+    rules = [
+        ln.strip()
+        for ln in ignore.splitlines()
+        if ln.strip() and not ln.lstrip().startswith("#")
+    ]
+    assert not [r for r in rules if f"artifacts/{LIVE_EDITION}" in r]
+
+    methods = root / "artifacts" / LIVE_EDITION / "methods"
+    for module in set(research_modules()) - set(MARKET_DEPENDENT_MODULES):
+        assert (methods / f"{module}.json").exists()
 
 
 def test_the_refresh_writes_the_live_edition_and_not_a_dated_one():

@@ -252,7 +252,11 @@ def _assert_sequential(rows: list[dict[str, Any]]) -> None:
 # anything reads it (S84). The parser above is young and will grow shapes; when
 # it does, every draft ever recorded re-parses from the original text rather than
 # from whatever a previous version of the parser made of it.
-PAYLOAD_VERSION = 1
+# 2 adds `board_edition`: the frozen edition holding the board this draft was
+# made against (S76). Version 1 payloads have no such field and none exist -- the
+# field arrived before the first draft was ever recorded -- so a reader may treat
+# its absence as "the board was not preserved" rather than as a format to support.
+PAYLOAD_VERSION = 2
 
 
 def payload(
@@ -265,6 +269,7 @@ def payload(
     draft_date: dt.date,
     rounds: int | None = None,
     partial: bool = False,
+    board_edition: str | None = None,
 ) -> dict[str, Any]:
     """The record of one league's draft, ready to be snapshotted.
 
@@ -290,6 +295,12 @@ def payload(
         "draft_date": draft_date.isoformat(),
         "pick_count": len(picks),
         "partial": partial,
+        # The frozen edition whose survival artifact priced this draft (S76). The
+        # seat is the value nothing else records; this is the second, and for the
+        # same reason -- the live board is regenerated in place, so by the time
+        # anyone reviews the draft the edition named here is the only copy of what
+        # the sheet said.
+        "board_edition": board_edition,
         # Verbatim. Everything above is derived from it and can be re-derived.
         "raw_text": raw_text,
     }
