@@ -8,6 +8,7 @@
     research sheet         render the S83 draft-day sheets
     research preseason-status  report the S84 preseason bundle (S84, S86)
     research refresh-check     refuse to publish a degraded draft board (S83)
+    research fit-check         measure that every sheet still prints on one page (S83)
     research archive-status    report the S84 archive's series; fail on a stall
     research validate      re-hash snapshots and run the data/leakage checks
 
@@ -1117,6 +1118,115 @@ def refresh_check(
             root=root,
         )
         typer.echo(f"refresh: recorded as the board to beat -> {path}")
+
+
+@app.command("fit-check")
+def fit_check(
+    edition: Annotated[str, typer.Option(help="edition to measure, e.g. 2026-draft")] = "",
+    headroom: Annotated[
+        bool, typer.Option(help="also measure how many more rows a position each page would take")
+    ] = True,
+    allow_missing_browser: Annotated[
+        bool, typer.Option(help="report and exit 0 when there is no browser to measure with")
+    ] = False,
+) -> None:
+    """Measure that every rendered sheet still prints on one page (S83).
+
+    Runs AFTER the commit, unlike `refresh-check`, and the difference is the
+    whole reasoning. `refresh-check` withholds the board because a BLOCKED sheet
+    is unusable and stale-but-complete beats fresh-but-blocked. This is the
+    opposite trade: a two-page sheet still carries every number and only its
+    second page is easy to miss, so fresh-but-two-page beats stale-but-one-page
+    and today's board must land either way. What this does instead is red the run
+    and open an issue -- the same placement, and for the same reason, as
+    `preseason-status` in the bundle workflow.
+
+    `--allow-missing-browser` is for a laptop, never for CI. A gate that quietly
+    stops measuring reports success forever.
+    """
+    from research import fit
+    from research import method as method_mod
+
+    edition_name = edition or method_mod.default_edition()
+    try:
+        browser = fit.require_browser()
+    except fit.FitError as exc:
+        typer.echo(f"fit: {exc}", err=not allow_missing_browser)
+        raise typer.Exit(code=0 if allow_missing_browser else 1) from None
+
+    # One root, looked up at call time and threaded through, so the whole command
+    # can be driven over a temporary edition in a test (`refresh-check` too).
+    report = fit.check(
+        edition_name, root=method_mod.ARTIFACT_DIR, browser=browser, with_headroom=headroom
+    )
+    pages = report["pages"]
+    if not pages:
+        # Nothing to measure is not the same as everything fitting. Absence is
+        # `refresh-check`'s to report (it counts the edition against what S83's
+        # renderer would have written), so this says so and stops rather than
+        # printing a clean bill of health for an empty directory.
+        typer.echo(
+            f"fit: edition {edition_name} has no rendered sheets to measure -- "
+            "`refresh-check` owns what a complete edition is",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    typer.echo(
+        f"fit: {len(pages)} sheet(s) measured with {report['browser_version']}, "
+        f"Arial resolves to {report['font']}"
+    )
+
+    room = report.get("headroom") or {}
+    tight = fit.tightest(report)
+    if tight:
+        name, left = tight
+        typer.echo(
+            f"fit: at MAX_TIER_PLAYERS={sheet_players()} the tightest sheet is {name} with "
+            f"{left} row(s) a position to spare"
+            + (
+                " -- the next long name breaks it, so re-measure before adding a column"
+                if left == 0
+                else ""
+            )
+        )
+    unmeasured = report.get("headroom_unmeasured") or []
+    if unmeasured:
+        # Not a failure and not silence either: the page counts above are real
+        # (they read the committed files), and the headroom is simply not
+        # available from this checkout.
+        typer.echo(
+            f"fit: headroom unmeasured on {len(unmeasured)} sheet(s) -- re-rendering them "
+            "from the artifacts on disk produces a BLOCKED page, so the probe would be "
+            "measuring a board that is not the one on file. Run this where the method "
+            "artifacts are, which is the refresh job."
+        )
+    elif headroom and not room:
+        typer.echo("fit: headroom not measured")
+
+    if not report["overflowing"]:
+        typer.echo("fit: every sheet prints on one page (S83)")
+        return
+
+    for name in report["overflowing"]:
+        typer.echo(f"fit: {name} prints on {pages[name]} pages", err=True)
+    typer.echo(
+        f"edition {edition_name} no longer fits on one page. S83 is not a preference: the "
+        "sheet is read at a table with a 90-second pick clock, and a section that slid onto "
+        "a second page is a section nobody reads. These sheets are already committed and are "
+        "still the freshest board there is -- a two-page sheet carries every number, which is "
+        "why this reds after the commit rather than withholding it. Lower MAX_TIER_PLAYERS in "
+        "research/sheet.py, re-measure with `make fit`, and record the new value with its "
+        "measurement beside it.",
+        err=True,
+    )
+    raise typer.Exit(code=1)
+
+
+def sheet_players() -> int:
+    from research import sheet as sheet_mod
+
+    return sheet_mod.MAX_TIER_PLAYERS
 
 
 @app.command("preseason-status")

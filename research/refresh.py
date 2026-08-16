@@ -98,17 +98,9 @@ def expected_sheets(profiles: list[dict[str, Any]]) -> list[str]:
     Read from `sheet`'s own helpers rather than restated here, so the gate and
     the renderer cannot drift into disagreeing about what a complete edition is.
     """
-    from research.sheet import profile_draft_slot, slot_filename, slots_to_render
+    from research.sheet import sheet_targets
 
-    names = ["index.html"]
-    for profile in profiles:
-        pid = profile["id"]
-        names.append(f"{pid}.html")
-        if profile_draft_slot(profile) is None:
-            # An undrawn order: one page per seat, plus the slot-agnostic one
-            # already added above.
-            names.extend(slot_filename(pid, seat) for seat in slots_to_render(profile))
-    return sorted(names)
+    return sorted(["index.html", *(name for name, _, _ in sheet_targets(profiles))])
 
 
 def missing_sheets(
