@@ -1,4 +1,4 @@
-.PHONY: setup ingest ids tables research sheet validate test lint snapshot preseason \
+.PHONY: setup ingest ids tables research sheet fit validate test lint snapshot preseason \
 	draft-check draft-record draft-review all
 
 SEASONS ?= 2012-2025
@@ -40,6 +40,15 @@ research:
 # regenerates one seat against the freshest ADP if a machine is to hand.
 sheet:
 	uv run research sheet $(if $(SLOT),--slot $(SLOT),)
+
+# S83's one-page rule, measured. This replaces the hand sweep the README used to
+# describe: it prints every sheet with the same headless invocation, counts the
+# PDF pages, and reports how many more rows a position the tightest page would
+# take before it breaks. Needs a Chromium or Chrome on PATH (or $CHROME_BIN).
+#
+# Re-measure with this before raising MAX_TIER_PLAYERS or adding a column.
+fit:
+	uv run research fit-check $(if $(EDITION),--edition $(EDITION),)
 
 # S76's audit trail, in the order it has to happen. PROFILE, SLOT and PICKS are
 # required; DATE defaults to today.

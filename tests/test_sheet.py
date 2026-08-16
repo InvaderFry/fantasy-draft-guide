@@ -195,6 +195,18 @@ def test_the_tier_board_carries_the_price_beside_the_value():
     assert ">41<" in page         # Player Two, ADP 41.2
 
 
+def test_the_tier_board_can_be_rendered_deeper_for_a_fit_probe():
+    """`research.fit` measures how many more rows a position the page would take
+    by rendering them, not by mutating MAX_TIER_PLAYERS on the module. Nothing on
+    the draft-day path passes this, so the default has to stay the constant."""
+    default = sheet.render("test", profile=PROFILE, artifacts=FULL)
+    assert sheet.render("test", profile=PROFILE, artifacts=FULL, max_tier_players=None) == default
+
+    shallow = sheet.render("test", profile=PROFILE, artifacts=FULL, max_tier_players=1)
+    assert "Bijan Robinson" in shallow
+    assert "Player Two" not in shallow
+
+
 def test_a_player_the_market_never_priced_says_so_rather_than_showing_a_zero():
     page = sheet.render("test", profile=PROFILE, artifacts=FULL)
     assert "Unpriced Man" in page

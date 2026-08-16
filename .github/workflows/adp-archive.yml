@@ -117,6 +117,12 @@ jobs:
   sheets:
     needs: capture
     runs-on: ubuntu-latest
+    # Job-level, which REPLACES the workflow-level grant rather than adding to
+    # it, so `contents` has to be named again here. `issues` is for the
+    # sheet-overflow alarm at the end of this job.
+    permissions:
+      contents: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -177,3 +183,58 @@ jobs:
             sleep $((2 ** attempt))
           done
           exit 1
+
+      # The measurement is only a bound if the fonts are the wide ones. The
+      # sheet asks for `-apple-system, "Segoe UI", Helvetica, Arial, sans-serif`;
+      # here the first three do not exist and Arial resolves to Liberation Sans,
+      # which is metric-compatible with Arial and wider than SF Pro or Segoe UI.
+      # So a page that fits on this runner fits on the machine that prints it.
+      # `fit-check` reports what Arial actually resolved to, so an image that
+      # stops shipping this package loosens the bound visibly rather than
+      # silently.
+      - name: Install the fonts the measurement is taken with
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends fonts-liberation
+
+      # AFTER the commit, and the difference from `refresh-check` is the whole
+      # reasoning. That one withholds the board, because a BLOCKED sheet is
+      # unusable and stale-but-complete beats fresh-but-blocked. This is the
+      # opposite trade: a two-page sheet still carries every number and only its
+      # second page is easy to miss, so fresh-but-two-page beats
+      # stale-but-one-page and today's board lands either way. Same placement,
+      # and for the same reason, as `preseason-status` in the bundle workflow:
+      # last, and the step allowed to fail.
+      #
+      # The browser is whatever the runner image ships -- `fit-check` looks for
+      # $CHROME_BIN and then chromium/google-chrome on PATH, and says which it
+      # measured with. If an image ever ships none, it reds naming what it looked
+      # for, which is the right failure: an unmeasured page is not a page that fits.
+      - name: Check the board still prints on one page
+        id: fit
+        run: |
+          uv run research fit-check --edition 2026-draft 2>&1 | tee fit.txt
+          exit "${PIPESTATUS[0]}"
+
+      # A red run in a repository nobody is watching is not an alarm. The same
+      # recipe archive-monitor.yml uses for a stalled archive, with its own label
+      # so the two never collapse into one thread.
+      - name: Open or update the overflow issue
+        if: failure() && steps.fit.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          body="$(printf '%s\n\n```\n%s\n```\n\n%s\n' \
+            "The S83 draft sheets no longer print on one page, as of $(date -u +%Y-%m-%d). Today's board is committed and is still the freshest one there is -- a two-page sheet carries every number -- but a section that slid onto a second page is a section nobody reads at a table with a pick clock." \
+            "$(tail -c 4000 fit.txt 2>/dev/null || echo 'no output captured')" \
+            "Run: $RUN_URL")"
+          gh label create sheet-overflow \
+            --description "The S83 draft sheet no longer fits on one page" \
+            --color D93F0B 2>/dev/null || true
+          existing="$(gh issue list --label sheet-overflow --state open \
+            --limit 1 --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --label sheet-overflow \
+              --title "Draft sheet no longer fits on one page" --body "$body"
+          fi

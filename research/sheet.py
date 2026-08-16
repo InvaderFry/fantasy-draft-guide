@@ -153,6 +153,8 @@ def tiers_section(
     artifacts: dict[str, Any],
     profile: dict[str, Any] | None,
     band: dict[str, Any] | None = None,
+    *,
+    max_players: int | None = None,
 ) -> str:
     if profile is None:
         return _blocked(tiers_mod.blockers() or ["no league profile selected"])
@@ -169,7 +171,7 @@ def tiers_section(
         replacement = (block.get("replacement") or {}).get("points")
         rows = []
         last_tier = None
-        for p in players[:MAX_TIER_PLAYERS]:
+        for p in players[: max_players if max_players is not None else MAX_TIER_PLAYERS]:
             new_tier = p["tier"] != last_tier
             last_tier = p["tier"]
             adp = p.get("adp")
@@ -561,14 +563,23 @@ def render(
     profile: dict[str, Any] | None = None,
     slot: int | None = None,
     artifacts: dict[str, Any] | None = None,
+    max_tier_players: int | None = None,
 ) -> str:
+    """The S83 page.
+
+    `max_tier_players` overrides the committed constant for one render. It exists
+    for `research.fit`, which measures how many more rows a position this page
+    would take before it breaks to two -- the question MAX_TIER_PLAYERS answers,
+    asked by rendering rather than by mutating a module global. Nothing on the
+    draft-day path passes it.
+    """
     arts = artifacts if artifacts is not None else load_artifacts(edition)
     # Derived once and shared: the section states the band, and the board marks
     # the players standing in it. A finding printed eight lines away from the
     # prices it applies to is a finding somebody has to remember.
     band = dead_zone_band(arts)
     bodies = {
-        "TIERS": tiers_section(arts, profile, band),
+        "TIERS": tiers_section(arts, profile, band, max_players=max_tier_players),
         "TARGETS": _not_built("Targets", "a research section (S27) requiring graded evidence"),
         "AVOIDS": dead_zone_section(arts, band),
         "REGRESSION": regression_section(arts),
@@ -655,6 +666,34 @@ def slots_to_render(profile: dict[str, Any], slot: int | None = None) -> list[in
     if slot is not None:
         return [slot]
     return list(range(1, int(profile["teams"]) + 1))
+
+
+def sheet_targets(
+    profiles: list[dict[str, Any]],
+) -> list[tuple[str, dict[str, Any], int | None]]:
+    """Every page a rendered edition carries, as (filename, profile, slot).
+
+    One statement of what a complete edition is, read by everything that needs to
+    know: `write` writes these, `refresh.expected_sheets` counts them, and
+    `fit.check` measures them. Stated three times it would drift, and the way it
+    drifts is that one of the three quietly stops covering a page.
+
+    The chooser is not here: it is a page about the pages, and it is written by
+    `write_index` from what actually landed on disk.
+    """
+    out: list[tuple[str, dict[str, Any], int | None]] = []
+    for profile in profiles:
+        pid = profile["id"]
+        configured = profile_draft_slot(profile)
+        if configured is not None:
+            # The order is drawn: one league, one seat, and the league's sheet is
+            # that seat's sheet.
+            out.append((f"{pid}.html", profile, configured))
+            continue
+        out.extend((slot_filename(pid, seat), profile, seat) for seat in slots_to_render(profile))
+        # The page to read the week before, when the seat is still unknown.
+        out.append((f"{pid}.html", profile, None))
+    return out
 
 
 def write(

@@ -20,6 +20,7 @@ Built here:
 | Preseason bundle | §84, §86 | the second capture program: nflverse depth charts, rosters and injuries archived before Week 1, on a cadence the code decides |
 | Price movement | §31.3 | what the archive is *for*: how each price has moved since the prior capture, marked on the board and in the pick blocks |
 | Refresh gate | §83 | the daily job refuses to publish a board worse than the one it would replace |
+| One-page gate | §83, §78 | every sheet printed and page-counted on every refresh — the constraint that had only ever been checked by hand |
 | Archive health | §84 | the series measured: what it holds, what it lost, and whether it has stopped |
 | nflverse ingest | §10A | 2012–2025 weekly stats, snaps, rosters, depth charts, injuries, play-by-play, schedules |
 | ID normalization | §12 | `gsis_id` canonical, crosswalk + labelled name matching |
@@ -47,6 +48,7 @@ make ids                        # player_ids.parquet
 make tables SEASONS=2023-2024   # canonical tables
 make research                   # S16 method artifacts
 make sheet                      # the S83 draft-day sheets, one per league per slot
+make fit                        # measure that every sheet still prints on one page
 make validate                   # hashes, schema, leakage, data checks
 make test
 ```
@@ -421,6 +423,12 @@ A test asserts the same thing about the sheets in the repository right now, so a
 broken board is a red test on every push rather than a red scheduled run nobody
 reads until draft day.
 
+There is a fourth way to lose the board and it is not in this table, because the
+right answer to it is the opposite one: a sheet that grew to **two pages**. That
+board is still the freshest one there is and still carries every number, so
+withholding it would be the wrong trade. `research fit-check` measures it after
+the commit instead, and reds. See *Checking it is still one page* above.
+
 ### The date to look at on the sheet
 
 Every page carries two dates, and they are not the same thing:
@@ -452,13 +460,64 @@ the team code costs about two players a position — kept, because it is what ma
 the §25 regression flags usable at the table: you read `FADE LA` and scan the
 board for LA.
 
-Re-measure before raising it:
+**Both breaks were found by hand, and only because somebody thought to look.**
+Every other failure on the draft-night path has a guard that runs unattended —
+`refresh-check` refuses a blocked or thinned board, `archive-status` files an
+issue when the price series stalls, `preseason-status` reds while a missed
+bundle is still worth taking. The one-page rule had a human with a shell loop.
+Meanwhile the refresh re-renders all 26 sheets every morning from a board that
+moves daily, so the next break is a longer name away, on a morning nobody is
+watching.
 
 ```bash
-for f in artifacts/2026-draft/sheets/*.html; do
-  chromium --headless --no-pdf-header-footer --print-to-pdf="/tmp/$(basename $f).pdf" "file://$PWD/$f"
-done   # every PDF must be 1 page
+make fit                      # every sheet, measured
+make fit EDITION=2026.08.13-r1
 ```
+
+`research fit-check` runs the same headless invocation the hand sweep used —
+unchanged, so the automated gate reproduces the measurement that set the constant
+rather than substituting a second one that disagrees with it — counts the PDF
+pages, and reds naming any sheet that grew. Nothing under `artifacts/` is
+written; every render goes to a temporary directory.
+
+It also reports the number the constant actually encodes: **how many more players
+a position the tightest sheet would take before it breaks.** A page count alone
+says "fine" right up to the morning it says "broken". On the 2026.08.13-r1 board
+the tightest seat is slot 9 with **0** rows to spare — one long name from two
+pages, which is the answer to "can we add a column" and it is no. Headroom is
+reported and never enforced: zero means the constant is exactly right, not that
+something is wrong.
+
+Two things it refuses to do rather than guess. With no browser on `PATH` it
+**fails** instead of passing — a gate that quietly stops measuring reports
+success forever. And when re-rendering the board produces a `BLOCKED` page,
+because the checkout has the sheets but not the method artifacts behind them, it
+reports headroom as *unmeasured* rather than generous: a blocked page is short,
+so it fits at any depth. The page counts are unaffected — those read the
+committed files themselves.
+
+**Where the gate sits, and why it is not where `refresh-check` sits.**
+`refresh-check` runs *between* the render and the commit and withholds the board,
+because a BLOCKED sheet is unusable and stale-but-complete beats
+fresh-but-blocked. The fit gate is the opposite trade: a two-page sheet still
+carries every number, and only its second page is easy to miss. So
+**fresh-but-two-page beats stale-but-one-page** — `fit-check` runs *after* the
+commit, today's board lands either way, and the run reds and opens a
+`sheet-overflow` issue. That is the placement `preseason-status` already uses in
+the bundle workflow, for the same reason: last, and the step allowed to fail.
+
+**The runner is measured; the drafter prints.** The sheet asks for
+`-apple-system, "Segoe UI", Helvetica, Arial, sans-serif`. On a Linux runner the
+first three do not exist and `Arial` resolves to Liberation Sans, which is
+metric-compatible with Arial and *wider* than SF Pro or Segoe UI — so a page that
+fits in CI fits on the machine that prints it. The workflow installs
+`fonts-liberation` to make that true rather than assumed, and `fit-check` prints
+what Arial resolved to, so a runner image that stops shipping it loosens the
+bound visibly instead of silently.
+
+A test asserts the same thing about the sheets committed right now, skipped when
+there is no browser to measure with — so a board that no longer fits is a red
+test on a human push as well as a red scheduled run.
 
 ## The projection source (§11)
 
@@ -861,7 +920,8 @@ data/snapshots/  dated immutable captures with hashes (COMMITTED — the archive
 data/processed/  canonical parquet tables (gitignored, rebuildable)
 pipeline/    ingest, normalize, features, scoring, snapshot, cli
 research/    questions.yaml, method contract, foundations/ teams/ running_back/,
-             sheet.py, draft_record.py (S76), freeze.py (S7)
+             sheet.py, fit.py (S83's one-page rule, measured), refresh.py (S83),
+             draft_record.py (S76), freeze.py (S7)
 artifacts/   dated editions: methods/*.json (S16) and sheets/*.html (S83)
              2026-draft/ -- the live board, refreshed daily in place; methods AND
                sheets are committed, because S76 audits it after the draft
