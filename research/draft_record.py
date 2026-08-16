@@ -8,10 +8,20 @@ before the guide is:
     only mechanism by which the evidence grades in S3.1 are ever checked against
     reality
 
-The board is reconstructible: the ADP captures are committed and the artifacts
-are dated. What is not reconstructible is the pairing -- which edition was in
-front of the drafter, which seat was drawn, and what was actually taken while
-the sheet said what it said. This module writes that pairing down.
+What is not reconstructible is the pairing -- which board was in front of the
+drafter, which seat was drawn, and what was actually taken while the sheet said
+what it said. This module writes that pairing down.
+
+**The board is not reconstructible either, and the sentence that used to stand
+here saying it was is what made that invisible.** The captures are committed and
+the dated editions are dated, both true; but the board on the table is
+`2026-draft`, which the daily refresh regenerates in place, and a rebuild cannot
+recover it -- `survival.py` prices off ``snapshot_date.max()`` and nothing in the
+pipeline pins an as-of date. A board rebuilt the morning after quotes prices the
+sheet never carried, pairs against them cleanly, and reports a calibration table
+rather than an error. So the board is copied to a dated immutable edition when
+the draft is recorded (`research/freeze.py`), the record names that edition, and
+`run` reads the edition the record names.
 
 **The survival check is the part worth the effort.** S31.1 is resolved and the
 answer is negative: FFC publishes no pick distribution, so every P(available) on
@@ -44,7 +54,11 @@ class BlockedError(ConfigError):
     """A prerequisite is missing, and guessing at it would produce a plausible lie."""
 
 
-def picks(profile_id: str, *, processed_dir=PROCESSED_DIR) -> pl.DataFrame:
+def picks(profile_id: str, *, processed_dir=None) -> pl.DataFrame:
+    # Resolved at call time rather than bound as a default, so the whole command
+    # can be driven over a temporary tree in a test -- the rule `refresh-check`
+    # already follows for its artifact root.
+    processed_dir = PROCESSED_DIR if processed_dir is None else processed_dir
     path = processed_dir / "draft_pick.parquet"
     if not path.exists():
         raise BlockedError(
@@ -107,6 +121,28 @@ def compute(
     """Pair every pick this seat made with what the sheet said beforehand."""
     slot = int(log.filter(pl.col("is_drafter"))["slot"][0])
     survival = _survival_quotes(edition, profile["id"], slot, root=root)
+    draft_day = str(log["draft_date"][0])
+
+    # Independent of the freeze, and deliberately so. The freeze protects the
+    # recording path; this protects everyone else -- anyone who passes --edition
+    # by hand, or who rebuilds the live board and reviews against that. It is the
+    # one failure in this module that produces no error and no odd-looking
+    # number: a board priced after the draft still pairs, still fills every
+    # bucket, and is measuring quotes that did not exist on the night.
+    priced = survival.get("adp_snapshot_date")
+    if priced and str(priced) > draft_day:
+        raise BlockedError(
+            f"the survival artifact in edition {edition!r} is priced off the ADP capture "
+            f"of {priced}, which is after the draft on {draft_day}. That is not the board "
+            "the drafter used, and auditing against it would report the approximation as "
+            "better or worse than it was with nothing on the page saying so.\n"
+            "  `research draft-record` freezes the board it drafted against and names that "
+            "edition in the record, which is what this reads by default. To take one after "
+            "the fact, check out the commit whose sheets were on the table and run "
+            "`research freeze-edition` from there -- artifacts/2026-draft is committed "
+            "(S7, S76)."
+        )
+
     taken_at = {int(r["overall_pick"]): r for r in log.iter_rows(named=True)}
 
     rows = []
@@ -349,17 +385,41 @@ def export(results: dict[str, Any], profile: dict[str, Any]) -> MethodArtifact:
     )
 
 
+def recorded_edition(log: pl.DataFrame) -> str | None:
+    """The frozen board this league's record says it drafted against (S76).
+
+    Written by `research draft-record` into the immutable snapshot payload and
+    carried into `draft_pick` as a column, so it is read back rather than guessed.
+    None for a record taken before the freeze existed, which falls back and then
+    blocks loudly -- the old behaviour, and better than quietly auditing against
+    whatever `2026-draft` holds today.
+    """
+    if "board_edition" not in log.columns:
+        return None
+    named = log["board_edition"].drop_nulls().unique().to_list()
+    return str(named[0]) if named else None
+
+
 def run(
-    *, edition: str | None = None, processed_dir=PROCESSED_DIR, root=ARTIFACT_DIR
+    *, edition: str | None = None, processed_dir=None, root=None
 ) -> list[tuple[dict[str, Any], MethodArtifact]]:
-    edition = edition or default_edition()
+    """Audit every league that has drafted, each against its own board.
+
+    The edition is resolved per profile, not once for the run. The two leagues
+    draft on different nights against boards a week apart, so one edition for both
+    would audit at least one of them against a board it never saw. An explicit
+    `edition` still wins, for the recovery case where the record names one that
+    has to be corrected.
+    """
+    root = ARTIFACT_DIR if root is None else root
     out = []
     for profile in real_profiles():
         try:
             log = picks(profile["id"], processed_dir=processed_dir)
         except BlockedError:
             continue  # this league has not drafted yet; the other one may have
-        results = compute(log, profile, edition, root=root)
+        used = edition or recorded_edition(log) or default_edition()
+        results = compute(log, profile, used, root=root)
         out.append((results, export(results, profile)))
     if not out:
         raise BlockedError(

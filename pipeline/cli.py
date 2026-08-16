@@ -538,6 +538,9 @@ def draft_record(
     date: Annotated[str, typer.Option(help="draft date, ISO, default today")] = "",
     rounds: Annotated[int, typer.Option(help="expected rounds, default inferred")] = 0,
     partial: Annotated[bool, typer.Option(help="accept a draft that really ended early")] = False,
+    board_edition: Annotated[
+        str, typer.Option(help="live edition whose sheet was on the table")
+    ] = "2026-draft",
     dry_run: Annotated[
         bool, typer.Option("--dry-run", help="parse and report; write nothing")
     ] = False,
@@ -560,8 +563,16 @@ def draft_record(
     name the S12 crosswalk cannot resolve, which parses cleanly and then pairs
     with nothing when `draft-review` runs. `--dry-run` does the same parse and
     the same crosswalk match, reports both, and writes nothing.
+
+    **It also freezes the board.** The live edition is regenerated in place every
+    morning, so the survival artifact that priced this draft has hours to live;
+    recording the draft is the one moment it is guaranteed to still be on disk.
+    The frozen edition is named in the record, and `draft-review` reads it back
+    from there (S7, S76).
     """
     from pipeline.ingest import draft_log
+    from research import freeze as freeze_mod
+    from research import method as method_mod
 
     profiles = {p["id"]: p for p in config.league_profiles()}
     if profile not in profiles:
@@ -572,6 +583,30 @@ def draft_record(
     league = profiles[profile]
     draft_day = dt.date.fromisoformat(date) if date else dt.date.today()
     year = season or draft_day.year
+
+    # Looked up at call time and threaded through, so the whole command can be
+    # driven over a temporary edition in a test (`refresh-check` does the same).
+    root = method_mod.ARTIFACT_DIR
+    frozen = freeze_mod.frozen_name(board_edition, profile, draft_day)
+    board_day = freeze_mod.board_captures(board_edition, root).get(profile)
+
+    # Before the parse, because it is the one refusal a later step cannot undo.
+    # A board that has already refreshed past the draft is not this draft's board,
+    # and freezing it would produce an audit that pairs cleanly against prices the
+    # sheet never carried -- which reads as a well calibrated approximation rather
+    # than as a fault (S76).
+    if board_day and board_day > draft_day.isoformat():
+        typer.echo(
+            f"the live board {board_edition!r} is priced off {board_day}, which is after "
+            f"the draft on {draft_day.isoformat()}. Freezing it would preserve a board "
+            "this draft was not made against, and the survival calibration would be "
+            "measuring the wrong day without saying so.\n"
+            "  The sheets committed on the draft date are in git history: check out that "
+            f"commit, run `research freeze-edition --from {board_edition} --as {frozen}`, "
+            "then re-run this with the board already frozen.",
+            err=True,
+        )
+        raise typer.Exit(code=1)
 
     text = Path(picks).read_text()
     try:
@@ -584,12 +619,14 @@ def draft_record(
             draft_date=draft_day,
             rounds=rounds or None,
             partial=partial,
+            board_edition=frozen,
         )
     except draft_log.DraftLogError as exc:
         typer.echo(f"draft log rejected: {exc}", err=True)
         raise typer.Exit(code=1) from None
 
     _report_draft_log(body, league, slot)
+    already = _freeze_board(freeze_mod, board_edition, frozen, board_day, root, dry_run)
     if dry_run:
         typer.echo("dry run: nothing written. Re-run without --dry-run to freeze it.")
         return
@@ -610,6 +647,7 @@ def draft_record(
                 "season": year,
                 "draft_slot": slot,
                 "partial": body["partial"],
+                "board_edition": frozen,
             },
         )
     except snapshot.SnapshotExistsError as exc:
@@ -617,9 +655,39 @@ def draft_record(
         raise typer.Exit(code=1) from None
 
     typer.echo(f"wrote {written} -- {body['pick_count']} picks from seat {slot}")
+    typer.echo(f"  board {'already frozen at' if already else 'frozen as'} {frozen}")
     typer.echo(
         "next: `research build-tables --tables draft_pick` then `research draft-review`"
     )
+
+
+def _freeze_board(
+    freeze_mod, source: str, name: str, board_day: str | None, root, dry_run: bool
+) -> bool:
+    """Preserve the board this draft was made against. True if it already was.
+
+    Ordered before the snapshot write on purpose. Both halves of the record are
+    unrecoverable, but only one of them is on a timer: the paste is a file on disk
+    and can be re-recorded tomorrow under `--date`, while the live board is
+    overwritten by a cron at 11:00 UTC. So the perishable half goes first.
+
+    An existing frozen edition is reported, not refused. The name carries the
+    profile and the draft date, so one that exists is by construction this draft's
+    board -- a retry after a failed record write must not be told that the board
+    is in the way of preserving the board.
+    """
+    priced = f" (priced off {board_day})" if board_day else ""
+    try:
+        freeze_mod.freeze(source, name, root=root, dry_run=dry_run)
+    except freeze_mod.FrozenEditionExistsError:
+        typer.echo(f"  board: {name} is already frozen{priced}")
+        return True
+    except freeze_mod.NothingToFreezeError as exc:
+        typer.echo(f"cannot freeze the board: {exc}", err=True)
+        raise typer.Exit(code=1) from None
+    verb = "would freeze" if dry_run else "froze"
+    typer.echo(f"  board: {verb} {source} -> {name}{priced}")
+    return False
 
 
 def _report_draft_log(body: dict, league: dict, slot: int) -> None:
@@ -682,29 +750,81 @@ def _report_draft_log(body: dict, league: dict, slot: int) -> None:
         )
 
 
+@app.command("freeze-edition")
+def freeze_edition(
+    source: Annotated[
+        str, typer.Option("--from", help="live edition to copy, e.g. 2026-draft")
+    ] = "2026-draft",
+    name: Annotated[str, typer.Option("--as", help="name of the frozen edition")] = "",
+    dry_run: Annotated[
+        bool, typer.Option("--dry-run", help="report what would be frozen; write nothing")
+    ] = False,
+) -> None:
+    """Copy the live board into a dated edition that is never rewritten (S7, S76).
+
+    `draft-record` calls this itself, which is the path that matters -- recording
+    the draft is the one moment the right board is guaranteed to still be on disk.
+    This command exists for the case that moment was missed: check out the commit
+    whose sheets were on the table and freeze from there.
+    """
+    from research import freeze as freeze_mod
+
+    if not name:
+        raise typer.BadParameter("--as is required; nothing chooses a frozen edition's name")
+
+    try:
+        path = freeze_mod.freeze(source, name, dry_run=dry_run)
+    except (freeze_mod.FrozenEditionExistsError, freeze_mod.NothingToFreezeError) as exc:
+        typer.echo(f"{exc}", err=True)
+        raise typer.Exit(code=1) from None
+
+    captures = freeze_mod.board_captures(source)
+    priced = ", ".join(f"{pid} {day}" for pid, day in sorted(captures.items())) or "unknown"
+    if dry_run:
+        typer.echo(f"dry run: would freeze {source} -> {path} (board priced off {priced})")
+        return
+    typer.echo(f"froze {source} -> {path} (board priced off {priced})")
+
+
 @app.command("draft-review")
 def draft_review(
-    edition: Annotated[str, typer.Option(help="edition whose sheet was on the table")] = "",
+    edition: Annotated[
+        str,
+        typer.Option(help="override the board; default is the one the record names"),
+    ] = "",
 ) -> None:
     """Pair what the sheet said with what happened (S76).
 
     Reads the recorded draft and the survival artifact of the edition actually
     used, and writes one S16 artifact per league. Includes the check S31.1 said
     the market could not supply: P(available) as quoted, against whether he was.
+
+    No `--edition` is needed and none should normally be passed. `draft-record`
+    freezes the board each league drafted against and names that edition in the
+    record; this reads it back, per league, because the two draft on different
+    nights against boards a week apart. The option is the recovery path, not the
+    normal one.
     """
     from research import draft_record
     from research import method as method_mod
 
-    edition_name = edition or method_mod.default_edition()
     try:
-        outcomes = draft_record.run(edition=edition_name)
+        outcomes = draft_record.run(edition=edition or None)
     except draft_record.BlockedError as exc:
         typer.echo(f"draft-review is blocked, not killed:\n  {exc}", err=True)
         raise typer.Exit(code=1) from None
 
     for results, artifact in outcomes:
-        path = artifact.write(edition_name)
-        typer.echo(f"{artifact.method_id}: {results['n']} held pick(s) -> {path}")
+        # Into the frozen edition, beside the board it audits. A deliberate
+        # exception to S7's "do not overwrite past editions": the review is
+        # derived and re-runnable where the board and the log are captured, and
+        # keeping it here makes one directory the whole evidentiary bundle for
+        # one draft -- the board, the sheets it rendered, and the pairing.
+        path = artifact.write(results["edition"], method_mod.ARTIFACT_DIR)
+        typer.echo(
+            f"{artifact.method_id}: {results['n']} held pick(s) against edition "
+            f"{results['edition']} -> {path}"
+        )
 
 
 def _preseason_report(today: dt.date | None = None) -> list[tuple[str, bool]]:
@@ -965,6 +1085,11 @@ def refresh_check(
             f"on the board, {entry.get('survival_slots')} slot(s), "
             f"capture {entry.get('adp_snapshot_date')}"
         )
+
+    # Before the baseline comparison, because a board rendered from yesterday's
+    # artifacts matches yesterday's baseline exactly -- that is what makes it
+    # invisible to `regressions`.
+    problems.extend(refresh.stale_boards(metrics, profiles))
 
     baseline = refresh.read_state(edition_name, root)
     if baseline is None:

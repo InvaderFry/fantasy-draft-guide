@@ -361,8 +361,8 @@ it maintains. Every step below works as designed:
 
 * `run-research` treats a blocked module as a **finding, not a failure**, and
   exits 0 — correct, because §19.3 is blocked by design until its gates open;
-* `artifacts/2026-draft/methods/**` is gitignored bar the two carried-forward
-  artifacts, so a fresh runner has **no previous board to fall back on**;
+* `run-research` writes **nothing** for a blocked module, so whatever artifacts
+  are already on disk are what the renderer then reads;
 * a section with no artifact behind it renders `BLOCKED` — deliberately, because
   a blank space on a draft sheet is worse;
 * the commit step fires on any change under `artifacts/2026-draft`.
@@ -371,6 +371,21 @@ So the morning a projection key rotates, the job renders 26 pages whose TIERS an
 SURVIVAL read BLOCKED and commits them over the good ones, and nothing goes red.
 The index banner cannot see it either: it compares the **ADP** capture date, and
 ADP was fine.
+
+**That morning now fails a second way, and the second is quieter.** The live
+board's method artifacts used to be gitignored, so a fresh runner started with
+nothing and a blocked module produced BLOCKED pages — loud, and caught by the
+scan. They are committed now, because §76 cannot audit a board that survived
+nowhere (see *After the draft* below). So the runner checks out **yesterday's**
+artifacts, a blocked module leaves them untouched, and 26 complete pages render
+from them. Nothing is blocked, no count has fallen, and the gate as originally
+written passes a board that is silently a day old.
+
+`refresh.stale_boards` closes it, by comparing the rendered board's ADP capture
+date against the newest capture **in the archive**. Not against the clock: FFC
+publishes once a day and a morning with nothing new is a day in hand, not a day
+lost — the same distinction the capture job draws. Behind a capture that is
+sitting in the repository is the signature of a refresh that did not read it.
 
 `research refresh-check` sits between the render and the commit, and **that
 ordering is the whole mechanism** — a failed step skips the commit. It refuses on
@@ -678,12 +693,13 @@ by which the evidence grades in §3.1 are ever checked against reality."*
 
 ```bash
 # 1. paste the platform's draft results into a file, then CHECK it:
-research draft-record --profile half_ppr_12 --slot 7 --picks picks.txt --dry-run
+make draft-check  PROFILE=half_ppr_12 SLOT=7 PICKS=picks.txt
 
-# 2. only once that reads clean, freeze it:
-research draft-record --profile half_ppr_12 --slot 7 --picks picks.txt
-research build-tables --tables draft_pick
-research draft-review --edition 2026-draft
+# 2. only once that reads clean, freeze it -- the same night:
+make draft-record PROFILE=half_ppr_12 SLOT=7 PICKS=picks.txt
+
+# 3. the audit. No --edition: the record names the board it was taken against.
+make draft-review
 ```
 
 **Dry-run first, always.** §84 refuses a second record on the same date, so a
@@ -706,6 +722,58 @@ his offensive one, so he resolved to no id in all twelve archived ADP captures
 and in the projection snapshot too. `config/manual_id_overrides.yaml` carries the
 correction. **The whole path is exercised on every CI run** —
 `tests/test_draft_dry_run.py` drives the real CLI over a full 12×14 board.
+
+### Record it the same night, because the board expires
+
+§76's pairing is against **the board that was in front of the drafter**, and until
+now that board did not survive the night. `artifacts/2026-draft` is regenerated
+**in place** by the 11:00 UTC refresh — about 7am Eastern, before anybody is
+awake — and its method artifacts were gitignored, so the survival artifact that
+priced a draft at 8pm existed only inside a GitHub runner and was gone with it.
+
+Rebuilding does not recover it. `survival.py` prices off `snapshot_date.max()`
+and **nothing in the pipeline pins an as-of date**, so a board rebuilt the
+morning after quotes prices the sheet never carried. It then pairs against them
+cleanly, fills every calibration bucket, and reports `unmatched: 0`. The failure
+does not produce an error. It produces a calibration table.
+
+So two things changed. The live board's method artifacts are **committed** — the
+cost is about 1.5 MB a day against the ~520 KB of sheets the same job already
+commits. And `draft-record` **freezes** the board into a dated edition that is
+never rewritten (§7), names it in the immutable record, and `draft-review` reads
+it back per league:
+
+```
+  board: froze 2026-draft -> 2026-draft-half_ppr_12-2026-08-29 (priced off 2026-08-29)
+wrote data/snapshots/2026-08-29/draft_half_ppr_12_2026.json -- 168 picks from seat 7
+```
+
+The freeze happens **before** the record is written, because only one of the two
+halves is on a timer: the paste is a file on disk and can be re-recorded tomorrow
+under `--date`, while the board is overwritten by a cron. And it checks for the
+artifact `draft-review` will actually open, so **a freeze that succeeds means a
+review that can run** — found on draft night, while the board is still there,
+rather than in November.
+
+Two refusals, both of which fire in `--dry-run` as well, since finding either
+after the record is frozen is finding it too late:
+
+* **the board has already refreshed past the draft** — it is not this draft's
+  board, and freezing it would file a board nobody drafted from as the one that
+  was on the table. The message names the recovery: the sheets committed on the
+  draft date are in git history, so check out that commit and run
+  `research freeze-edition --from 2026-draft --as <name>` from there.
+* **the board is missing the survival artifact** — a directory that exists is
+  not a board.
+
+`draft-review` refuses the same thing independently, for anyone who passes
+`--edition 2026-draft` by hand a week later. That is the obvious thing to try and
+it is exactly the thing that silently audits the wrong board.
+
+Both leagues resolve **separately**. They draft on different nights off boards a
+week apart, so one edition for the run would audit at least one of them against a
+board it never saw — and it would not look like an error, because the other
+league's board pairs perfectly well.
 
 `--slot` is the seat that was actually drawn. **It is the one value nothing else
 in this repository holds** — the sheets are rendered for all twelve precisely
@@ -793,8 +861,11 @@ data/snapshots/  dated immutable captures with hashes (COMMITTED — the archive
 data/processed/  canonical parquet tables (gitignored, rebuildable)
 pipeline/    ingest, normalize, features, scoring, snapshot, cli
 research/    questions.yaml, method contract, foundations/ teams/ running_back/,
-             sheet.py, draft_record.py (S76)
-artifacts/   dated editions: methods/*.json (S16) and sheets/*.html (S83),
-             plus 2026-draft/ -- the live board, refreshed daily in place
+             sheet.py, draft_record.py (S76), freeze.py (S7)
+artifacts/   dated editions: methods/*.json (S16) and sheets/*.html (S83)
+             2026-draft/ -- the live board, refreshed daily in place; methods AND
+               sheets are committed, because S76 audits it after the draft
+             2026-draft-<profile>-<date>/ -- a frozen copy of the board one
+               league drafted from, never rewritten (S7, S76)
 tests/       data, leakage, config and snapshot tests
 ```

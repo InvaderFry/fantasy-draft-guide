@@ -15,12 +15,22 @@ __pycache__/
 .ruff_cache/
 dist/
 
-# The live draft board (S83). Its sheets are the deliverable and are committed --
-# they have to be openable from a phone at a draft table with no checkout. Its
-# method artifacts are not: the two market-dependent ones are regenerated from
-# scratch on every refresh, and the snapshots they are built from are already in
-# the archive above, which is the whole reason that archive is committed. The two
-# that are NOT regenerated daily are carried forward and so must survive.
-artifacts/2026-draft/methods/**
-!artifacts/2026-draft/methods/team_scoring_regression.json
-!artifacts/2026-draft/methods/rb_dead_zone_bucket_rates.json
+# The live draft board (S83) is committed WHOLE -- sheets and method artifacts
+# both. The sheets have to be openable from a phone at a draft table with no
+# checkout; the artifacts are the machine-readable half of the same deliverable,
+# and S76's audit reads them after the fact.
+#
+# The market-dependent two used to be ignored here, on the argument that they are
+# regenerated on every refresh and the snapshots behind them are archived anyway.
+# Both halves of that are true and the conclusion was still wrong. `2026-draft` is
+# regenerated IN PLACE, so the board a draft was actually made from survived
+# nowhere once the runner was reclaimed -- and it cannot be rebuilt, because
+# `survival.py` prices off `snapshot_date.max()` with no as-of pin, so a rebuild
+# the morning after quotes prices the sheet never carried. A file that exists only
+# inside a GitHub runner is not an archive.
+#
+# The cost is about 1.5 MB a day against the ~520 KB of sheets this same job
+# already commits daily -- the same order, for the half that S76 cannot work
+# without. The dated editions (artifacts/2026.08.13-r1/methods/) have always
+# committed theirs; the live board was the sole exception, and the only edition
+# anyone drafts from.

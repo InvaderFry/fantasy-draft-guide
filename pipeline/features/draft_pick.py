@@ -75,6 +75,9 @@ def parse_payload(payload: dict, *, snapshot_date: dt.date) -> list[dict]:
             "value_type": "observed",
             "source": draft_log.SOURCE_NAME,
             "profile_id": str(payload["profile_id"]),
+            # Nullable, and null means the board was not preserved rather than
+            # that it was the default one. `draft_record.run` refuses on it.
+            "board_edition": payload.get("board_edition"),
             "teams": teams,
             "overall_pick": pick["overall_pick"],
             "round": pick["round"],
@@ -112,7 +115,8 @@ def _empty_schema() -> dict[str, pl.DataType]:
     return {
         "season": pl.Int64, "draft_date": pl.Date, "snapshot_date": pl.Date,
         "as_of": pl.Date, "source_as_of": pl.Date, "value_type": pl.String,
-        "source": pl.String, "profile_id": pl.String, "teams": pl.Int64,
+        "source": pl.String, "profile_id": pl.String, "board_edition": pl.String,
+        "teams": pl.Int64,
         "overall_pick": pl.Int64, "round": pl.Int64, "slot": pl.Int64,
         "is_drafter": pl.Boolean, "player_id": pl.String,
         "source_player_name": pl.String, "position": pl.String, "team": pl.String,
