@@ -46,7 +46,7 @@ from typing import Any
 
 from pipeline.config import draft_slot as profile_draft_slot
 from pipeline.config import real_profiles
-from research.foundations import price_movement
+from research.foundations import price_movement, provider_agreement
 from research.foundations import survival as survival_mod
 from research.foundations import tiers as tiers_mod
 from research.method import ARTIFACT_DIR, default_edition
@@ -177,7 +177,8 @@ def tiers_section(
             adp = p.get("adp")
             rows.append(
                 '<tr class="{cls}"><td>{tier}</td><td>{player}</td><td>{team}</td>'
-                '<td class="num">{vor}</td><td class="num{dz}">{move}{adp}</td></tr>'.format(
+                '<td class="num{soft}">{vor}</td>'
+                '<td class="num{dz}">{move}{adp}</td></tr>'.format(
                     cls="tier-start" if new_tier else "",
                     tier=p["tier"],
                     player=html.escape(str(p["player"])),
@@ -188,6 +189,7 @@ def tiers_section(
                     adp="&mdash;" if adp is None else f"{adp:.0f}",
                     dz=" dz" if in_dead_zone(band, pos, adp) else "",
                     move=move_mark(p.get("adp_delta"), results.get("teams")),
+                    soft=soft_mark(p.get("provider_agreement")),
                 )
             )
         blocks.append(
@@ -279,6 +281,49 @@ def move_mark(delta: float | None, teams: int | None) -> str:
     rising = price_movement.direction(delta) == price_movement.RISING
     # Rising means the market is taking him EARLIER, which is a falling ADP.
     return f'<span class="mv">{"&#9650;" if rising else "&#9660;"}</span>'
+
+
+def soft_mark(agreement: str | None) -> str:
+    """S38.1's LOW agreement, as a class on the VOR figure. Costs no width.
+
+    Only LOW is marked. S38.1's Use table gives MEDIUM and HIGH "normal
+    treatment", and a mark that appears against every row is not a mark.
+
+    On the VOR figure and not the price: VOR is the projection-derived number and
+    the projection is what the two providers disagree about. The ADP cell already
+    carries two meanings (S31.3's glyph and S21.1's colour), and a third would be
+    unreadable at 8pt under a pick clock.
+    """
+    return " soft" if provider_agreement.is_low(agreement) else ""
+
+
+def agreement_legend(artifacts: dict[str, Any], profile: dict[str, Any] | None) -> str:
+    """One clause saying what a softened figure means, and as of when.
+
+    Returns "" when there is no second provider -- which is what CI and every
+    board rendered before S38.1 are in, so those pages stay byte-identical.
+
+    When the comparison exists but was suppressed, the clause says so rather than
+    going silent: a reader who knows the second provider is archived would
+    otherwise read an unmarked board as agreement.
+    """
+    if profile is None:
+        return ""
+    art = artifacts.get(f"{tiers_mod.METHOD_ID}__{profile['id']}")
+    block = ((art or {}).get("primary_results") or {}).get("provider_dispersion") or {}
+    if block.get("measurable"):
+        other = html.escape(str(block.get("other_provider") or "a second provider"))
+        as_of = html.escape(str(block.get("comparison_as_of") or ""))
+        return (
+            f' &middot; <span class="soft">dotted</span> value = {other} disagrees, '
+            f"compared {as_of}"
+        )
+    if block.get("days_behind_board") is not None:
+        return (
+            f' &middot; second board {block["days_behind_board"]} days older than this '
+            "one; agreement not shown"
+        )
+    return ""
 
 
 def movement_legend(artifacts: dict[str, Any], profile: dict[str, Any] | None) -> str:
@@ -595,12 +640,14 @@ def render(
     generated = dt.datetime.now(dt.UTC).date().isoformat()
     captured = adp_capture_date(arts, profile)
     moved = movement_legend(arts, profile)
+    agreed = agreement_legend(arts, profile)
     priced = (
         "ADP not priced"
         if captured is None
         else f"priced from the ADP capture of <strong>{html.escape(captured)}</strong>"
         + ("" if captured == generated else " &mdash; not today&rsquo;s")
         + moved
+        + agreed
     )
     header_note = (
         ""
@@ -874,6 +921,12 @@ _PAGE = """<!doctype html>
   /* S31.3's direction. Sized well below the digits it sits beside: it qualifies
      the price, it is not the price. */
   .mv {{ color: #666; font-size: 6pt; padding-right: 1px; }}
+  /* S38.1 LOW agreement: the two archived providers disagree about this
+     projection. A style on the figure rather than a mark beside it, because the
+     figure IS the thing in doubt and because the page has no width left -- the
+     one-page rule is measured at a single row a position to spare on the
+     tightest sheet (S83, research/fit.py). */
+  .soft {{ text-decoration: underline dotted #a11; text-underline-offset: 1.5px; }}
   .missing {{ color: #777; font-size: 7.5pt; font-style: italic; }}
   ul.missing {{ margin: 2px 0 4px; padding-left: 14px; }}
   code {{ font-size: 7.5pt; }}

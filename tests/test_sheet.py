@@ -545,3 +545,95 @@ def test_the_index_carries_the_capture_date_and_flags_a_stale_one(tmp_path, monk
     captured = SURVIVAL_ARTIFACT["primary_results"]["adp_snapshot_date"]
     assert captured in index
     assert "daily refresh has not run" in index
+
+
+# -- S38.1 provider disagreement --------------------------------------------
+
+
+def _with_agreement(labels, dispersion):
+    """TIER_ARTIFACT with S38.1's label on each player and a dispersion block."""
+    results = json.loads(json.dumps(TIER_ARTIFACT["primary_results"]))
+    for player in results["positions"]["RB"]["players"]:
+        player["provider_agreement"] = labels.get(player["player"])
+    results["provider_dispersion"] = dispersion
+    art = {**TIER_ARTIFACT, "primary_results": results}
+    return {**FULL, f"{tiers_mod.METHOD_ID}__fixture_12": art}
+
+
+MEASURED = {
+    "measurable": True,
+    "other_provider": "fftoday",
+    "comparison_as_of": "2026-08-14",
+    "days_behind_board": 2,
+}
+
+
+def test_a_board_with_one_provider_renders_exactly_as_it_did_before():
+    """S38.1 is additive. Today's archive holds one provider, so today's page must
+    be unchanged -- including the header line, where a legend for marks that
+    cannot appear would be a line of the page spent saying nothing."""
+    before = sheet.render("test", profile=PROFILE, slot=7, artifacts=FULL)
+    unmeasured = _with_agreement(
+        {}, {"measurable": False, "reason": "one provider archived"}
+    )
+    after = sheet.render("test", profile=PROFILE, slot=7, artifacts=unmeasured)
+
+    assert before == after
+    # The CSS rule is always present; what must not appear is a cell using it.
+    assert 'class="num soft"' not in before
+
+
+def test_a_disputed_projection_is_marked_without_costing_a_column():
+    """The one-page rule is measured at zero rows to spare, so the mark is a style
+    on a figure that is already there rather than a character beside it."""
+    arts = _with_agreement({"Player Two": "low"}, MEASURED)
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=arts)
+
+    assert '<td class="num soft">80</td>' in page
+    # The header row is untouched: five columns before, five after.
+    assert page.count("<th>T</th><th>Player</th><th>Tm</th>") == page.count(
+        '<th class="num">VOR</th><th class="num">ADP</th>'
+    )
+
+
+def test_agreement_and_disagreement_are_not_the_same_absence():
+    """A player the second provider never priced carries no mark, and neither does
+    one both providers agree on -- but only one of those is agreement."""
+    arts = _with_agreement(
+        {"Bijan Robinson": "high", "Player Two": "low", "Unpriced Man": None}, MEASURED
+    )
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=arts)
+
+    assert '<td class="num soft">170</td>' not in page   # high agreement
+    assert '<td class="num soft">60</td>' not in page    # never priced
+    assert '<td class="num soft">80</td>' in page        # the disagreement
+
+
+def test_the_legend_names_the_second_provider_and_when_it_was_compared():
+    arts = _with_agreement({"Player Two": "low"}, MEASURED)
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=arts)
+
+    assert "fftoday disagrees" in page
+    assert "2026-08-14" in page
+
+
+def test_a_suppressed_comparison_says_so_rather_than_going_quiet():
+    """A reader who knows a second provider is archived would otherwise read an
+    unmarked board as agreement."""
+    arts = _with_agreement(
+        {}, {"measurable": False, "reason": "too old", "days_behind_board": 21}
+    )
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=arts)
+
+    assert "21 days older" in page
+    assert "agreement not shown" in page
+
+
+def test_nothing_the_agreement_puts_on_the_page_is_forbidden_by_s83():
+    """S83 bars sample sizes, confidence intervals and grades from the sheet, and
+    a spread between two providers reads a lot like all three."""
+    arts = _with_agreement({"Player Two": "low"}, MEASURED)
+    page = sheet.render("test", profile=PROFILE, slot=7, artifacts=arts)
+    sheet.assert_sheet_constraints(page)  # raises if it drifted
+    for token in ("cv", "stdev", "±", "n="):
+        assert token not in page.lower()

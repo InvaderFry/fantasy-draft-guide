@@ -336,6 +336,65 @@ questions:
       An interpolated or assumed move is worse than none: it would print a
       confident arrow at a draft table from data that does not exist.
 
+  - id: cross_provider_projection_agreement
+    question: >
+      How far apart are two independent providers on the same player's season
+      projection, and is that spread wide enough to change a pick (S38.1)?
+    type: descriptive_construction
+    blocks:
+      - S83 draft-day sheet (whether a gap on the tier board is read as real)
+      - S39 recommendation weighting
+      - S56 fair-value adjustment
+    decision_change: >
+      Whether a drafter treats a gap on the tier board as a gap or as two boards
+      disagreeing. S38.1's Use table: at a LOW-agreement player the thesis rests
+      on the projection rather than on a research signal, so the drafter widens
+      the price band and does not reach on the tier ordering alone. Every
+      "research fair value" in this guide is a provider projection plus an
+      adjustment, and until now the provider number carried no stated error at
+      all.
+    resolution_method: >
+      A second provider archived through S11 option 1B -- a manual export, hashed
+      into data/snapshots/<date>/projections_<key>.csv by
+      `research snapshot --sources projections-manual`. Both boards are scored by
+      pipeline/scoring.py under the SAME league profile, which is what makes them
+      comparable, then compared at a capture date both providers were archived on
+      or before. Labelled by S38.1's own thresholds.
+      research/foundations/provider_agreement.py.
+    power_status: NOT_APPLICABLE   # a construction from two archives, not a test
+    status: OPEN
+    answered: >
+      Nothing yet. The machinery is built and the second provider is not
+      captured: with one provider archived the module reports `measurable: false`
+      and the sheet renders exactly as it did before, which is the state to
+      expect until an export lands.
+    limitation: >
+      Dispersion measures DISAGREEMENT, NOT ACCURACY (S38.1). Two providers can
+      agree closely and both be wrong, particularly where they share upstream
+      inputs -- it is a floor on uncertainty, never a ceiling, and two is the
+      smallest sample of opinions S38.1 contemplates. Replace it with measured
+      projection error when a historical preseason projection archive exists
+      (S66), as a new methodology version rather than a silent edit.
+    kill_rule: >
+      Three clauses, all refusals, because each of the states below computes
+      cleanly and means something other than what it says.
+      (1) NEVER average the providers into a consensus row (S38.1, S80). The
+          spread IS the signal and a mean destroys it; the board's value metric
+          is computed as if the second provider were absent, and a test asserts
+          the board is identical with and without it.
+      (2) If the second provider does not publish every stat the league profile
+          scores, report NO agreement. pipeline/scoring.py fills an unpublished
+          column with zero, so a provider omitting fumbles-lost scores high and
+          one omitting receptions scores low -- arriving as a confident LOW
+          against every player on the board, produced entirely by a column that
+          was never published.
+      (3) If the newest capture both providers share is more than seven days
+          behind the board being priced, report NO agreement and say so on the
+          page. A spread taken across two vintages measures the calendar rather
+          than the providers. Same rule and same reason as adp_price_movement: a
+          confident mark at a draft table from data that does not exist is worse
+          than no mark.
+
   - id: fantasypros_projection_shape
     question: >
       What does the FantasyPros public API actually return for season

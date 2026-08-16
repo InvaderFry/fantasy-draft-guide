@@ -183,3 +183,71 @@ def test_an_intraday_republish_does_not_red_the_archive(archive, monkeypatch, ca
     capture()  # exits 0
     assert (archive / CAPTURE_DATE.isoformat() / FILENAME).read_bytes() == morning
     assert "the first capture stands" in capsys.readouterr().err
+
+
+# -- S38.1's second provider (`--sources projections-manual`) ----------------
+
+
+def test_a_manual_capture_with_no_declared_provider_is_a_skip_not_a_failure(
+    archive, monkeypatch, capsys
+):
+    """S38.1's capture must never cost a day of ADP.
+
+    `snapshot` is run by the archive job, which commits the ADP captured seconds
+    earlier -- so anything that exits non-zero from there is a reason a captured
+    day never lands. An undeclared second provider is a state the repository is
+    in by design until someone produces an export.
+    """
+    monkeypatch.setattr(cli.projections_csv, "configured_providers", dict)
+    capture(sources="projections-manual")  # exits 0
+    out = capsys.readouterr().out
+    assert "no providers declared" in out
+    assert "nothing new to capture" in out
+
+
+def test_the_manual_path_is_reached_even_when_the_api_key_is_set(archive, monkeypatch):
+    """The defect this source name exists for.
+
+    S11's `_fetch_projections` is a FALLBACK ORDER -- FantasyPros first, manual
+    CSV only on MissingKeyError. The key is a repository secret, so on the runner
+    the manual adapter was unreachable and the board could only ever carry one
+    provider. S38.1 needs a second opinion, not a substitute one.
+    """
+    export = b"player_name,position,team,rush_yds\nBijan Robinson,RB,ATL,1290\n"
+
+    class FakeCsvAdapter:
+        providers = {"other_2026": {"provider_id": "other"}}
+
+        def fetch(self) -> list[Fetched]:
+            return [fetched(export, window_end=None, filename="projections_other_2026.csv")]
+
+    monkeypatch.setattr(cli.projections_csv, "ProjectionCsvAdapter", FakeCsvAdapter)
+    # The API key being present is exactly the condition that used to hide it.
+    monkeypatch.setenv("FANTASYPROS_API_KEY", "set-and-irrelevant-here")
+
+    capture(sources="projections-manual")
+    assert (archive / CAPTURE_DATE.isoformat() / "projections_other_2026.csv").exists()
+
+
+def test_a_manual_export_is_not_refiled_on_a_second_run(archive, monkeypatch, capsys):
+    """A one-time capture whose command is safe to re-run.
+
+    The export is a file on disk, so re-running the capture serves identical
+    bytes. `_classify`'s `unchanged` rule makes that a benign no-op rather than a
+    second dated copy of one opinion, which would double the provider's weight in
+    any dispersion measure taken across providers (S38.1).
+    """
+    export = b"player_name,position,team,rush_yds\nBijan Robinson,RB,ATL,1290\n"
+    name = "projections_other_2026.csv"
+    snapshot.Snapshot(dt.date(2026, 8, 13)).write(name, export, source="projection_csv")
+
+    class FakeCsvAdapter:
+        providers = {"other_2026": {"provider_id": "other"}}
+
+        def fetch(self) -> list[Fetched]:
+            return [fetched(export, window_end=None, filename=name)]
+
+    monkeypatch.setattr(cli.projections_csv, "ProjectionCsvAdapter", FakeCsvAdapter)
+    capture(sources="projections-manual")  # exits 0
+    assert not (archive / CAPTURE_DATE.isoformat()).exists()
+    assert "unchanged since 2026-08-13" in capsys.readouterr().err

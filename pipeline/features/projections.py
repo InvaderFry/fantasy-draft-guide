@@ -157,16 +157,45 @@ def coverage(frame: pl.DataFrame) -> dict[str, Any]:
     }
 
 
-def latest(frame: pl.DataFrame, *, season: int | None = None) -> pl.DataFrame:
+def vintages(frame: pl.DataFrame) -> dict[str, dt.date]:
+    """The newest capture date held for each provider (S38.1).
+
+    Not the newest date overall: providers are captured on different cadences --
+    the API board daily, a manual export once -- so one number cannot describe
+    both. Cross-provider comparison and every report of it reads this.
+    """
+    if not frame.height or "provider_id" not in frame.columns:
+        return {}
+    newest = frame.group_by("provider_id").agg(pl.col("snapshot_date").max())
+    return {
+        str(row["provider_id"]): row["snapshot_date"]
+        for row in newest.iter_rows(named=True)
+        if row["provider_id"] is not None and row["snapshot_date"] is not None
+    }
+
+
+def latest(
+    frame: pl.DataFrame,
+    *,
+    season: int | None = None,
+    on_or_before: dt.date | None = None,
+) -> pl.DataFrame:
     """The most recent capture per provider per player.
 
     Stacking every snapshot date is what makes the table an archive; a tier board
     wants today's price of today's opinion, not an eight-week smear of both.
+
+    `on_or_before` pins the answer to a past day. S38.1 compares two providers
+    captured on different cadences, and comparing each one's newest capture would
+    measure the days between them as though they were disagreement. Pinning both
+    to a shared date measures the providers.
     """
     if not frame.height:
         return frame
     if season is not None:
         frame = frame.filter(pl.col("season") == season)
+    if on_or_before is not None:
+        frame = frame.filter(pl.col("snapshot_date") <= on_or_before)
     if not frame.height:
         return frame
     return (

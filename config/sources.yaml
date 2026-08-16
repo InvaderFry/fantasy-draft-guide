@@ -175,6 +175,18 @@ sources:
       # the payload) and games played. An absent column is left absent rather
       # than aimed at the nearest-looking one.
 
+# Which archived provider the S19.3 tier board is DRAWN from (S38.1).
+#
+# Explicit, because the alternative bit us in the design: `chosen_provider` used
+# to return the alphabetically first provider present, so archiving a second one
+# whose id sorts earlier -- `cbs`, `espn`, `4for4` -- would silently rebuild every
+# tier, every replacement level and every VOR on 26 sheets from the new provider,
+# with no row count falling and nothing announcing it.
+#
+# The other archived providers are CARRIED alongside for cross-provider spread,
+# never averaged into this one (S38.1, S80).
+board_provider: fantasypros
+
 # Column mappings for manual projection imports (S11 option 1B).
 # Add one block per provider export you actually drop in data/raw/projections/.
 projection_providers: {}

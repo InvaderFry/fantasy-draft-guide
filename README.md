@@ -19,6 +19,7 @@ Built here:
 | ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires — followed by a second job that re-renders the sheets from it |
 | Preseason bundle | §84, §86 | the second capture program: nflverse depth charts, rosters and injuries archived before Week 1, on a cadence the code decides |
 | Price movement | §31.3 | what the archive is *for*: how each price has moved since the prior capture, marked on the board and in the pick blocks |
+| Provider spread | §38.1 | a second projection provider carried beside the board, and where the two disagree marked on the value — the error bar the board had never had |
 | Refresh gate | §83 | the daily job refuses to publish a board worse than the one it would replace |
 | One-page gate | §83, §78 | every sheet printed and page-counted on every refresh — the constraint that had only ever been checked by hand |
 | Archive health | §84 | the series measured: what it holds, what it lost, and whether it has stopped |
@@ -185,7 +186,7 @@ it. §83's seven sections and what each carries today:
 
 | Section | Spec | State |
 |---|---|---|
-| TIERS | §19.3 | **filled in** — tier, player, team, VOR **and ADP** by position |
+| TIERS | §19.3 | **filled in** — tier, player, team, VOR **and ADP** by position, with §38.1's provider disagreement marked on the value |
 | TARGETS | §27 | not built — needs graded evidence (§79) |
 | AVOIDS | §28 | **filled in** — §21.1's price band. Player-level avoids still need §79 |
 | REGRESSION | §25 | **filled in** — teams flagged, with the expected move |
@@ -557,6 +558,153 @@ merely non-empty: scoring the mapped frame under a half-PPR profile reproduces
 FantasyPros' own `points_half` to the cent. A stat map can be wrong in a way that
 still computes, and a tier board built on it looks exactly like a correct one.
 
+## What the projection is worth, and who disagrees (§38.1)
+
+§38.1 names the largest unquantified uncertainty in the whole document:
+
+> Every "research fair value" in the guide is a provider projection plus an
+> adjustment. The provider number carries error, and because historical preseason
+> projection archives are unavailable (§66), **that error cannot be measured.**
+
+It cannot be eliminated, and §38.1 says so: it can be *bounded and displayed*.
+Until now this repository could do neither. `provider_dispersion` ran on every
+refresh and returned the honest, useless answer — `measurable: false`, *"one
+provider archived ... the board carries no error bar"* — so a player one provider
+likes far more than another printed exactly like one they agree on.
+
+The treatment is §38.1's own, thresholds included:
+
+```
+provider_spread    = max(points) - min(points)
+provider_cv        = stdev(points) / mean(points)
+provider_agreement = high if cv < 0.08 else medium if cv < 0.15 else low
+```
+
+Those two constants come from the spec rather than from this data, which is what
+makes them usable: §80 prohibits choosing a threshold after seeing what it
+produces, and these were committed before anyone here had two providers to fit
+them against.
+
+**Carried, never blended.** §38.1 and §80 both forbid a consensus row — the spread
+*is* the signal and a mean destroys it. §19.3's value metric is computed on the
+board provider's rows alone, exactly as if the second provider were absent, and
+the test that pins it asserts every tier, every replacement level and every VOR
+is identical with and without one. That is the guarantee that would otherwise fail
+silently: a board subtly shifted by a provider nobody chose to rank on looks
+exactly like a board, and every number on it is plausible.
+
+### On the page: a dotted value, and nothing else
+
+Only LOW is marked. §38.1's Use table gives MEDIUM and HIGH "normal treatment",
+and a mark against every row is not a mark.
+
+The mark is a **dotted underline on the VOR figure** rather than a character
+beside it, because the page has no width left — `research fit-check` measures the
+tightest sheet at one row a position to spare. It goes on VOR because VOR is the
+projection-derived number and the projection is the thing in doubt; the ADP cell
+already carries two meanings (§31.3's ▲▼ and §21.1's red) and a third would be
+unreadable at 8pt under a pick clock.
+
+```
+RB  1  Bijan Robinson  ATL   170   ▲2
+RB  2  Some Back       DET    80̲    41     <- the two providers disagree about him
+```
+
+The legend names the second provider and the date the comparison was taken. When
+there is no second provider it prints nothing at all, and the page is byte-for-byte
+what it was before — a test asserts exactly that, because the archive is in that
+state today.
+
+All 26 sheets were re-measured with every player marked and a long provider name
+in the legend — a worse board than any real one — and every one still prints on a
+single page with the same headroom.
+
+### Two things it refuses to measure
+
+Both of these compute cleanly and mean something other than what they say, which
+is the same shape of defect as a projection stat map that maps onto the wrong
+columns.
+
+**A provider that does not publish what the league scores.** `pipeline/scoring.py`
+fills an unpublished stat column with zero and `projections._conform` hands every
+provider all of §13's columns whether it published them or not. So a provider
+omitting fumbles-lost — a *negative* term — scores systematically **higher**, and
+one omitting receptions scores catastrophically lower under PPR. Neither is
+disagreement, and both arrive as a confident LOW against every player on the
+board. The comparison is refused, naming the columns.
+
+**Two boards taken on different days.** A manual export is captured once and the
+API board daily, so their newest captures drift apart, and a spread between them
+is partly the calendar. So each provider is read at its newest capture **at or
+before a date they share** — the comparison moves back, the board still prices off
+today — and past seven days even the pinned comparison is too old to describe
+today's board and nothing is reported. Seven days is one preseason week: a full
+round of preseason games and one injury cycle, which is the shortest span over
+which a provider's board moves for reasons that are not disagreement.
+
+A suppressed comparison **says so on the page** rather than going quiet. A reader
+who knows a second provider is archived would otherwise read an unmarked board as
+agreement, which is the one reading that is worse than no information.
+
+### Adding the second provider
+
+`data/raw/` is gitignored and a runner checks out fresh, so the dated snapshot is
+the only copy that survives. The manual path needs no network, so unlike FFC and
+FantasyPros it runs anywhere.
+
+```bash
+# 1. drop the export in data/raw/projections/ and declare its columns under
+#    `projection_providers` in config/sources.yaml (see the commented example),
+#    plus a `sources:` registry block with its license and attribution (S46)
+# 2. capture it -- writes and hashes it into today's snapshot
+make projections-manual
+# 3. commit config/sources.yaml AND data/snapshots/<date>/ together
+```
+
+`--sources projections-manual` is deliberately a **separate source name** from the
+daily `projections`, and not an extension of it. §11's `_fetch_projections` is a
+*fallback order* — FantasyPros first, manual CSV only if the key is missing — and
+since the key is a repository secret the manual adapter was unreachable on the
+runner, so the board could only ever carry one provider. Widening that function
+instead would have been worse than useless: the daily archive job would then reach
+the CSV adapter on every run, find nothing under the gitignored `data/raw/`, and
+raise **before the FFC payloads were written** — costing a day of ADP, which is
+§84's one unrecoverable failure, to buy a provider that was not there.
+
+`research validate` reports what the archive holds, since that is now the question
+§38.1 turns on:
+
+```
+projections: board drawn from `fantasypros` (config/sources.yaml board_provider)
+projections: archived: fantasypros newest 2026-08-16, fftoday newest 2026-08-14
+projections: newest captures 2 day(s) apart; S38.1 agreement is reported
+```
+
+### The board's provider is now a decision
+
+`chosen_provider` used to return the alphabetically first provider present. That
+is correct exactly while there is one of them — and §38.1 exists to add a second.
+Archiving any provider whose id sorts earlier (`cbs`, `espn`, `4for4`) would have
+**rebuilt every tier, every replacement level and every VOR across 26 sheets from
+a board nobody chose**, on the morning it first landed. No row count falls, so
+`refresh-check`'s thinning gate is blind to it.
+
+`board_provider` in `config/sources.yaml` is now the answer, and the rules are
+asymmetric on purpose:
+
+| Archive | Outcome |
+|---|---|
+| holds the configured provider | draw the board from it |
+| holds one provider, not the configured one | draw from what there is and **record the substitution** — refusing would render TIERS as `BLOCKED` on 26 sheets because a provider was renamed, and §83's trade is that stale-but-complete beats fresh-but-blocked |
+| holds several, none configured | **refuse** — picking one of several unconfigured boards is the original defect wearing a different hat |
+
+**Dispersion measures disagreement, not accuracy.** Two providers can agree closely
+and both be wrong, particularly where they share upstream inputs. It is a floor on
+uncertainty and never a ceiling — and it is two providers, the minimum §38.1
+contemplates, so it is a floor taken over the smallest possible sample of
+opinions. §66's measured projection error replaces it when a historical archive
+exists, as a new methodology version.
+
 ## The preseason bundle (§84)
 
 §84 has two capture programs. The daily one archives prices. The second is a
@@ -884,7 +1032,13 @@ about who was available at every pick after the gap.
 * **Fantasy Football Calculator** — ADP, free for personal and commercial use
   with attribution requested.
 * **FantasyPros** — projections, key-gated and configured; first capture
-  2026-08-13 (§11).
+  2026-08-13 (§11). The board is drawn from this provider (`board_provider` in
+  `config/sources.yaml`).
+* **A second projection provider** — §38.1 asks for two or three so their spread
+  can stand in for the error nobody can measure. None is declared yet; the manual
+  import path (§11 option 1B) and the comparison are built and dormant. Whichever
+  is added is registered in `config/sources.yaml` with its license before its
+  first capture (§46, §80).
 
 Full registry with purposes and licenses: `config/sources.yaml` (§46). This is
 a technical registry, not legal advice.
@@ -920,6 +1074,7 @@ data/snapshots/  dated immutable captures with hashes (COMMITTED — the archive
 data/processed/  canonical parquet tables (gitignored, rebuildable)
 pipeline/    ingest, normalize, features, scoring, snapshot, cli
 research/    questions.yaml, method contract, foundations/ teams/ running_back/,
+             foundations/provider_agreement.py (S38.1's cross-provider spread),
              sheet.py, fit.py (S83's one-page rule, measured), refresh.py (S83),
              draft_record.py (S76), freeze.py (S7)
 artifacts/   dated editions: methods/*.json (S16) and sheets/*.html (S83)
