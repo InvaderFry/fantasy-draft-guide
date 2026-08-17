@@ -32,11 +32,15 @@
       "configured": "fantasypros",
       "substituted": false,
       "archived": [
-        "fantasypros"
+        "fantasypros",
+        "sleeper"
       ]
     },
-    "providers_archived": null,
-    "agreement_as_of": null,
+    "providers_archived": [
+      "fantasypros",
+      "sleeper"
+    ],
+    "agreement_as_of": "2026-08-17",
     "adp_snapshot_date": "2026-08-17",
     "price_movement_since": "2026-08-13"
   },
@@ -52,7 +56,8 @@
       "configured": "fantasypros",
       "substituted": false,
       "archived": [
-        "fantasypros"
+        "fantasypros",
+        "sleeper"
       ]
     },
     "tier_break_multiple": 2.0,
@@ -107,7 +112,7 @@
             "adp": 31.0,
             "position_adp": 1,
             "adp_delta": 6.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Lamar Jackson",
@@ -118,7 +123,7 @@
             "adp": 56.2,
             "position_adp": 4,
             "adp_delta": 5.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jalen Hurts",
@@ -129,7 +134,7 @@
             "adp": 77.4,
             "position_adp": 8,
             "adp_delta": 2.5,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Drake Maye",
@@ -140,7 +145,7 @@
             "adp": 51.5,
             "position_adp": 2,
             "adp_delta": 5.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jayden Daniels",
@@ -151,7 +156,7 @@
             "adp": 71.8,
             "position_adp": 6,
             "adp_delta": 0.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jaxson Dart",
@@ -162,7 +167,7 @@
             "adp": 119.8,
             "position_adp": 16,
             "adp_delta": 21.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Joe Burrow",
@@ -173,7 +178,7 @@
             "adp": 55.0,
             "position_adp": 3,
             "adp_delta": -2.6,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Dak Prescott",
@@ -184,7 +189,7 @@
             "adp": 66.4,
             "position_adp": 5,
             "adp_delta": -0.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Caleb Williams",
@@ -195,7 +200,7 @@
             "adp": 86.0,
             "position_adp": 9,
             "adp_delta": -17.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Brock Purdy",
@@ -206,7 +211,7 @@
             "adp": 86.6,
             "position_adp": 10,
             "adp_delta": 11.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Trevor Lawrence",
@@ -217,7 +222,7 @@
             "adp": 94.7,
             "position_adp": 11,
             "adp_delta": 6.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Patrick Mahomes II",
@@ -228,7 +233,7 @@
             "adp": 100.1,
             "position_adp": 12,
             "adp_delta": 0.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Justin Herbert",
@@ -239,7 +244,7 @@
             "adp": 107.5,
             "position_adp": 14,
             "adp_delta": 3.6,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Bo Nix",
@@ -250,7 +255,7 @@
             "adp": 116.5,
             "position_adp": 15,
             "adp_delta": -2.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Matthew Stafford",
@@ -261,7 +266,7 @@
             "adp": 76.5,
             "position_adp": 7,
             "adp_delta": -0.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jared Goff",
@@ -272,7 +277,7 @@
             "adp": 104.1,
             "position_adp": 13,
             "adp_delta": -4.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tyler Shough",
@@ -283,7 +288,7 @@
             "adp": 132.6,
             "position_adp": 17,
             "adp_delta": -4.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Baker Mayfield",
@@ -294,7 +299,7 @@
             "adp": 133.4,
             "position_adp": 18,
             "adp_delta": 0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Kyler Murray",
@@ -305,7 +310,7 @@
             "adp": 137.0,
             "position_adp": 19,
             "adp_delta": -9.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Daniel Jones",
@@ -316,7 +321,7 @@
             "adp": 165.7,
             "position_adp": 24,
             "adp_delta": 8.8,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Malik Willis",
@@ -327,7 +332,7 @@
             "adp": 165.9,
             "position_adp": 25,
             "adp_delta": 5.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jordan Love",
@@ -338,7 +343,7 @@
             "adp": 148.4,
             "position_adp": 21,
             "adp_delta": -0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Sam Darnold",
@@ -349,7 +354,7 @@
             "adp": 148.0,
             "position_adp": 20,
             "adp_delta": 2.6,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "C.J. Stroud",
@@ -360,7 +365,7 @@
             "adp": 164.2,
             "position_adp": 23,
             "adp_delta": -5.4,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Bryce Young",
@@ -371,7 +376,7 @@
             "adp": 156.0,
             "position_adp": 22,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jacoby Brissett",
@@ -382,7 +387,7 @@
             "adp": 174.8,
             "position_adp": 26,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Cam Ward",
@@ -393,7 +398,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Geno Smith",
@@ -404,7 +409,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Aaron Rodgers",
@@ -415,7 +420,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Fernando Mendoza",
@@ -426,7 +431,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tua Tagovailoa",
@@ -437,7 +442,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Deshaun Watson",
@@ -448,7 +453,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Shedeur Sanders",
@@ -459,7 +464,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Michael Penix Jr.",
@@ -470,7 +475,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kirk Cousins",
@@ -481,7 +486,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Ty Simpson",
@@ -492,7 +497,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Carson Beck",
@@ -503,7 +508,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "J.J. McCarthy",
@@ -514,7 +519,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Marcus Mariota",
@@ -525,7 +530,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Davis Mills",
@@ -536,7 +541,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Shane Buechele",
@@ -547,7 +552,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Riley Leonard",
@@ -558,7 +563,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Will Levis",
@@ -569,7 +574,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tyson Bagent",
@@ -580,7 +585,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Justin Fields",
@@ -591,7 +596,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jarrett Stidham",
@@ -602,7 +607,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Quinn Ewers",
@@ -613,7 +618,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jake Browning",
@@ -624,7 +629,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jameis Winston",
@@ -635,7 +640,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Anthony Richardson Sr.",
@@ -646,7 +651,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tyler Huntley",
@@ -657,7 +662,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Joshua Dobbs",
@@ -668,7 +673,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tommy DeVito",
@@ -679,7 +684,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tyrod Taylor",
@@ -690,7 +695,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Tanner McKee",
@@ -701,7 +706,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Mac Jones",
@@ -712,7 +717,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Andy Dalton",
@@ -723,7 +728,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Chris Oladokun",
@@ -734,7 +739,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Behren Morton",
@@ -745,7 +750,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Trey Lance",
@@ -756,7 +761,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Sam Howell",
@@ -767,7 +772,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Spencer Rattler",
@@ -778,7 +783,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Joe Flacco",
@@ -789,7 +794,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Gardner Minshew II",
@@ -800,7 +805,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kenny Pickett",
@@ -811,7 +816,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Nick Mullens",
@@ -822,7 +827,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Adrian Martinez",
@@ -833,7 +838,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Drew Lock",
@@ -844,7 +849,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Garrett Nussmeier",
@@ -855,7 +860,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Cole Payton",
@@ -866,7 +871,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Drew Allar",
@@ -877,7 +882,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jalen Milroe",
@@ -888,7 +893,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Cade Klubnik",
@@ -899,7 +904,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Mitchell Trubisky",
@@ -910,7 +915,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kyle Allen",
@@ -921,7 +926,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Joe Milton III",
@@ -932,7 +937,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Will Howard",
@@ -943,7 +948,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Desmond Ridder",
@@ -954,7 +959,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Mason Rudolph",
@@ -965,7 +970,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Brady Cook",
@@ -976,7 +981,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           }
         ]
       },
@@ -998,7 +1003,7 @@
             "adp": 1.5,
             "position_adp": 1,
             "adp_delta": 0.0,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Bijan Robinson",
@@ -1009,7 +1014,7 @@
             "adp": 2.0,
             "position_adp": 2,
             "adp_delta": -0.1,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Christian McCaffrey",
@@ -1020,7 +1025,7 @@
             "adp": 6.8,
             "position_adp": 4,
             "adp_delta": 0.1,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jonathan Taylor",
@@ -1031,7 +1036,7 @@
             "adp": 5.9,
             "position_adp": 3,
             "adp_delta": 0.1,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Derrick Henry",
@@ -1042,7 +1047,7 @@
             "adp": 10.5,
             "position_adp": 6,
             "adp_delta": 0.5,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "De'Von Achane",
@@ -1053,7 +1058,7 @@
             "adp": 11.6,
             "position_adp": 7,
             "adp_delta": 0.5,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "James Cook III",
@@ -1064,7 +1069,7 @@
             "adp": 8.9,
             "position_adp": 5,
             "adp_delta": -2.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Ashton Jeanty",
@@ -1075,7 +1080,7 @@
             "adp": 15.7,
             "position_adp": 9,
             "adp_delta": 0.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Chase Brown",
@@ -1086,7 +1091,7 @@
             "adp": 15.0,
             "position_adp": 8,
             "adp_delta": -1.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Saquon Barkley",
@@ -1097,7 +1102,7 @@
             "adp": 18.0,
             "position_adp": 10,
             "adp_delta": -0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Kenneth Walker III",
@@ -1108,7 +1113,7 @@
             "adp": 22.5,
             "position_adp": 12,
             "adp_delta": -3.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Josh Jacobs",
@@ -1119,7 +1124,7 @@
             "adp": 26.9,
             "position_adp": 13,
             "adp_delta": 3.9,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Breece Hall",
@@ -1130,7 +1135,7 @@
             "adp": 29.0,
             "position_adp": 15,
             "adp_delta": 1.8,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Omarion Hampton",
@@ -1141,7 +1146,7 @@
             "adp": 22.2,
             "position_adp": 11,
             "adp_delta": 0.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jeremiyah Love",
@@ -1152,7 +1157,7 @@
             "adp": 32.1,
             "position_adp": 16,
             "adp_delta": 2.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Kyren Williams",
@@ -1163,7 +1168,7 @@
             "adp": 27.4,
             "position_adp": 14,
             "adp_delta": -3.7,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Cam Skattebo",
@@ -1174,7 +1179,7 @@
             "adp": 35.0,
             "position_adp": 18,
             "adp_delta": 0.7,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Javonte Williams",
@@ -1185,7 +1190,7 @@
             "adp": 34.9,
             "position_adp": 17,
             "adp_delta": -1.1,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Travis Etienne Jr.",
@@ -1196,7 +1201,7 @@
             "adp": 42.8,
             "position_adp": 19,
             "adp_delta": 1.6,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "D'Andre Swift",
@@ -1207,7 +1212,7 @@
             "adp": 43.3,
             "position_adp": 20,
             "adp_delta": 0.4,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Bucky Irving",
@@ -1218,7 +1223,7 @@
             "adp": 47.8,
             "position_adp": 21,
             "adp_delta": 2.1,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Quinshon Judkins",
@@ -1229,7 +1234,7 @@
             "adp": 52.3,
             "position_adp": 22,
             "adp_delta": 3.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Bhayshul Tuten",
@@ -1240,7 +1245,7 @@
             "adp": 53.6,
             "position_adp": 23,
             "adp_delta": 1.6,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "David Montgomery",
@@ -1251,7 +1256,7 @@
             "adp": 55.5,
             "position_adp": 24,
             "adp_delta": -7.4,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jaylen Warren",
@@ -1262,7 +1267,7 @@
             "adp": 64.2,
             "position_adp": 26,
             "adp_delta": -12.5,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "TreVeyon Henderson",
@@ -1273,7 +1278,7 @@
             "adp": 58.5,
             "position_adp": 25,
             "adp_delta": 1.2,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jadarian Price",
@@ -1284,7 +1289,7 @@
             "adp": 78.8,
             "position_adp": 31,
             "adp_delta": 12.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tony Pollard",
@@ -1295,7 +1300,7 @@
             "adp": 65.4,
             "position_adp": 27,
             "adp_delta": -1.4,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Rhamondre Stevenson",
@@ -1306,7 +1311,7 @@
             "adp": 69.7,
             "position_adp": 28,
             "adp_delta": -2.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Rico Dowdle",
@@ -1317,7 +1322,7 @@
             "adp": 77.8,
             "position_adp": 30,
             "adp_delta": 10.6,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "J.K. Dobbins",
@@ -1328,7 +1333,7 @@
             "adp": 88.7,
             "position_adp": 33,
             "adp_delta": 2.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Chuba Hubbard",
@@ -1339,7 +1344,7 @@
             "adp": 71.9,
             "position_adp": 29,
             "adp_delta": -4.9,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "RJ Harvey",
@@ -1350,7 +1355,7 @@
             "adp": 87.5,
             "position_adp": 32,
             "adp_delta": -0.9,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Rachaad White",
@@ -1361,7 +1366,7 @@
             "adp": 112.1,
             "position_adp": 38,
             "adp_delta": 5.1,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kyle Monangai",
@@ -1372,7 +1377,7 @@
             "adp": 113.9,
             "position_adp": 39,
             "adp_delta": 11.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Kenny Gainwell",
@@ -1383,7 +1388,7 @@
             "adp": 101.8,
             "position_adp": 35,
             "adp_delta": 3.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Aaron Jones Sr.",
@@ -1394,7 +1399,7 @@
             "adp": 99.8,
             "position_adp": 34,
             "adp_delta": 3.3,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jonathon Brooks",
@@ -1405,7 +1410,7 @@
             "adp": 110.5,
             "position_adp": 37,
             "adp_delta": -1.6,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jacory Croskey-Merritt",
@@ -1416,7 +1421,7 @@
             "adp": 110.3,
             "position_adp": 36,
             "adp_delta": 0.8,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jordan Mason",
@@ -1427,7 +1432,7 @@
             "adp": 114.6,
             "position_adp": 40,
             "adp_delta": -2.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Blake Corum",
@@ -1438,7 +1443,7 @@
             "adp": 123.0,
             "position_adp": 41,
             "adp_delta": 3.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tyjae Spears",
@@ -1449,7 +1454,7 @@
             "adp": 150.3,
             "position_adp": 47,
             "adp_delta": 2.6,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Alvin Kamara",
@@ -1460,7 +1465,7 @@
             "adp": 148.8,
             "position_adp": 46,
             "adp_delta": 3.9,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Zach Charbonnet",
@@ -1471,7 +1476,7 @@
             "adp": 133.1,
             "position_adp": 42,
             "adp_delta": -1.1,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Woody Marks",
@@ -1482,7 +1487,7 @@
             "adp": 144.9,
             "position_adp": 43,
             "adp_delta": -0.4,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tyrone Tracy Jr.",
@@ -1493,7 +1498,7 @@
             "adp": 148.4,
             "position_adp": 45,
             "adp_delta": -9.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Isiah Pacheco",
@@ -1504,7 +1509,7 @@
             "adp": 150.9,
             "position_adp": 48,
             "adp_delta": 7.2,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Justice Hill",
@@ -1515,7 +1520,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Chris Rodriguez Jr.",
@@ -1526,7 +1531,7 @@
             "adp": 154.3,
             "position_adp": 50,
             "adp_delta": -3.9,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Dylan Sampson",
@@ -1537,7 +1542,7 @@
             "adp": 178.2,
             "position_adp": 60,
             "adp_delta": 13.6,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Brian Robinson Jr.",
@@ -1548,7 +1553,7 @@
             "adp": 173.5,
             "position_adp": 59,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "AJ Dillon",
@@ -1559,7 +1564,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Samaje Perine",
@@ -1570,7 +1575,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tyler Allgeier",
@@ -1581,7 +1586,7 @@
             "adp": 160.2,
             "position_adp": 53,
             "adp_delta": 9.7,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Ty Johnson",
@@ -1592,7 +1597,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jordan James",
@@ -1603,7 +1608,7 @@
             "adp": 166.2,
             "position_adp": 56,
             "adp_delta": 3.8,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tank Bigsby",
@@ -1614,7 +1619,7 @@
             "adp": 166.0,
             "position_adp": 55,
             "adp_delta": 4.5,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Braelon Allen",
@@ -1625,7 +1630,7 @@
             "adp": 155.4,
             "position_adp": 51,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "MarShawn Lloyd",
@@ -1636,7 +1641,7 @@
             "adp": 166.3,
             "position_adp": 57,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Keaton Mitchell",
@@ -1647,7 +1652,7 @@
             "adp": 151.3,
             "position_adp": 49,
             "adp_delta": 3.2,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Mike Washington Jr.",
@@ -1658,7 +1663,7 @@
             "adp": 173.5,
             "position_adp": 58,
             "adp_delta": 5.4,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Emari Demercado",
@@ -1669,7 +1674,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kaelon Black",
@@ -1680,7 +1685,7 @@
             "adp": 160.7,
             "position_adp": 54,
             "adp_delta": -4.5,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Adam Randall",
@@ -1691,7 +1696,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Chris Brooks",
@@ -1702,7 +1707,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Kimani Vidal",
@@ -1713,7 +1718,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "James Conner",
@@ -1724,7 +1729,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jaydon Blue",
@@ -1735,7 +1740,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Emanuel Wilson",
@@ -1746,7 +1751,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jaylen Wright",
@@ -1757,7 +1762,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Malik Davis",
@@ -1768,7 +1773,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jawhar Jordan",
@@ -1779,7 +1784,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kyle Juszczyk",
@@ -1801,7 +1806,7 @@
             "adp": 157.6,
             "position_adp": 52,
             "adp_delta": 3.4,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Isaiah Davis",
@@ -1812,7 +1817,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "LeQuint Allen Jr.",
@@ -1823,7 +1828,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Sean Tucker",
@@ -1834,7 +1839,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Frank Gore Jr.",
@@ -1845,7 +1850,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Roschon Johnson",
@@ -1856,7 +1861,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Ollie Gordon II",
@@ -1867,7 +1872,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Emmett Johnson",
@@ -1878,7 +1883,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Ray Davis",
@@ -1889,7 +1894,7 @@
             "adp": 146.2,
             "position_adp": 44,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "DJ Giddens",
@@ -1900,7 +1905,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Ty Chandler",
@@ -1911,7 +1916,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Austin Ekeler",
@@ -1922,7 +1927,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "George Holani",
@@ -1933,7 +1938,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Brashard Smith",
@@ -1944,7 +1949,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Phil Mafah",
@@ -1955,7 +1960,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Elijah Mitchell",
@@ -1966,7 +1971,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jam Miller",
@@ -1977,7 +1982,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jeremy McNichols",
@@ -1988,7 +1993,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Salvon Ahmed",
@@ -1999,7 +2004,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jarquez Hunter",
@@ -2010,7 +2015,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Israel Abanikanda",
@@ -2021,7 +2026,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Dameon Pierce",
@@ -2032,7 +2037,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Audric Estime",
@@ -2043,7 +2048,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Will Shipley",
@@ -2054,7 +2059,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Donovan Edwards",
@@ -2065,7 +2070,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Carlos Washington Jr.",
@@ -2076,7 +2081,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Deuce Vaughn",
@@ -2087,7 +2092,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Seth McGowan",
@@ -2098,7 +2103,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Najee Harris",
@@ -2109,7 +2114,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Hunter Luepke",
@@ -2131,7 +2136,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Demond Claiborne",
@@ -2142,7 +2147,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Tahj Brooks",
@@ -2153,7 +2158,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Devin Neal",
@@ -2164,7 +2169,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Devin Singletary",
@@ -2175,7 +2180,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Nicholas Singleton",
@@ -2186,7 +2191,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jerome Ford",
@@ -2197,7 +2202,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Michael Burton",
@@ -2219,7 +2224,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Trevor Etienne",
@@ -2230,7 +2235,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Alec Ingold",
@@ -2274,7 +2279,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Reggie Gilliam",
@@ -2285,7 +2290,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Patrick Ricard",
@@ -2307,7 +2312,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "British Brooks",
@@ -2318,7 +2323,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           }
         ]
       },
@@ -2340,7 +2345,7 @@
             "adp": 3.0,
             "position_adp": 1,
             "adp_delta": 0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Ja'Marr Chase",
@@ -2351,7 +2356,7 @@
             "adp": 4.1,
             "position_adp": 2,
             "adp_delta": 0.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jaxon Smith-Njigba",
@@ -2362,7 +2367,7 @@
             "adp": 5.4,
             "position_adp": 3,
             "adp_delta": 0.1,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Amon-Ra St. Brown",
@@ -2373,7 +2378,7 @@
             "adp": 7.6,
             "position_adp": 4,
             "adp_delta": 0.0,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Drake London",
@@ -2384,7 +2389,7 @@
             "adp": 11.8,
             "position_adp": 5,
             "adp_delta": 2.2,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "CeeDee Lamb",
@@ -2395,7 +2400,7 @@
             "adp": 12.7,
             "position_adp": 6,
             "adp_delta": 0.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Rashee Rice",
@@ -2406,7 +2411,7 @@
             "adp": 16.2,
             "position_adp": 8,
             "adp_delta": 3.4,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Justin Jefferson",
@@ -2417,7 +2422,7 @@
             "adp": 14.1,
             "position_adp": 7,
             "adp_delta": -1.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "A.J. Brown",
@@ -2428,7 +2433,7 @@
             "adp": 18.8,
             "position_adp": 9,
             "adp_delta": -0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "George Pickens",
@@ -2439,7 +2444,7 @@
             "adp": 19.3,
             "position_adp": 10,
             "adp_delta": -0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Chris Olave",
@@ -2450,7 +2455,7 @@
             "adp": 24.3,
             "position_adp": 12,
             "adp_delta": 1.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Nico Collins",
@@ -2461,7 +2466,7 @@
             "adp": 21.1,
             "position_adp": 11,
             "adp_delta": -2.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Zay Flowers",
@@ -2472,7 +2477,7 @@
             "adp": 24.3,
             "position_adp": 13,
             "adp_delta": -0.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Malik Nabers",
@@ -2483,7 +2488,7 @@
             "adp": 27.3,
             "position_adp": 14,
             "adp_delta": -3.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Garrett Wilson",
@@ -2494,7 +2499,7 @@
             "adp": 30.7,
             "position_adp": 15,
             "adp_delta": -0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tetairoa McMillan",
@@ -2505,7 +2510,7 @@
             "adp": 33.7,
             "position_adp": 17,
             "adp_delta": -2.5,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "DeVonta Smith",
@@ -2516,7 +2521,7 @@
             "adp": 31.2,
             "position_adp": 16,
             "adp_delta": -0.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Emeka Egbuka",
@@ -2527,7 +2532,7 @@
             "adp": 36.9,
             "position_adp": 19,
             "adp_delta": 4.4,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Davante Adams",
@@ -2538,7 +2543,7 @@
             "adp": 37.2,
             "position_adp": 20,
             "adp_delta": -2.1,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Tee Higgins",
@@ -2549,7 +2554,7 @@
             "adp": 34.8,
             "position_adp": 18,
             "adp_delta": -3.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jameson Williams",
@@ -2560,7 +2565,7 @@
             "adp": 39.4,
             "position_adp": 21,
             "adp_delta": -1.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Ladd McConkey",
@@ -2571,7 +2576,7 @@
             "adp": 40.6,
             "position_adp": 22,
             "adp_delta": -4.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Rome Odunze",
@@ -2582,7 +2587,7 @@
             "adp": 45.9,
             "position_adp": 24,
             "adp_delta": 1.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Terry McLaurin",
@@ -2593,7 +2598,7 @@
             "adp": 44.7,
             "position_adp": 23,
             "adp_delta": 1.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Alec Pierce",
@@ -2604,7 +2609,7 @@
             "adp": 54.9,
             "position_adp": 28,
             "adp_delta": 4.6,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "DJ Moore",
@@ -2615,7 +2620,7 @@
             "adp": 49.5,
             "position_adp": 26,
             "adp_delta": 0.8,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jaylen Waddle",
@@ -2626,7 +2631,7 @@
             "adp": 46.8,
             "position_adp": 25,
             "adp_delta": -4.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Luther Burden III",
@@ -2637,7 +2642,7 @@
             "adp": 59.8,
             "position_adp": 30,
             "adp_delta": 4.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Mike Evans",
@@ -2648,7 +2653,7 @@
             "adp": 52.3,
             "position_adp": 27,
             "adp_delta": -4.5,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Christian Watson",
@@ -2659,7 +2664,7 @@
             "adp": 56.9,
             "position_adp": 29,
             "adp_delta": -6.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Courtland Sutton",
@@ -2670,7 +2675,7 @@
             "adp": 61.2,
             "position_adp": 31,
             "adp_delta": 5.5,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Marvin Harrison Jr.",
@@ -2681,7 +2686,7 @@
             "adp": 63.3,
             "position_adp": 33,
             "adp_delta": 1.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "DK Metcalf",
@@ -2692,7 +2697,7 @@
             "adp": 62.7,
             "position_adp": 32,
             "adp_delta": 0.4,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Parker Washington",
@@ -2703,7 +2708,7 @@
             "adp": 65.1,
             "position_adp": 34,
             "adp_delta": -2.9,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Brian Thomas Jr.",
@@ -2714,7 +2719,7 @@
             "adp": 70.2,
             "position_adp": 35,
             "adp_delta": 0.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Michael Pittman Jr.",
@@ -2725,7 +2730,7 @@
             "adp": 81.2,
             "position_adp": 39,
             "adp_delta": 0.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Carnell Tate",
@@ -2736,7 +2741,7 @@
             "adp": 72.9,
             "position_adp": 36,
             "adp_delta": -2.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jayden Reed",
@@ -2747,7 +2752,7 @@
             "adp": 90.3,
             "position_adp": 43,
             "adp_delta": -0.2,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jakobi Meyers",
@@ -2758,7 +2763,7 @@
             "adp": 88.8,
             "position_adp": 42,
             "adp_delta": 9.6,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Quentin Johnston",
@@ -2769,7 +2774,7 @@
             "adp": 84.4,
             "position_adp": 41,
             "adp_delta": 2.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Michael Wilson",
@@ -2780,7 +2785,7 @@
             "adp": 75.0,
             "position_adp": 37,
             "adp_delta": -9.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Chris Godwin Jr.",
@@ -2791,7 +2796,7 @@
             "adp": 78.1,
             "position_adp": 38,
             "adp_delta": -12.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jordan Addison",
@@ -2802,7 +2807,7 @@
             "adp": 91.0,
             "position_adp": 44,
             "adp_delta": -0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Wan'Dale Robinson",
@@ -2813,7 +2818,7 @@
             "adp": 94.1,
             "position_adp": 45,
             "adp_delta": 13.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jordyn Tyson",
@@ -2824,7 +2829,7 @@
             "adp": 95.1,
             "position_adp": 46,
             "adp_delta": 9.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Xavier Worthy",
@@ -2835,7 +2840,7 @@
             "adp": 101.3,
             "position_adp": 48,
             "adp_delta": 0.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Deebo Samuel Sr.",
@@ -2846,7 +2851,7 @@
             "adp": 108.0,
             "position_adp": 51,
             "adp_delta": 17.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Josh Downs",
@@ -2857,7 +2862,7 @@
             "adp": 84.0,
             "position_adp": 40,
             "adp_delta": -13.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Matthew Golden",
@@ -2868,7 +2873,7 @@
             "adp": 108.6,
             "position_adp": 53,
             "adp_delta": -7.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Stefon Diggs",
@@ -2879,7 +2884,7 @@
             "adp": 96.2,
             "position_adp": 47,
             "adp_delta": 2.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Rashid Shaheed",
@@ -2890,7 +2895,7 @@
             "adp": 121.4,
             "position_adp": 56,
             "adp_delta": 4.4,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Khalil Shakir",
@@ -2901,7 +2906,7 @@
             "adp": 104.5,
             "position_adp": 49,
             "adp_delta": 1.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "KC Concepcion",
@@ -2912,7 +2917,7 @@
             "adp": 123.1,
             "position_adp": 57,
             "adp_delta": -4.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Romeo Doubs",
@@ -2923,7 +2928,7 @@
             "adp": 108.5,
             "position_adp": 52,
             "adp_delta": -0.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jalen Coker",
@@ -2934,7 +2939,7 @@
             "adp": 114.2,
             "position_adp": 54,
             "adp_delta": -10.4,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "De'Zhaun Stribling",
@@ -2945,7 +2950,7 @@
             "adp": 143.5,
             "position_adp": 67,
             "adp_delta": -4.5,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Makai Lemon",
@@ -2956,7 +2961,7 @@
             "adp": 107.8,
             "position_adp": 50,
             "adp_delta": 5.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Calvin Ridley",
@@ -2967,7 +2972,7 @@
             "adp": 140.7,
             "position_adp": 65,
             "adp_delta": 11.3,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Denzel Boston",
@@ -2978,7 +2983,7 @@
             "adp": 140.6,
             "position_adp": 64,
             "adp_delta": -9.4,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jayden Higgins",
@@ -2989,7 +2994,7 @@
             "adp": 119.6,
             "position_adp": 55,
             "adp_delta": -11.0,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jerry Jeudy",
@@ -3000,7 +3005,7 @@
             "adp": 131.8,
             "position_adp": 60,
             "adp_delta": -4.1,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Tre Tucker",
@@ -3011,7 +3016,7 @@
             "adp": 135.8,
             "position_adp": 62,
             "adp_delta": 0.3,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Tank Dell",
@@ -3022,7 +3027,7 @@
             "adp": 161.1,
             "position_adp": 71,
             "adp_delta": 15.6,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Rashod Bateman",
@@ -3033,7 +3038,7 @@
             "adp": 129.1,
             "position_adp": 58,
             "adp_delta": -6.9,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jalen McMillan",
@@ -3044,7 +3049,7 @@
             "adp": 133.7,
             "position_adp": 61,
             "adp_delta": -5.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jauan Jennings",
@@ -3055,7 +3060,7 @@
             "adp": 140.8,
             "position_adp": 66,
             "adp_delta": -5.7,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jalen Nailor",
@@ -3066,7 +3071,7 @@
             "adp": 139.9,
             "position_adp": 63,
             "adp_delta": -3.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Ja'Kobi Lane",
@@ -3077,7 +3082,7 @@
             "adp": 166.6,
             "position_adp": 75,
             "adp_delta": 6.0,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Cooper Kupp",
@@ -3088,7 +3093,7 @@
             "adp": 147.3,
             "position_adp": 68,
             "adp_delta": -8.2,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Adonai Mitchell",
@@ -3099,7 +3104,7 @@
             "adp": 167.2,
             "position_adp": 76,
             "adp_delta": 8.6,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Kayshon Boutte",
@@ -3110,7 +3115,7 @@
             "adp": 164.6,
             "position_adp": 73,
             "adp_delta": -4.3,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Travis Hunter",
@@ -3121,7 +3126,7 @@
             "adp": 155.9,
             "position_adp": 70,
             "adp_delta": -1.4,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Malik Washington",
@@ -3132,7 +3137,7 @@
             "adp": 147.9,
             "position_adp": 69,
             "adp_delta": -5.6,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Germie Bernard",
@@ -3143,7 +3148,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Dontayvion Wicks",
@@ -3154,7 +3159,7 @@
             "adp": 166.2,
             "position_adp": 74,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Bub Means",
@@ -3165,7 +3170,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Antonio Williams",
@@ -3176,7 +3181,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Caleb Douglas",
@@ -3187,7 +3192,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Devaughn Vele",
@@ -3198,7 +3203,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Darius Slayton",
@@ -3209,7 +3214,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Tyquan Thornton",
@@ -3220,7 +3225,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tory Horton",
@@ -3231,7 +3236,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Troy Franklin",
@@ -3242,7 +3247,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Xavier Legette",
@@ -3253,7 +3258,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Omar Cooper Jr.",
@@ -3264,7 +3269,7 @@
             "adp": 167.5,
             "position_adp": 77,
             "adp_delta": 4.3,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jahan Dotson",
@@ -3275,7 +3280,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Christian Kirk",
@@ -3286,7 +3291,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Isaac TeSlaa",
@@ -3297,7 +3302,7 @@
             "adp": 170.9,
             "position_adp": 79,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Ryan Flournoy",
@@ -3308,7 +3313,7 @@
             "adp": 163.9,
             "position_adp": 72,
             "adp_delta": -0.3,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tre' Harris",
@@ -3319,7 +3324,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Ashton Dulin",
@@ -3330,7 +3335,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jalen Tolbert",
@@ -3341,7 +3346,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Ted Hurst III",
@@ -3352,7 +3357,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Hollywood Brown",
@@ -3374,7 +3379,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Andrei Iosivas",
@@ -3385,7 +3390,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Chimere Dike",
@@ -3396,7 +3401,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Zachariah Branch",
@@ -3407,7 +3412,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Keon Coleman",
@@ -3418,7 +3423,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Jaylin Noel",
@@ -3429,7 +3434,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Pat Bryant",
@@ -3440,7 +3445,7 @@
             "adp": 168.3,
             "position_adp": 78,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Joshua Palmer",
@@ -3451,7 +3456,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Marvin Mims Jr.",
@@ -3462,7 +3467,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "KaVontae Turpin",
@@ -3473,7 +3478,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Olamide Zaccheaus",
@@ -3484,7 +3489,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Zavion Thomas",
@@ -3495,7 +3500,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Darnell Mooney",
@@ -3506,7 +3511,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Xavier Hutchinson",
@@ -3517,7 +3522,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jack Bech",
@@ -3528,7 +3533,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "DeMario Douglas",
@@ -3539,7 +3544,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Savion Williams",
@@ -3550,7 +3555,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Calvin Austin III",
@@ -3561,7 +3566,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jahdae Walker",
@@ -3572,7 +3577,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Malachi Fields",
@@ -3583,7 +3588,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tutu Atwell",
@@ -3594,7 +3599,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Chris Bell",
@@ -3605,7 +3610,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Cedric Tillman",
@@ -3616,7 +3621,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Demarcus Robinson",
@@ -3627,7 +3632,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Luke McCaffrey",
@@ -3638,7 +3643,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Nick Westbrook-Ikhine",
@@ -3649,7 +3654,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kendrick Bourne",
@@ -3660,7 +3665,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Dyami Brown",
@@ -3671,7 +3676,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Malik Benson",
@@ -3682,7 +3687,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Treylon Burks",
@@ -3693,7 +3698,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Theo Wease Jr.",
@@ -3704,7 +3709,7 @@
             "adp": 130.9,
             "position_adp": 59,
             "adp_delta": -0.3,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kalif Raymond",
@@ -3715,7 +3720,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Devontez Walker",
@@ -3726,7 +3731,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Cyrus Allen",
@@ -3737,7 +3742,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Isaiah Williams",
@@ -3748,7 +3753,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Colbie Young",
@@ -3759,7 +3764,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jaylin Lane",
@@ -3770,7 +3775,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Elijah Sarratt",
@@ -3781,7 +3786,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kevin Coleman Jr.",
@@ -3792,7 +3797,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jordan Whittington",
@@ -3803,7 +3808,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Isaiah Bond",
@@ -3814,7 +3819,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Konata Mumpfield",
@@ -3825,7 +3830,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Skyler Bell",
@@ -3836,7 +3841,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Roman Wilson",
@@ -3847,7 +3852,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Brenen Thompson",
@@ -3858,7 +3863,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Mack Hollins",
@@ -3869,7 +3874,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Bryce Lance",
@@ -3880,7 +3885,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Odell Beckham Jr.",
@@ -3891,7 +3896,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Kyle Williams",
@@ -3902,7 +3907,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tez Johnson",
@@ -3913,7 +3918,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jimmy Horn Jr.",
@@ -3924,7 +3929,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jalen Royals",
@@ -3935,7 +3940,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "KeAndre Lambert-Smith",
@@ -3946,7 +3951,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Laquon Treadwell",
@@ -3957,7 +3962,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Dont'e Thornton Jr.",
@@ -3968,7 +3973,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Greg Dortch",
@@ -3979,7 +3984,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Bo Melton",
@@ -3990,7 +3995,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tyrell Shavers",
@@ -4001,7 +4006,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Derius Davis",
@@ -4012,7 +4017,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Malachi Corley",
@@ -4023,7 +4028,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Mitch Tinsley",
@@ -4034,7 +4039,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Xavier Smith",
@@ -4045,7 +4050,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "CJ Daniels",
@@ -4056,7 +4061,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Justin Watson",
@@ -4067,7 +4072,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jonathan Mingo",
@@ -4078,7 +4083,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tai Felton",
@@ -4089,7 +4094,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Darius Cooper",
@@ -4100,7 +4105,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Barion Brown",
@@ -4111,7 +4116,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Reggie Virgil",
@@ -4122,7 +4127,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Anthony Gould",
@@ -4133,7 +4138,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Brycen Tremayne",
@@ -4144,7 +4149,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jalen Reagor",
@@ -4155,7 +4160,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Arian Smith",
@@ -4166,7 +4171,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Ben Skowronek",
@@ -4177,7 +4182,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kameron Johnson",
@@ -4188,7 +4193,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Kaden Wetjen",
@@ -4199,7 +4204,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           }
         ]
       },
@@ -4221,7 +4226,7 @@
             "adp": 38.5,
             "position_adp": 1,
             "adp_delta": -5.5,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Brock Bowers",
@@ -4232,7 +4237,7 @@
             "adp": 41.9,
             "position_adp": 2,
             "adp_delta": -2.9,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Colston Loveland",
@@ -4243,7 +4248,7 @@
             "adp": 60.1,
             "position_adp": 3,
             "adp_delta": -6.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tyler Warren",
@@ -4254,7 +4259,7 @@
             "adp": 69.7,
             "position_adp": 4,
             "adp_delta": -1.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Kyle Pitts Sr.",
@@ -4265,7 +4270,7 @@
             "adp": 81.7,
             "position_adp": 6,
             "adp_delta": -0.7,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Harold Fannin Jr.",
@@ -4276,7 +4281,7 @@
             "adp": 81.2,
             "position_adp": 5,
             "adp_delta": -3.4,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Sam LaPorta",
@@ -4287,7 +4292,7 @@
             "adp": 90.3,
             "position_adp": 7,
             "adp_delta": -2.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Tucker Kraft",
@@ -4298,7 +4303,7 @@
             "adp": 94.1,
             "position_adp": 8,
             "adp_delta": -8.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Dallas Goedert",
@@ -4309,7 +4314,7 @@
             "adp": 112.8,
             "position_adp": 9,
             "adp_delta": 5.4,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Travis Kelce",
@@ -4320,7 +4325,7 @@
             "adp": 121.8,
             "position_adp": 11,
             "adp_delta": -6.3,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "George Kittle",
@@ -4331,7 +4336,7 @@
             "adp": 117.1,
             "position_adp": 10,
             "adp_delta": 1.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Mark Andrews",
@@ -4342,7 +4347,7 @@
             "adp": 128.3,
             "position_adp": 12,
             "adp_delta": -9.2,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Isaiah Likely",
@@ -4353,7 +4358,7 @@
             "adp": 136.8,
             "position_adp": 13,
             "adp_delta": 0.8,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Dalton Kincaid",
@@ -4364,7 +4369,7 @@
             "adp": 142.5,
             "position_adp": 14,
             "adp_delta": -2.0,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jake Ferguson",
@@ -4375,7 +4380,7 @@
             "adp": 148.7,
             "position_adp": 16,
             "adp_delta": 2.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Hunter Henry",
@@ -4386,7 +4391,7 @@
             "adp": 147.7,
             "position_adp": 15,
             "adp_delta": -9.1,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Juwan Johnson",
@@ -4397,7 +4402,7 @@
             "adp": 168.8,
             "position_adp": 21,
             "adp_delta": 11.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Brenton Strange",
@@ -4408,7 +4413,7 @@
             "adp": 162.2,
             "position_adp": 18,
             "adp_delta": 4.7,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Dalton Schultz",
@@ -4419,7 +4424,7 @@
             "adp": 155.0,
             "position_adp": 17,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "T.J. Hockenson",
@@ -4430,7 +4435,7 @@
             "adp": 168.3,
             "position_adp": 20,
             "adp_delta": 8.6,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Pat Freiermuth",
@@ -4441,7 +4446,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Greg Dulcich",
@@ -4452,7 +4457,7 @@
             "adp": 173.6,
             "position_adp": 22,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Kenyon Sadiq",
@@ -4463,7 +4468,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Cade Otton",
@@ -4474,7 +4479,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "AJ Barner",
@@ -4485,7 +4490,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Chig Okonkwo",
@@ -4496,7 +4501,7 @@
             "adp": 167.6,
             "position_adp": 19,
             "adp_delta": -8.7,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Terrance Ferguson",
@@ -4507,7 +4512,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Evan Engram",
@@ -4518,7 +4523,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Oronde Gadsden II",
@@ -4529,7 +4534,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Gunnar Helm",
@@ -4540,7 +4545,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Mike Gesicki",
@@ -4551,7 +4556,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Darren Waller",
@@ -4562,7 +4567,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "David Njoku",
@@ -4573,7 +4578,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Mason Taylor",
@@ -4584,7 +4589,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Colby Parkinson",
@@ -4595,7 +4600,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Michael Mayer",
@@ -4606,7 +4611,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Dawson Knox",
@@ -4617,7 +4622,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Theo Johnson",
@@ -4628,7 +4633,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Darnell Washington",
@@ -4639,7 +4644,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Tyler Higbee",
@@ -4650,7 +4655,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Cole Kmet",
@@ -4661,7 +4666,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Erick All Jr.",
@@ -4672,7 +4677,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Will Kacmarek",
@@ -4683,7 +4688,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Noah Fant",
@@ -4694,7 +4699,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Charlie Kolar",
@@ -4705,7 +4710,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Austin Hooper",
@@ -4716,7 +4721,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Josh Oliver",
@@ -4727,7 +4732,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Daniel Bellinger",
@@ -4738,7 +4743,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Brock Wright",
@@ -4749,7 +4754,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Noah Gray",
@@ -4760,7 +4765,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Eli Stowers",
@@ -4771,7 +4776,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tommy Tremble",
@@ -4782,7 +4787,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Elijah Arroyo",
@@ -4793,7 +4798,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Adam Trautman",
@@ -4804,7 +4809,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Luke Musgrave",
@@ -4815,7 +4820,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Eli Raridon",
@@ -4826,7 +4831,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Ja'Tavion Sanders",
@@ -4837,7 +4842,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Davis Allen",
@@ -4848,7 +4853,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Ben Sims",
@@ -4859,7 +4864,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Marlin Klein",
@@ -4870,7 +4875,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Elijah Higgins",
@@ -4881,7 +4886,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "John Bates",
@@ -4892,7 +4897,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jake Tonges",
@@ -4903,7 +4908,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jeremy Ruckert",
@@ -4914,7 +4919,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Nate Boerkircher",
@@ -4925,7 +4930,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Connor Heyward",
@@ -4936,7 +4941,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Nick Vannett",
@@ -4947,7 +4952,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Drew Sample",
@@ -4958,7 +4963,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Nate Adkins",
@@ -4969,7 +4974,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Cade Stover",
@@ -4980,7 +4985,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Jackson Hawes",
@@ -4991,7 +4996,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Ben Sinnott",
@@ -5002,7 +5007,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Zack Kuntz",
@@ -5013,7 +5018,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jack Endries",
@@ -5024,7 +5029,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Luke Schoonmaker",
@@ -5035,7 +5040,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Will Mallory",
@@ -5046,7 +5051,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Hayden Rucci",
@@ -5057,7 +5062,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Charlie Woerner",
@@ -5068,7 +5073,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Grant Calcaterra",
@@ -5079,7 +5084,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Foster Moreau",
@@ -5090,7 +5095,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Travis Vokolek",
@@ -5101,7 +5106,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Rivaldo Fairweather",
@@ -5112,7 +5117,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Teagan Quitoriano",
@@ -5123,7 +5128,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Bauer Sharp",
@@ -5134,7 +5139,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tanner Hudson",
@@ -5145,7 +5150,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Cam Grandy",
@@ -5156,7 +5161,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Dallen Bentley",
@@ -5167,7 +5172,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Anthony Firkser",
@@ -5178,7 +5183,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tanner Conner",
@@ -5189,7 +5194,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Zaire Mitchell-Paden",
@@ -5200,7 +5205,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Mo Alie-Cox",
@@ -5211,7 +5216,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jared Wiley",
@@ -5222,7 +5227,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Thomas Fidone II",
@@ -5233,7 +5238,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jaheim Bell",
@@ -5244,7 +5249,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jaren Kanak",
@@ -5255,7 +5260,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Donald Parham Jr.",
@@ -5266,7 +5271,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Drake Dabney",
@@ -5277,7 +5282,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Zach Ertz",
@@ -5288,7 +5293,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "John FitzPatrick",
@@ -5299,7 +5304,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Seydou Traore",
@@ -5310,7 +5315,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Durham Smythe",
@@ -5321,7 +5326,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Mitchell Evans",
@@ -5332,7 +5337,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Joe Royer",
@@ -5343,7 +5348,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Max Klare",
@@ -5354,7 +5359,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Justin Joly",
@@ -5365,7 +5370,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Brevyn Spann-Ford",
@@ -5376,7 +5381,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Devin Culp",
@@ -5387,7 +5392,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Sam Roush",
@@ -5398,7 +5403,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Payne Durham",
@@ -5409,7 +5414,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Oscar Delp",
@@ -5420,7 +5425,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tip Reiman",
@@ -5431,7 +5436,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "medium"
           },
           {
             "player": "Ian Thomas",
@@ -5442,7 +5447,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Hunter Long",
@@ -5453,7 +5458,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Luke Farrell",
@@ -5464,7 +5469,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Ko Kieft",
@@ -5475,7 +5480,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tanner Koziol",
@@ -5486,7 +5491,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "CJ Dippre",
@@ -5497,7 +5502,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Tyler Conklin",
@@ -5508,7 +5513,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Josh Cuevas",
@@ -5519,7 +5524,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Eric Saubert",
@@ -5530,7 +5535,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Drew Ogletree",
@@ -5541,7 +5546,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Josh Whyle",
@@ -5552,7 +5557,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Johnny Mundt",
@@ -5563,7 +5568,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           },
           {
             "player": "Jack Stoll",
@@ -5574,7 +5579,7 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "high"
           },
           {
             "player": "Chris Manhertz",
@@ -5585,26 +5590,64 @@
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
-            "provider_agreement": null
+            "provider_agreement": "low"
           }
         ]
       }
     },
     "provider_dispersion": {
-      "measurable": false,
-      "reason": "one provider archived, so projection uncertainty cannot be estimated from cross-provider spread (S38.1). The board carries no error bar.",
+      "measurable": true,
+      "providers": [
+        "fantasypros",
+        "sleeper"
+      ],
+      "board_provider": "fantasypros",
+      "other_provider": "sleeper",
+      "board_as_of": "2026-08-17",
+      "comparison_as_of": "2026-08-17",
+      "comparison_pinned_to_shared_capture": true,
+      "days_behind_board": 0,
+      "max_vintage_gap_days": 7,
       "cv_thresholds": {
         "high_below": 0.08,
         "medium_below": 0.15
+      },
+      "board_rows": 496,
+      "players_compared": 488,
+      "unpriced_by_other": 8,
+      "counts_by_agreement": {
+        "high": 158,
+        "medium": 85,
+        "low": 245
+      },
+      "median_cv": 0.1515,
+      "median_spread_points": 12.0,
+      "scored_stats_compared": [
+        "fumbles_lost",
+        "interceptions",
+        "passing_tds",
+        "passing_yards",
+        "receiving_tds",
+        "receiving_yards",
+        "receptions",
+        "rushing_tds",
+        "rushing_yards",
+        "special_teams_tds",
+        "two_point_conversions"
+      ],
+      "range_points": {
+        "low": -0.9,
+        "high": 361.1
       }
     },
     "coverage": {
-      "rows": 496,
-      "matched": 491,
-      "matched_share": 0.9899,
-      "unmatched": 5,
+      "rows": 1053,
+      "matched": 1037,
+      "matched_share": 0.9848,
+      "unmatched": 16,
       "providers": [
-        "fantasypros"
+        "fantasypros",
+        "sleeper"
       ],
       "snapshot_dates": [
         "2026-08-13",
