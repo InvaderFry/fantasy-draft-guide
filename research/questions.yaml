@@ -354,9 +354,11 @@ questions:
       adjustment, and until now the provider number carried no stated error at
       all.
     resolution_method: >
-      A second provider archived through S11 option 1B -- a manual export, hashed
-      into data/snapshots/<date>/projections_<key>.csv by
-      `research snapshot --sources projections-manual`. Both boards are scored by
+      A second provider captured on a GitHub Actions runner, where egress is open:
+      `research snapshot --sources sleeper`, in its own workflow job running after
+      the ADP capture has committed, so a provider outage cannot cost a day of
+      price movement (S84). The manual-CSV path (S11 option 1B) stays available
+      for any provider without an API. Both boards are scored by
       pipeline/scoring.py under the SAME league profile, which is what makes them
       comparable, then compared at a capture date both providers were archived on
       or before. Labelled by S38.1's own thresholds.
@@ -371,7 +373,18 @@ questions:
     limitation: >
       Dispersion measures DISAGREEMENT, NOT ACCURACY (S38.1). Two providers can
       agree closely and both be wrong, particularly where they share upstream
-      inputs -- it is a floor on uncertainty, never a ceiling, and two is the
+      inputs -- and that clause is why the second provider is Sleeper rather than
+      either candidate S11 names for manual import. FantasyPros' consensus, which
+      this board is drawn from, aggregates CBS, ESPN, FFA, FFToday, FantasyPros,
+      FantasySharks, NFL, NumberFire, RTSports and WalterFootball (component list
+      read 2026-08-16). ESPN and FFToday are therefore inputs to the board's own
+      number, and comparing an aggregate against one of its own components
+      measures how far a contributor sits from a mean containing it -- smaller by
+      construction, for a reason that has nothing to do with the players. That is
+      an asserted property of published component lists, not a measured one: if
+      Sleeper's payload names an upstream vendor inside that list, the choice has
+      to be revisited (see `sleeper_projection_shape`).
+      It is a floor on uncertainty, never a ceiling, and two is the
       smallest sample of opinions S38.1 contemplates. Replace it with measured
       projection error when a historical preseason projection archive exists
       (S66), as a new methodology version rather than a silent edit.
@@ -394,6 +407,62 @@ questions:
           than the providers. Same rule and same reason as adp_price_movement: a
           confident mark at a draft table from data that does not exist is worse
           than no mark.
+
+  - id: sleeper_projection_shape
+    question: >
+      What does Sleeper's season projection payload actually look like -- its
+      envelope, where identity lives, which stat columns it publishes, whether it
+      carries a canonical id, and WHO COMPUTES IT?
+    type: source_resolution
+    blocks:
+      - S38.1 cross-provider projection uncertainty
+    decision_change: >
+      Whether S38.1 reports anything at all. The adapter was written blind --
+      api.sleeper.app answers 403 at CONNECT from the development sandbox, as FFC
+      and FantasyPros do -- so host, path, envelope, identity container, name
+      field and every stat column are guesses held in config/sources.yaml.
+    resolution_method: >
+      The first successful runner capture. pipeline/ingest/sleeper.py records
+      `observed_row_keys`, `observed_stat_keys` and `observed_player_keys` into
+      the snapshot manifest, which is committed -- so the answer lives in the
+      archive rather than in a CI log that ages out. A wrong guess is corrected
+      in YAML and re-parsed against the same stored bytes, because S84 keeps the
+      payload unmodified.
+    status: OPEN
+    unanswered: >
+      All of it. Five independent guesses: the host (api.sleeper.com or
+      api.sleeper.app), the envelope (a bare list is assumed), whether identity
+      sits flat on the row or under a nested `player` object, whether the name is
+      `full_name` or first+last, and every stat column name.
+
+      THREE ANSWERS MATTER MORE THAN THE REST.
+
+      (1) Does the projection row carry `gsis_id`? Sleeper publishes it on the
+      player objects in /v1/players/nfl, but the object embedded in a projection
+      row may be slimmer. If it does, S12 resolution is an exact join and better
+      than the FantasyPros path, which is name-matched. If it does not, the
+      fallback is the same name match everything else here uses, and `sleeper_id`
+      is already in player_ids.ROSTER_ID_COLUMNS as a third route worth wiring.
+
+      (2) Does it publish its own scored total (`pts_half_ppr` and siblings)?
+      That total is the only independent check that the stat map is RIGHT rather
+      than merely non-empty -- the check that caught FantasyPros' `fumbles`
+      column being fumbles LOST. Note it must be scored under SLEEPER's default
+      rules, not the league's: Sleeper's published default prices an interception
+      at -1 where this repository's BASE_RULES use -2.
+
+      (3) WHO COMPUTES THE PROJECTION. If the payload names an upstream vendor,
+      the independence argument behind choosing this provider is a claim about
+      that vendor rather than about Sleeper. It survives a vendor outside
+      FantasyPros' component list and does NOT survive one inside it, in which
+      case the provider choice has to be revisited. Recorded here as a resolution
+      criterion so it is checked rather than assumed.
+    limitation: >
+      Until the first capture lands, every value in the `sleeper_api` block of
+      config/sources.yaml is a guess. The adapter is written so a wrong guess
+      FAILS rather than emitting a frame of nulls: a null board reads downstream
+      as a provider with no projections, and S19.3 would report itself blocked
+      for a reason that is not true.
 
   - id: fantasypros_projection_shape
     question: >

@@ -105,6 +105,70 @@ jobs:
           done
           exit 1
 
+  # S38.1's second provider, in its own job for one reason: a Sleeper failure
+  # must not be able to cost a day of ADP. That is S84's single unrecoverable
+  # failure, and it is exactly what would happen if this were another step in
+  # `capture` -- an adapter raising there aborts the job before the FFC payloads
+  # are committed, and the day is gone.
+  #
+  # `needs: capture` rather than a parallel job, because both commit to
+  # data/snapshots on main and two pushes racing the same file is a rebase loop.
+  # `continue-on-error` so a Sleeper outage leaves the run green and the sheets
+  # job still rendering: the board is still complete without a second provider,
+  # it simply carries no error bar, which is the state it was in until now.
+  #
+  # No alarm attached, deliberately. A Sleeper series that stops reports itself:
+  # S38.1 suppresses agreement once the shared capture falls more than
+  # MAX_VINTAGE_GAP_DAYS behind the board, and the sheet prints "agreement not
+  # shown" in its own legend. A failure that is visible on the deliverable does
+  # not need a second channel.
+  sleeper:
+    needs: capture
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main          # the snapshot the capture job just pushed
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install project
+        run: uv sync
+
+      # Daily, though S38.1 only needs weekly: MAX_VINTAGE_GAP_DAYS is 7, and a
+      # daily series means the day both providers share is almost always today,
+      # so `tiers.second_opinion` pins the comparison to a real shared capture
+      # rather than reaching back for one. No key: Sleeper is unauthenticated.
+      - name: Capture Sleeper projections
+        run: |
+          uv run research snapshot --sources sleeper \
+            ${{ inputs.season && format('--season {0}', inputs.season) || '' }}
+
+      - name: Verify hashes
+        run: uv run research validate
+
+      - name: Commit snapshot
+        run: |
+          if [ -z "$(git status --porcelain data/snapshots)" ]; then
+            echo "nothing new to commit - the capture step reported why and exited 0"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/snapshots
+          git commit -m "Sleeper projections: $(date -u +%Y-%m-%d) [skip ci]"
+          for attempt in 1 2 3 4; do
+            git pull --rebase origin main && git push origin main && exit 0
+            sleep $((2 ** attempt))
+          done
+          exit 1
+
   # The capture is only half the job. S84 archives the price; nothing rebuilt
   # anything downstream of it, so the S83 sheets stayed frozen at whatever board
   # they were last generated from -- and with the draft dates unknown there is no
@@ -115,7 +179,10 @@ jobs:
   # re-rendered. The two must not share a failure. By the time this runs the
   # capture has already committed and pushed.
   sheets:
-    needs: capture
+    # Both, so the re-rendered board carries the second provider. `sleeper` is
+    # continue-on-error, so its failure resolves as success here and this job
+    # still runs -- which is the intent: a board with no error bar beats no board.
+    needs: [capture, sleeper]
     runs-on: ubuntu-latest
     # Job-level, which REPLACES the workflow-level grant rather than adding to
     # it, so `contents` has to be named again here. `issues` is for the

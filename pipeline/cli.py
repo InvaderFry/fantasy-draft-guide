@@ -29,7 +29,7 @@ import polars as pl
 import typer
 
 from pipeline import config, preseason, snapshot
-from pipeline.ingest import fantasypros, ffc_adp, nflverse, projections_csv
+from pipeline.ingest import base, fantasypros, ffc_adp, nflverse, projections_csv, sleeper
 from pipeline.ingest.base import Fetched
 from pipeline.normalize import player_ids
 from pipeline.normalize.player_ids import match_external
@@ -58,8 +58,8 @@ def snapshot_(
         typer.Option(
             "--sources",
             help=(
-                "comma list: ffc,projections,projections-manual,nflverse-static,"
-                "nflverse-preseason"
+                "comma list: ffc,projections,sleeper,projections-manual,"
+                "nflverse-static,nflverse-preseason"
             ),
         ),
     ] = "ffc",
@@ -95,6 +95,8 @@ def snapshot_(
             if payloads is None:
                 skipped.append("projections")
                 continue
+        elif name == "sleeper":
+            payloads = sleeper.SleeperAdapter(season=year).fetch()
         elif name == "projections-manual":
             payloads = _fetch_manual_projections()
             if payloads is None:
@@ -345,6 +347,21 @@ def _fetch_projections(season: int) -> list | None:
         return fantasypros.FantasyProsAdapter(season=season).fetch()
     except fantasypros.MissingKeyError as exc:
         typer.echo(f"projections: {exc}")
+    except (base.FetchError, fantasypros.ResponseShapeError) as exc:
+        # S84. This source shares the daily job with the ADP capture, and the
+        # capture's bytes are written before this runs but committed after -- so
+        # an exception escaping here discards a day of price movement that cannot
+        # be bought back, to report a projection that can be fetched tomorrow.
+        #
+        # Reported as a skip for that reason, and ONLY for this source: the
+        # Sleeper capture is a separate job running after the commit, where a
+        # loud failure costs nothing and is the honest signal.
+        typer.echo(
+            f"projections: FantasyPros fetch failed and was skipped -- {exc}. The ADP "
+            "capture is unaffected (S84); a projection missed today is fetchable "
+            "tomorrow.",
+            err=True,
+        )
 
     adapter = projections_csv.ProjectionCsvAdapter()
     if not adapter.providers:
@@ -582,18 +599,57 @@ def _projection_archive_status() -> list[str]:
             "run `research snapshot --sources projections-manual`."
         )
     elif board in held:
-        newest_other = max(others.values())
-        gap = abs((held[board] - newest_other).days)
-        verdict = (
-            "S38.1 agreement is reported"
-            if gap <= provider_agreement.MAX_VINTAGE_GAP_DAYS
-            else (
-                f"S38.1 agreement is SUPPRESSED past {provider_agreement.MAX_VINTAGE_GAP_DAYS} "
-                "days -- re-export the second provider"
+        other_id = max(others, key=lambda p: others[p])
+        gap = abs((held[board] - others[other_id]).days)
+        if gap > provider_agreement.MAX_VINTAGE_GAP_DAYS:
+            out.append(
+                f"newest captures {gap} day(s) apart; S38.1 agreement is SUPPRESSED past "
+                f"{provider_agreement.MAX_VINTAGE_GAP_DAYS} days -- re-capture the second "
+                "provider"
             )
-        )
-        out.append(f"newest captures {gap} day(s) apart; {verdict}")
+        else:
+            out.append(f"newest captures {gap} day(s) apart, inside S38.1's window")
+            # The vintage gap is only one of two gates, and reporting agreement
+            # from it alone is the failure this repository keeps closing: with
+            # mismatched stat sets `validate` would print "agreement is reported"
+            # every morning while all 26 sheets showed nothing.
+            out.append(_comparability_line(pl.read_parquet(path), board, other_id))
     return out
+
+
+def _comparability_line(frame, board: str, other: str) -> str:
+    """S38.1's OTHER gate: do the two providers publish the same scored columns?
+
+    `populated_scored_stats` compares sets, so one scored column published by the
+    board provider and not by the second suppresses every mark on every sheet --
+    and it looks like a careful refusal rather than a defect.
+    """
+    from pipeline.features import projections as projection_table
+    from research.foundations import provider_agreement as agreement
+
+    profiles = config.real_profiles()
+    if not profiles:
+        return "no real league profile, so scored-column comparability cannot be checked"
+    profile = profiles[0]
+    latest = projection_table.latest(frame)
+    sets = {
+        provider: agreement.populated_scored_stats(
+            latest.filter(pl.col("provider_id") == provider), profile
+        )
+        for provider in (board, other)
+    }
+    if sets[board] == sets[other]:
+        return (
+            f"both providers populate the same {len(sets[board])} scored column(s) under "
+            f"{profile['id']}; S38.1 agreement is reported"
+        )
+    return (
+        f"S38.1 agreement is REFUSED: under {profile['id']} the providers do not publish "
+        f"the same scored columns. Missing from {other}: "
+        f"{sorted(sets[board] - sets[other]) or 'none'}; missing from {board}: "
+        f"{sorted(sets[other] - sets[board]) or 'none'}. Scoring fills an unpublished "
+        "column with zero, so comparing them would mark every player from a defect."
+    )
 
 
 def _projection_status() -> str:
@@ -620,6 +676,14 @@ def _projection_status() -> str:
         return (
             f"no API key; {len(providers)} manual provider(s) declared under "
             f"`projection_providers` -- S11 option 1B is the live path: {sorted(providers)}"
+        )
+    if config.sleeper_config().get("api_base"):
+        return (
+            "no FantasyPros key and no manual provider, but `sleeper_api` is configured "
+            "and needs none -- S38.1's second provider is the only live path, so S19.3 "
+            "would draw the board from it (config/sources.yaml board_provider). Note the "
+            "key is read from the environment, so an unset key here says nothing about "
+            "the repository secret the archive workflow uses."
         )
     return (
         "NO SOURCE. Neither FANTASYPROS_API_KEY nor a `projection_providers` entry in "

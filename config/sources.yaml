@@ -90,6 +90,128 @@ sources:
       S10D. Corpus-acquisition problem unsolved and permitted-access path
       undefined. Also blocked from the sandbox. Not ingested.
 
+  sleeper_api:
+    url: https://docs.sleeper.com/
+    api_base: https://api.sleeper.com
+    # Reported alternately as api.sleeper.app. Both are tried in order rather
+    # than one being guessed at, the same way nflverse datasets carry ordered
+    # release locations -- upstream moved `stats_player` and that adapter
+    # survived it without a code change.
+    api_base_fallbacks:
+      - https://api.sleeper.app
+    purpose:
+      - current_season_projections
+      - cross_provider_projection_uncertainty
+    license: provider_specific
+    attribution_required: true
+    attribution: "Projections courtesy of Sleeper."
+    status: configured
+    notes: >
+      S38.1's SECOND provider. The number S38.1 exists to produce is the spread
+      between two providers, and a spread needs two.
+
+      WHY THIS PROVIDER, and it is not the obvious one. FantasyPros' consensus --
+      the board this repository draws from -- aggregates CBS, ESPN, FFA,
+      FFToday, FantasyPros, FantasySharks, NFL, NumberFire, RTSports and
+      WalterFootball. So ESPN and FFToday, the two candidates S11 names for
+      manual import, are COMPONENTS OF THE BOARD PROVIDER'S OWN NUMBER. Comparing
+      an aggregate against one of its own inputs does not measure provider
+      disagreement; it measures how far one contributor sits from the mean of a
+      set containing it, which is smaller by construction and smaller for a
+      reason that has nothing to do with the players. That is S38.1's own stated
+      failure mode -- "two providers can agree closely and both be wrong,
+      particularly where they share upstream inputs" -- and it would produce a
+      board on which almost nothing is marked and the absence of a mark means
+      nothing. Sleeper is not in that list.
+
+      TERMS, read before capturing (S80). The API is free to use for
+      NON-COMMERCIAL purposes; commercial use requires contacting Sleeper for a
+      licence. This repository is personal draft preparation. No API key exists
+      or is required. Sleeper asks for fewer than 1000 calls per minute; this
+      adapter makes one call per capture, and nothing here should ever loop per
+      player.
+
+      SHAPE UNVERIFIED. api.sleeper.app answers 403 at CONNECT from the
+      development sandbox, exactly as FantasyPros and FFC do, so this adapter was
+      written blind and everything shape-dependent is configuration below rather
+      than a literal in pipeline/ingest/sleeper.py. The first runner call records
+      what it actually received into the snapshot manifest `notes`
+      (`observed_row_keys`, `observed_stat_keys`), which is how
+      `fantasypros_projection_shape` was answered from the archive rather than
+      from a CI log. See `sleeper_projection_shape` in research/questions.yaml.
+
+    projections_path: "projections/nfl/{season}"
+    positions: [QB, RB, WR, TE]
+    params:
+      season_type: regular
+      order_by: ppr
+    # Sleeper takes the position filter as a repeated `position[]` parameter, so
+    # one request covers the board rather than one per position.
+    position_param: "position[]"
+    container_key: ""           # the payload is believed to be a bare list
+    stat_container_key: stats   # ...with the projected quantities nested here
+    id_col: player_id
+    name_col: full_name
+    team_col: team
+    position_col: position
+    # Sleeper publishes cross-provider ids on its player objects, gsis_id among
+    # them. If the projection payload carries one, S12 resolution is an exact
+    # join rather than a name match -- better than the FantasyPros path, which
+    # is name-matched and is why `Travis Hunter` needed a manual override.
+    player_container_key: player
+    gsis_id_col: gsis_id
+    # Provider column -> this repository's stat names (player_week's spelling, so
+    # pipeline/scoring.py prices a projection with the same code and the same
+    # league profile it prices a real season with).
+    stat_map:
+      pass_att: pass_attempts
+      pass_cmp: pass_completions
+      pass_yd: passing_yards
+      pass_td: passing_tds
+      pass_int: interceptions
+      rush_att: carries
+      rush_yd: rushing_yards
+      rush_td: rushing_tds
+      rec: receptions
+      rec_yd: receiving_yards
+      rec_td: receiving_tds
+      rec_tgt: targets
+      fum_lost: fumbles_lost
+      # Sleeper splits two-point conversions across three columns where
+      # FantasyPros publishes one. THREE SOURCES MAPPED TO ONE DESTINATION, which
+      # `parse` sums -- a 1:1 loop of the kind fantasypros.py uses would keep
+      # whichever came last in dict order, and a third of a total still computes.
+      pass_2pt: two_point_conversions
+      rush_2pt: two_point_conversions
+      rec_2pt: two_point_conversions
+      # Both real profiles score return touchdowns, and FantasyPros publishes
+      # them (`ret_tds`). If Sleeper does not, S38.1 REFUSES the whole comparison
+      # -- `populated_scored_stats` compares sets, so one missing scored column
+      # suppresses every mark on every sheet, permanently, with a well-reasoned
+      # message. That is the single most likely way this feature quietly does
+      # nothing, so the candidate names are mapped and the probe settles it.
+      #
+      # If the probe confirms Sleeper publishes none of these, the fix is NOT to
+      # drop `ret_tds` from the FantasyPros map: that changes the board's own
+      # arithmetic, which S38.1's kill rule forbids. It is to compare on the
+      # rules both providers populate, and that is a deliberate change to
+      # research/foundations/provider_agreement.py made with evidence in hand.
+      st_td: special_teams_tds
+      kr_td: special_teams_tds
+      pr_td: special_teams_tds
+
+    # The provider's OWN scored totals, believed to be published under these
+    # names. Deliberately NOT in `stat_map` and deliberately not mapped onto
+    # `projected_fantasy_points`: this is the CHECK on the stat map, not an input
+    # to it. Scoring the mapped frame under a league profile must reproduce the
+    # provider's matching total to the cent -- the only way to tell a correct
+    # mapping from one that merely computes without erroring (S11). Mapping it
+    # in would make the check compare a column to itself.
+    published_points:
+      standard: pts_std
+      half_ppr: pts_half_ppr
+      ppr: pts_ppr
+
   fantasypros_api:
     url: https://www.fantasypros.com/api-data/
     docs: https://support.fantasypros.com/hc/en-us/articles/49749297704475

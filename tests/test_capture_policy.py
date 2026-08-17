@@ -251,3 +251,85 @@ def test_a_manual_export_is_not_refiled_on_a_second_run(archive, monkeypatch, ca
     capture(sources="projections-manual")  # exits 0
     assert not (archive / CAPTURE_DATE.isoformat()).exists()
     assert "unchanged since 2026-08-13" in capsys.readouterr().err
+
+
+def test_a_sleeper_capture_is_isolated_from_the_adp_capture(archive, monkeypatch, capsys):
+    """S38.1's provider must never be able to cost a day of price movement.
+
+    The workflow enforces this structurally -- `sleeper` is its own job, running
+    after `capture` has already committed, marked continue-on-error -- and this
+    pins the other half: `--sources ffc` and `--sources sleeper` are separate
+    invocations, so an adapter raising in one cannot abort the other before it
+    writes. A projection missed today is fetchable tomorrow; an ADP day is not.
+    """
+    today = payload(adp=3.9, window_end=CAPTURE_DATE)
+    serve(monkeypatch, [fetched(today, window_end=CAPTURE_DATE)])
+
+    class ExplodingSleeper:
+        def __init__(self, season: int) -> None:
+            pass
+
+        def fetch(self):
+            raise RuntimeError("api.sleeper.com went away mid-preseason")
+
+    monkeypatch.setattr(cli.sleeper, "SleeperAdapter", ExplodingSleeper)
+
+    capture()  # the ADP capture, unaffected and exiting 0
+    assert (archive / CAPTURE_DATE.isoformat() / FILENAME).exists()
+
+    with pytest.raises(RuntimeError):
+        capture(sources="sleeper")
+    # ...and the ADP capture it could not reach is still on disk.
+    assert (archive / CAPTURE_DATE.isoformat() / FILENAME).exists()
+
+
+def test_a_sleeper_board_the_provider_has_not_refreshed_is_not_refiled(
+    archive, monkeypatch, capsys
+):
+    """S38.1 reads the newest capture per provider, so a duplicate dated copy of
+    one board would move the comparison date without moving the opinion."""
+    board = b'[{"player_id":"4034","stats":{"rush_yd":1290}}]'
+    name = "sleeper_projections_2026.json"
+    snapshot.Snapshot(dt.date(2026, 8, 13)).write(name, board, source="sleeper_api")
+
+    class FixedSleeper:
+        def __init__(self, season: int) -> None:
+            pass
+
+        def fetch(self):
+            return [fetched(board, window_end=None, filename=name)]
+
+    monkeypatch.setattr(cli.sleeper, "SleeperAdapter", FixedSleeper)
+    capture(sources="sleeper")  # exits 0
+    assert not (archive / CAPTURE_DATE.isoformat()).exists()
+    assert "unchanged since 2026-08-13" in capsys.readouterr().err
+
+
+def test_a_projection_outage_cannot_discard_the_adp_day_it_shares_a_job_with(
+    archive, monkeypatch, capsys
+):
+    """S84, and this one was already live before S38.1 touched anything.
+
+    `_fetch_projections` caught only MissingKeyError, so a FantasyPros HTTP
+    failure propagated out of `snapshot_`. The FFC bytes are written before that
+    runs and committed after it, so the exception discarded a captured day of
+    price movement -- unrecoverable -- in order to report a projection that is
+    fetchable tomorrow.
+    """
+    today = payload(adp=3.9, window_end=CAPTURE_DATE)
+    serve(monkeypatch, [fetched(today, window_end=CAPTURE_DATE)])
+
+    class DownAdapter:
+        def __init__(self, season: int) -> None:
+            pass
+
+        def fetch(self):
+            raise cli.base.FetchError("api.fantasypros.com: 503 after 4 attempts")
+
+    monkeypatch.setattr(cli.fantasypros, "FantasyProsAdapter", DownAdapter)
+    monkeypatch.setattr(cli.projections_csv, "configured_providers", dict)
+
+    capture(sources="ffc,projections")  # exits 0
+
+    assert (archive / CAPTURE_DATE.isoformat() / FILENAME).exists()
+    assert "was skipped" in capsys.readouterr().err
