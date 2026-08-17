@@ -101,14 +101,46 @@ def test_the_refresh_writes_the_live_edition_and_not_a_dated_one():
     assert editions == {LIVE_EDITION}
 
 
+def _needs(job: dict) -> list[str]:
+    needs = job.get("needs") or []
+    return [needs] if isinstance(needs, str) else list(needs)
+
+
 def test_a_failed_refresh_cannot_cost_a_capture_day():
     """S84: an uncaptured day of ADP movement is gone permanently, and a sheet
     can always be re-rendered. So they are separate jobs, and the capture is the
-    one that goes first."""
+    one that goes first.
+
+    Asserted as a property rather than as a literal `needs` value: the workflow
+    gains jobs -- S38.1's second provider was the first -- and a test comparing
+    the whole list fails for the wrong reason every time one lands.
+    """
     jobs = _workflow()["jobs"]
     assert "sheets" in jobs and "capture" in jobs
-    assert jobs["sheets"]["needs"] == "capture"
+    assert "capture" in _needs(jobs["sheets"])
+    assert not _needs(jobs["capture"])          # nothing runs before the capture
     assert "artifacts" not in _run_script("capture")
+
+
+def test_the_second_provider_cannot_cost_a_capture_day_either():
+    """S38.1's provider is worth having and it is not worth a day of ADP.
+
+    Three properties, and all three are load-bearing: it runs AFTER the capture
+    has committed, it cannot fail the run, and it is not a step inside `capture`
+    -- where an adapter raising would abort the job before the FFC payloads were
+    written, which is S84's one unrecoverable failure.
+    """
+    jobs = _workflow()["jobs"]
+    assert "sleeper" in jobs
+    assert _needs(jobs["sleeper"]) == ["capture"]
+    assert jobs["sleeper"]["continue-on-error"] is True
+    assert "sleeper" not in _run_script("capture")
+
+
+def test_the_refresh_sees_the_second_provider():
+    """A board that holds two providers and sheets rendered before the second one
+    landed would report `measurable: false` while the archive says otherwise."""
+    assert "sleeper" in _needs(_workflow()["jobs"]["sheets"])
 
 
 def test_an_unchanged_sheet_does_not_fail_the_refresh():

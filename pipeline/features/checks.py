@@ -11,6 +11,7 @@ from pathlib import Path
 import polars as pl
 
 from pipeline.config import PROCESSED_DIR, decision_dates
+from pipeline.features import projections
 from pipeline.features.schema import VALUE_TYPES
 
 MIN_SEASON = 2012
@@ -190,8 +191,15 @@ def _check_projection_snapshot(frame: pl.DataFrame) -> list[tuple[str, bool]]:
     # S38.1: one row per provider per player. A duplicate means the same provider
     # was stacked twice for one snapshot date, which would double its weight in
     # any dispersion measure taken across providers.
-    keys = ["provider_id", "snapshot_date", "source_player_name", "position"]
-    if all(k in frame.columns for k in keys):
+    # Keyed on the provider's own id where there is one. Name+position holds only
+    # while no two players share both, which is true of a few hundred established
+    # players and false of a whole player universe -- the league has had two
+    # Michael Carters. Without this, a second provider serving its full board
+    # fails this check on the day it lands, and `validate` runs inside the capture
+    # job, so a failure here is a reason a captured day never gets committed.
+    keys = ["provider_id", "snapshot_date", "_identity"]
+    if all(k in frame.columns for k in ("provider_id", "snapshot_date", "source_player_name")):
+        frame = frame.with_columns(projections._identity_key(frame.columns))
         duplicated = frame.height - frame.unique(subset=keys).height
         out.append(
             _ok("projection_snapshot: one row per provider per player per capture")

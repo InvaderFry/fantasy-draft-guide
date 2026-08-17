@@ -646,38 +646,139 @@ A suppressed comparison **says so on the page** rather than going quiet. A reade
 who knows a second provider is archived would otherwise read an unmarked board as
 agreement, which is the one reading that is worse than no information.
 
-### Adding the second provider
+### The second provider is Sleeper, and the obvious two would not have worked
 
-`data/raw/` is gitignored and a runner checks out fresh, so the dated snapshot is
-the only copy that survives. The manual path needs no network, so unlike FFC and
-FantasyPros it runs anywhere.
+§38.1 asks for two or three providers so their spread can stand in for the error
+nobody can measure. §11 names FFToday and ESPN as the import candidates. **Both
+are wrong here, and not for a licensing reason.**
 
-```bash
-# 1. drop the export in data/raw/projections/ and declare its columns under
-#    `projection_providers` in config/sources.yaml (see the commented example),
-#    plus a `sources:` registry block with its license and attribution (S46)
-# 2. capture it -- writes and hashes it into today's snapshot
-make projections-manual
-# 3. commit config/sources.yaml AND data/snapshots/<date>/ together
+FantasyPros' consensus — the number this board is drawn from — aggregates **CBS,
+ESPN, FFA, FFToday, FantasyPros, FantasySharks, NFL, NumberFire, RTSports and
+WalterFootball**. ESPN and FFToday are therefore *inputs to the board's own
+projection*. Comparing an aggregate against one of its own components does not
+measure provider disagreement; it measures how far one contributor sits from the
+mean of a set containing it, which is smaller by construction and smaller for a
+reason that has nothing to do with football. §38.1 warns about exactly this —
+*"particularly where they share upstream inputs"* — and the result would be a
+board where almost nothing is marked and the absence of a mark means nothing.
+
+Sleeper is not in that list. It also needs no key and publishes its terms, which
+makes it the only one of the three whose permission is written down rather than
+inferred.
+
+One contingency is recorded rather than assumed: if Sleeper's payload turns out
+to name an upstream vendor, the independence argument is a claim about *that
+vendor*. It survives one outside FantasyPros' component list and does not survive
+one inside it. `sleeper_projection_shape` in `research/questions.yaml` carries it
+as a resolution criterion, so the first capture checks it.
+
+### Written blind, on purpose
+
+`api.sleeper.app` answers 403 at CONNECT from the development sandbox, exactly as
+FFC and FantasyPros do. So `pipeline/ingest/sleeper.py` was written against a
+payload nobody here has seen, and **every shape-dependent value is in
+`config/sources.yaml`** — host, path, envelope, identity container, name field,
+every stat column. That is not a style preference. The FantasyPros adapter was
+written the same way and its guess was wrong in four ways; all four were YAML
+edits.
+
+The first runner capture records `observed_row_keys`, `observed_stat_keys` and
+`observed_player_keys` into the snapshot manifest, which is committed — so the
+shape question is answered from the archive rather than from a CI log that ages
+out. And because §84 stores unmodified bytes, a payload captured under a wrong
+mapping is not a lost capture: it is the same bytes waiting for a better parser.
+
+A wrong guess **fails** rather than emitting a frame of nulls. A null board reads
+downstream as a provider with no projections, and §19.3 would report itself
+blocked for a reason that is not true.
+
+### Three things that would have made this quietly do nothing
+
+Each computes cleanly. None looks like a fault.
+
+**A stat map missing a scored column.** Both leagues score two-point conversions
+and return touchdowns; FantasyPros publishes both. The first Sleeper map had
+neither — and `populated_scored_stats` compares *sets*, so §38.1 would have
+refused the comparison on every player on every sheet, permanently, with a
+well-reasoned message, every morning after a successful capture. Sleeper splits
+2-point conversions across three columns, so `parse` **sums** repeated
+destinations where the FantasyPros adapter assigns 1:1 — an assignment loop keeps
+whichever source came last in dict order, which is a third of the total and still
+a number. A test now compares the two providers' declared maps against what the
+profiles actually score, so this cannot ship again.
+
+**Two players with the same name.** `projections.latest()` kept the newest row
+per provider, name and position. That holds while no two players share both —
+true of FantasyPros' few hundred established players, false of a provider serving
+its whole player universe, and the league has had two Michael Carters. One of
+them silently became the other's projection: no error, no count to notice. It is
+keyed on the provider's own id now, with name and position as the fallback for
+the manual-CSV path.
+
+**A projection outage discarding a day of ADP.** This one predates §38.1.
+`_fetch_projections` caught only a missing key, so a FantasyPros HTTP failure
+propagated out of `snapshot`. The FFC bytes are written before that runs and
+committed *after* it — so the exception threw away a captured day of price
+movement, which cannot be bought back, in order to report a projection that is
+fetchable tomorrow. It is a reported skip now.
+
+### Where the capture runs, and why it is its own job
+
+```
+capture   ->  sleeper  ->  sheets
+(ffc,        (S38.1,      (re-render all 26,
+ projections) continue-    now seeing both
+ COMMITS      on-error)    providers)
 ```
 
-`--sources projections-manual` is deliberately a **separate source name** from the
-daily `projections`, and not an extension of it. §11's `_fetch_projections` is a
-*fallback order* — FantasyPros first, manual CSV only if the key is missing — and
-since the key is a repository secret the manual adapter was unreachable on the
-runner, so the board could only ever carry one provider. Widening that function
-instead would have been worse than useless: the daily archive job would then reach
-the CSV adapter on every run, find nothing under the gitignored `data/raw/`, and
-raise **before the FFC payloads were written** — costing a day of ADP, which is
-§84's one unrecoverable failure, to buy a provider that was not there.
+`sleeper` is a **separate job that runs after the ADP capture has committed**, and
+is marked `continue-on-error`. Both properties are load-bearing. An adapter
+raising inside the capture job aborts it before the FFC payloads are committed,
+and a missed ADP day is §84's one unrecoverable failure — worth more than any
+projection, which is fetchable tomorrow. A Sleeper outage leaves the run green
+and the sheets rendering: a board with no error bar beats no board.
+
+Daily rather than weekly, though §38.1 only needs weekly. `MAX_VINTAGE_GAP_DAYS`
+is 7, so a weekly cadence has exactly zero slack — one failed run suppresses the
+feature everywhere. Daily also means the day both providers share is almost
+always today, so the comparison describes today's board. It costs little: a
+byte-identical payload is `unchanged` and writes nothing, so the archive grows
+with how often Sleeper republishes rather than with the cron.
+
+**No alarm is attached, deliberately.** A Sleeper series that stops reports
+itself: §38.1 suppresses agreement once the shared capture falls more than seven
+days behind the board, and the sheet prints `agreement not shown` in its own
+legend. A failure visible on the deliverable does not need a second channel.
+
+### The order to do this in
+
+The adapter is written and scheduled, and **nothing has been captured yet**. The
+shape is five independent guesses, so the sequence matters:
+
+```bash
+# 1. probe: dispatch the archive workflow once and read the manifest it writes.
+#    `notes` carries the row, stat and player keys actually served.
+# 2. correct config/sources.yaml against what landed -- no Python changes
+# 3. re-parse the SAME stored bytes; S84 kept them unmodified
+uv run research build-tables --tables projection_snapshot
+uv run research validate
+```
+
+Expect the first parse to fail or to map partially. That is the design working:
+`ResponseShapeError` names the keys observed and the keys configured, so the
+correction is a line of YAML.
+
+A provider without an API still goes through the manual path instead —
+`make projections-manual`, an export declared under `projection_providers`. That
+route is built and tested; it is simply not how Sleeper arrives.
 
 `research validate` reports what the archive holds, since that is now the question
 §38.1 turns on:
 
 ```
 projections: board drawn from `fantasypros` (config/sources.yaml board_provider)
-projections: archived: fantasypros newest 2026-08-16, fftoday newest 2026-08-14
-projections: newest captures 2 day(s) apart; S38.1 agreement is reported
+projections: archived: fantasypros newest 2026-08-17, sleeper newest 2026-08-17
+projections: newest captures 0 day(s) apart; S38.1 agreement is reported
 ```
 
 ### The board's provider is now a decision
@@ -1034,11 +1135,9 @@ about who was available at every pick after the gap.
 * **FantasyPros** — projections, key-gated and configured; first capture
   2026-08-13 (§11). The board is drawn from this provider (`board_provider` in
   `config/sources.yaml`).
-* **A second projection provider** — §38.1 asks for two or three so their spread
-  can stand in for the error nobody can measure. None is declared yet; the manual
-  import path (§11 option 1B) and the comparison are built and dormant. Whichever
-  is added is registered in `config/sources.yaml` with its license before its
-  first capture (§46, §80).
+* **Sleeper** — §38.1's second projection provider, captured daily on a runner.
+  Free for non-commercial use; no key. Registered in `config/sources.yaml` with
+  its terms and the reason it is this provider and not another (§46, §80).
 
 Full registry with purposes and licenses: `config/sources.yaml` (§46). This is
 a technical registry, not legal advice.

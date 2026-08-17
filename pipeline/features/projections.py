@@ -31,12 +31,13 @@ import polars as pl
 from pipeline.config import SNAPSHOT_DIR, projection_providers
 from pipeline.features.assertions import assert_as_of_present
 from pipeline.features.schema import PROJECTION_SNAPSHOT_COLUMNS
-from pipeline.ingest import fantasypros, projections_csv
+from pipeline.ingest import fantasypros, projections_csv, sleeper
 from pipeline.normalize.player_ids import load_player_ids, match_external
 
 API_FILENAME = re.compile(
     r"^fantasypros_projections_(?P<position>[a-z]+)_(?P<season>\d{4})\.json$"
 )
+SLEEPER_FILENAME = re.compile(r"^sleeper_projections_(?P<season>\d{4})\.json$")
 CSV_FILENAME = re.compile(r"^projections_(?P<provider>.+)\.csv$")
 
 
@@ -53,7 +54,11 @@ def snapshot_files(root: Path = SNAPSHOT_DIR) -> list[tuple[dt.date, Path]]:
         except ValueError:
             continue
         for path in sorted(day.iterdir()):
-            if API_FILENAME.match(path.name) or CSV_FILENAME.match(path.name):
+            if (
+                API_FILENAME.match(path.name)
+                or SLEEPER_FILENAME.match(path.name)
+                or CSV_FILENAME.match(path.name)
+            ):
                 found.append((date, path))
     return found
 
@@ -67,6 +72,13 @@ def parse_file(date: dt.date, path: Path, *, season: int | None = None) -> list[
             snapshot_date=date,
             season=season or int(api.group("season")),
             position=api.group("position").upper(),
+        )
+    sleeper_match = SLEEPER_FILENAME.match(path.name)
+    if sleeper_match:
+        return sleeper.parse(
+            path.read_bytes(),
+            snapshot_date=date,
+            season=season or int(sleeper_match.group("season")),
         )
     csv_match = CSV_FILENAME.match(path.name)
     if not csv_match:
@@ -102,10 +114,58 @@ def build(root: Path = SNAPSHOT_DIR, *, crosswalk: pl.DataFrame | None = None) -
 
     frame = pl.DataFrame(rows, infer_schema_length=None)
     xwalk = crosswalk if crosswalk is not None else load_player_ids()
-    frame = match_external(frame, crosswalk=xwalk).rename({"gsis_id": "player_id"})
+    frame = _resolve_ids(frame, xwalk)
     frame = _conform(frame)
     assert_as_of_present(frame, "projection_snapshot")
     return frame
+
+
+def _resolve_ids(frame: pl.DataFrame, crosswalk: pl.DataFrame) -> pl.DataFrame:
+    """Attach S12's `player_id`, preferring an id the provider supplied itself.
+
+    `match_external` matches on NAMES -- override, then name+position+team, then
+    name+position -- because neither Fantasy Football Calculator nor FantasyPros
+    publishes a canonical id. That is the join that lost `Travis Hunter` across
+    twelve captures: nflverse rosters him at his defensive position and every
+    fantasy source at his offensive one, so he resolved to nothing and needed a
+    manual override.
+
+    A provider that publishes `gsis_id` on its own rows does not need any of
+    that. Sleeper does. So a row arriving with `player_id` already set keeps it,
+    and only the remainder goes through the name match -- which is a strict
+    improvement to the existing path rather than a special case, because every
+    provider that ever publishes an id gets the exact join automatically.
+
+    The provider's own `match_method` is preserved rather than overwritten with
+    `name_position`, so `coverage()` and the S12 reports can tell an exact join
+    from a lucky spelling.
+    """
+    supplied = "player_id" in frame.columns
+    if supplied:
+        frame = frame.rename({"player_id": "_provider_id"})
+        for col, dtype in (("match_method", pl.String), ("match_confidence", pl.Float64)):
+            if col in frame.columns:
+                frame = frame.rename({col: f"_provider_{col}"})
+            else:
+                frame = frame.with_columns(pl.lit(None, dtype=dtype).alias(f"_provider_{col}"))
+
+    frame = match_external(frame, crosswalk=crosswalk)
+
+    if not supplied:
+        return frame.rename({"gsis_id": "player_id"})
+
+    have = pl.col("_provider_id").is_not_null()
+    return frame.with_columns(
+        pl.coalesce("_provider_id", "gsis_id").alias("player_id"),
+        pl.when(have)
+        .then(pl.col("_provider_match_method"))
+        .otherwise(pl.col("match_method"))
+        .alias("match_method"),
+        pl.when(have)
+        .then(pl.col("_provider_match_confidence"))
+        .otherwise(pl.col("match_confidence"))
+        .alias("match_confidence"),
+    ).drop("_provider_id", "_provider_match_method", "_provider_match_confidence", "gsis_id")
 
 
 def _conform(frame: pl.DataFrame) -> pl.DataFrame:
@@ -200,8 +260,41 @@ def latest(
         return frame
     return (
         frame.sort("snapshot_date")
-        .group_by(["provider_id", "source_player_name", "position"], maintain_order=True)
+        .with_columns(_identity_key(frame.columns))
+        .group_by(["provider_id", "_identity"], maintain_order=True)
         .last()
+        .drop("_identity")
+    )
+
+
+def _identity_key(columns: list[str]) -> pl.Expr:
+    """One player, keyed on the provider's own id where there is one.
+
+    This used to group on ``source_player_name`` and ``position``, which holds
+    exactly as long as no two players share both. FantasyPros publishes a few
+    hundred established players and never collided. A provider serving its whole
+    player universe does: the league has had two Michael Carters and two Josh
+    Allens, and `.last()` silently kept one of them and threw the other away --
+    no error, no count to notice, just a player who is quietly somebody else.
+
+    The provider's own id is unique by construction, so it is used when present;
+    name and position remain the fallback for the manual-CSV path, which may
+    carry no id at all.
+    """
+    name_key = (
+        pl.lit("name:")
+        + pl.col("source_player_name").fill_null("")
+        + "|"
+        + pl.col("position").fill_null("")
+    )
+    if "source_player_id" not in columns:
+        return name_key.alias("_identity")
+    if_id = pl.col("source_player_id").cast(pl.String)
+    return (
+        pl.when(if_id.is_not_null() & (if_id != ""))
+        .then(pl.lit("id:") + if_id)
+        .otherwise(name_key)
+        .alias("_identity")
     )
 
 

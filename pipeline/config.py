@@ -275,6 +275,16 @@ def fantasypros_config() -> dict[str, Any]:
     return sources().get("fantasypros_api") or {}
 
 
+def sleeper_config() -> dict[str, Any]:
+    """The Sleeper API block (S38.1's second provider).
+
+    Same reasoning as `fantasypros_config`: the host is unreachable from the
+    development sandbox, so the response shape is a guess and a wrong guess has
+    to be correctable in YAML rather than in the adapter.
+    """
+    return sources().get("sleeper_api") or {}
+
+
 def projection_source_available() -> bool:
     """Whether any projection path is configured at all (S11, S19.3)."""
     if os.environ.get("FANTASYPROS_API_KEY", "").strip() and fantasypros_config().get("api_base"):

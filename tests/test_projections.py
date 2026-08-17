@@ -411,7 +411,7 @@ def _archive(tmp_path, rows):
 def test_validate_says_the_board_carries_no_error_bar_with_one_provider(tmp_path, monkeypatch):
     """The state this repository was in until S38.1, reported where somebody looks."""
     monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(
-        tmp_path, [{"provider_id": "fantasypros", "snapshot_date": dt.date(2026, 8, 16)}]
+        tmp_path, [_scored("fantasypros", dt.date(2026, 8, 16), **ALL_SCORED)]
     ))
     monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
 
@@ -420,10 +420,26 @@ def test_validate_says_the_board_carries_no_error_bar_with_one_provider(tmp_path
     assert "no error bar" in lines
 
 
+def _scored(provider, date, **stats):
+    row = {
+        "provider_id": provider, "snapshot_date": date, "source_player_id": provider + "1",
+        "source_player_name": "Bijan Robinson", "position": "RB", "season": 2026,
+    }
+    row.update(stats)
+    return row
+
+
+ALL_SCORED = {
+    "passing_yards": 0.0, "passing_tds": 0.0, "interceptions": 0.0, "rushing_yards": 1290.0,
+    "rushing_tds": 11.0, "receptions": 52.0, "receiving_yards": 420.0, "receiving_tds": 3.0,
+    "fumbles_lost": 2.0, "two_point_conversions": 1.0, "special_teams_tds": 0.0,
+}
+
+
 def test_validate_reports_the_gap_between_two_providers_captures(tmp_path, monkeypatch):
     monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(tmp_path, [
-        {"provider_id": "fantasypros", "snapshot_date": dt.date(2026, 8, 16)},
-        {"provider_id": "fftoday", "snapshot_date": dt.date(2026, 8, 14)},
+        _scored("fantasypros", dt.date(2026, 8, 16), **ALL_SCORED),
+        _scored("sleeper", dt.date(2026, 8, 14), **ALL_SCORED),
     ]))
     monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
 
@@ -432,11 +448,32 @@ def test_validate_reports_the_gap_between_two_providers_captures(tmp_path, monke
     assert "agreement is reported" in lines
 
 
+def test_validate_does_not_claim_agreement_from_the_vintage_gap_alone(tmp_path, monkeypatch):
+    """S38.1 has two gates and this reported one of them.
+
+    With the captures a day apart and mismatched scored columns, `validate` said
+    "agreement is reported" every morning while all 26 sheets showed nothing --
+    the exact shape of defect this repository keeps closing, a state that
+    computes cleanly and describes something else.
+    """
+    short = {k: v for k, v in ALL_SCORED.items() if k != "special_teams_tds"}
+    monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(tmp_path, [
+        _scored("fantasypros", dt.date(2026, 8, 16), **ALL_SCORED),
+        _scored("sleeper", dt.date(2026, 8, 16), **short),
+    ]))
+    monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
+
+    lines = " ".join(cli._projection_archive_status())
+    assert "REFUSED" in lines
+    assert "special_teams_tds" in lines
+    assert "agreement is reported" not in lines
+
+
 def test_validate_says_when_the_second_provider_has_aged_out(tmp_path, monkeypatch):
     """A suppressed comparison that reported nothing would look like agreement."""
     monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(tmp_path, [
-        {"provider_id": "fantasypros", "snapshot_date": dt.date(2026, 8, 16)},
-        {"provider_id": "fftoday", "snapshot_date": dt.date(2026, 7, 1)},
+        _scored("fantasypros", dt.date(2026, 8, 16), **ALL_SCORED),
+        _scored("sleeper", dt.date(2026, 7, 1), **ALL_SCORED),
     ]))
     monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
 
@@ -446,8 +483,113 @@ def test_validate_says_when_the_second_provider_has_aged_out(tmp_path, monkeypat
 
 def test_validate_flags_a_configured_board_provider_that_never_landed(tmp_path, monkeypatch):
     monkeypatch.setattr(cli.config, "PROCESSED_DIR", _archive(
-        tmp_path, [{"provider_id": "fftoday", "snapshot_date": dt.date(2026, 8, 16)}]
+        tmp_path, [_scored("fftoday", dt.date(2026, 8, 16), **ALL_SCORED)]
     ))
     monkeypatch.setattr(cli.config, "board_provider", lambda: "fantasypros")
 
     assert "NOT IN THE ARCHIVE" in " ".join(cli._projection_archive_status())
+
+
+def test_a_sleeper_capture_lands_in_the_table_with_its_own_id_resolved(tmp_path):
+    """End to end: the archived payload -> projection_snapshot, joined by id.
+
+    The join is the part worth pinning. Every other source here is name-matched,
+    and `_resolve_ids` exists so a provider that publishes gsis_id is not dragged
+    through a name match that can only lose players -- Travis Hunter resolved to
+    nothing across twelve captures for exactly that reason.
+    """
+    day = tmp_path / "2026-08-16"
+    day.mkdir()
+    (day / "sleeper_projections_2026.json").write_bytes(
+        json.dumps([
+            {
+                "player_id": "4034",
+                "stats": {"rush_yd": 1290.0, "rush_td": 11.0, "rec": 52.0},
+                "player": {
+                    "full_name": "Bijan Robinson", "team": "ATL", "position": "RB",
+                    "gsis_id": "00-0038996",
+                },
+            }
+        ]).encode()
+    )
+
+    frame = projections.build(root=tmp_path, crosswalk=CROSSWALK)
+
+    assert frame.height == 1
+    assert frame["provider_id"][0] == "sleeper"
+    assert frame["player_id"][0] == "00-0038996"
+    assert frame["match_method"][0] == "provider_gsis_id"
+    assert frame["rushing_yards"][0] == 1290.0
+    # S13's shape, whatever the provider served.
+    assert list(frame.columns) == list(PROJECTION_SNAPSHOT_COLUMNS)
+
+
+def test_two_providers_stack_rather_than_average(tmp_path):
+    """S38.1 and S80: one row per provider per player. An averaged row destroys
+    the only proxy for projection uncertainty available."""
+    day = tmp_path / "2026-08-16"
+    day.mkdir()
+    (day / "sleeper_projections_2026.json").write_bytes(
+        json.dumps([{
+            "player_id": "4034",
+            "stats": {"rush_yd": 1100.0},
+            "player": {"full_name": "Bijan Robinson", "team": "ATL", "position": "RB",
+                       "gsis_id": "00-0038996"},
+        }]).encode()
+    )
+    (day / "fantasypros_projections_rb_2026.json").write_bytes(
+        json.dumps({"players": [{
+            "fpid": "1", "name": "Bijan Robinson", "team_id": "ATL", "position_id": "RB",
+            "stats": {"rush_yds": 1290.0},
+        }]}).encode()
+    )
+
+    frame = projections.build(root=tmp_path, crosswalk=CROSSWALK)
+
+    assert sorted(frame["provider_id"].to_list()) == ["fantasypros", "sleeper"]
+    assert frame.height == 2
+    assert sorted(frame["rushing_yards"].to_list()) == [1100.0, 1290.0]
+
+
+def test_two_players_sharing_a_name_and_position_are_not_collapsed_into_one():
+    """A latent bug the second provider would have fired on day one.
+
+    `latest()` keyed on provider + name + position and took `.last()`, which is
+    correct exactly while no two players share both. FantasyPros publishes a few
+    hundred established players and never collided. A provider serving its whole
+    player universe does -- the league has had two Michael Carters and two Josh
+    Allens -- and the collapse produced no error and no count to notice: one of
+    them simply became the other's projection.
+    """
+    def player(pid, points):
+        return {
+            "provider_id": "sleeper", "source_player_id": pid,
+            "source_player_name": "Michael Carter", "position": "RB",
+            "snapshot_date": dt.date(2026, 8, 16), "season": 2026,
+            "projected_points": points,
+        }
+
+    out = projections.latest(pl.DataFrame([player("111", 180.0), player("222", 40.0)]),
+                             season=2026)
+
+    assert out.height == 2
+    assert sorted(out["projected_points"].to_list()) == [40.0, 180.0]
+
+
+def test_a_provider_with_no_ids_still_keys_on_the_name():
+    """The manual-CSV path may carry no id at all, and must keep working."""
+    rows = [
+        {"provider_id": "csv", "source_player_name": n, "position": "RB",
+         "snapshot_date": d, "season": 2026, "projected_points": p}
+        for n, d, p in [
+            ("Bijan Robinson", dt.date(2026, 8, 13), 100.0),
+            ("Bijan Robinson", dt.date(2026, 8, 16), 200.0),   # newer wins
+            ("Breece Hall", dt.date(2026, 8, 16), 150.0),
+        ]
+    ]
+    out = projections.latest(pl.DataFrame(rows), season=2026)
+
+    assert out.height == 2
+    assert out.filter(pl.col("source_player_name") == "Bijan Robinson")[
+        "projected_points"
+    ][0] == 200.0
