@@ -1,0 +1,62 @@
+# Publish only the live S83 draft sheets. The repository also contains raw and
+# processed data, dated research artifacts, and audit material; none of those
+# belong in the public site artifact.
+name: Publish draft guide
+
+on:
+  # A push by GITHUB_TOKEN does not trigger another push workflow. The daily
+  # archive commits refreshed sheets that way, so workflow_run is what keeps
+  # Pages current. Run after every completion, including a red fit check: the
+  # archive workflow commits the accepted board before measuring page count,
+  # and a fresh two-page board is deliberately preferred to a stale one.
+  workflow_run:
+    workflows: ["ADP archive"]
+    types: [completed]
+  # Human changes and the initial merge should publish without waiting for the
+  # next archive run.
+  push:
+    branches: [main]
+    paths:
+      - "artifacts/2026-draft/sheets/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Always publish the accepted state on main. For workflow_run events this
+      # avoids checking out the triggering workflow's event SHA, and for a
+      # manually dispatched archive it still publishes the board that landed on
+      # main rather than code from the dispatching ref.
+      - name: Check out the live board
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Verify the site entry point
+        run: test -s artifacts/2026-draft/sheets/index.html
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload the live guide
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: artifacts/2026-draft/sheets
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

@@ -4,6 +4,8 @@ Implementation of the data layer described in
 [`static_fantasy_football_research_guide_plan_r2.md`](static_fantasy_football_research_guide_plan_r2.md).
 Section references throughout the code (`S13`, `S6.1`, ...) point at that spec.
 
+**[Open the live 2026 draft guide](https://invaderfry.github.io/fantasy-draft-guide/)**
+
 ## What this chunk is
 
 The spec routes any build starting within three weeks of a draft to its §88
