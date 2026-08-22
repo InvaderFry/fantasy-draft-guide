@@ -1,14 +1,14 @@
 {
-  "checked": "2026-08-21",
+  "checked": "2026-08-22",
   "edition": "2026-draft",
   "profiles": {
     "half_ppr_12": {
-      "adp_snapshot_date": "2026-08-21",
+      "adp_snapshot_date": "2026-08-22",
       "board_rows": 497,
-      "players_priced": 188,
-      "players_with_spread": 188,
-      "priced": 188,
-      "priced_share": 0.3783,
+      "players_priced": 192,
+      "players_with_spread": 191,
+      "priced": 192,
+      "priced_share": 0.3863,
       "survival_slots": 12,
       "tier_players": {
         "QB": 80,
@@ -18,7 +18,7 @@
       }
     },
     "ppr_12": {
-      "adp_snapshot_date": "2026-08-21",
+      "adp_snapshot_date": "2026-08-22",
       "board_rows": 497,
       "players_priced": 218,
       "players_with_spread": 218,
