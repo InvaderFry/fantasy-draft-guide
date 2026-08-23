@@ -1,0 +1,50 @@
+{
+  "files": {
+    "depth_charts_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 2076423,
+      "capture_reason": "7 days since the last capture",
+      "dataset": "depth_charts",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "preseason depth chart rank as a role signal (S86)",
+      "retrieved_at": "2026-08-23T08:28:09+00:00",
+      "season": 2026,
+      "sha256": "2e3c0189550bafb65f65a399c7897aa8f1c582be7f5ad86127e12fdc72e78363",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.parquet",
+      "week1_start": "2026-09-09"
+    },
+    "roster_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 528515,
+      "capture_reason": "7 days since the last capture",
+      "dataset": "rosters",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "team, position, age, experience",
+      "retrieved_at": "2026-08-23T08:28:09+00:00",
+      "season": 2026,
+      "sha256": "ef57313e8808ed6dded2daf09ae69d2b98917b4a45443c15c9fbc57f1537d0d4",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2026.parquet",
+      "week1_start": "2026-09-09"
+    },
+    "roster_weekly_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 528564,
+      "capture_reason": "7 days since the last capture",
+      "dataset": "weekly_rosters",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "in-season roster status by week",
+      "retrieved_at": "2026-08-23T08:28:09+00:00",
+      "season": 2026,
+      "sha256": "8fdae351b1124693571c82e74592b15893fbfe49473514f8cfbba601f1208403",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2026.parquet",
+      "week1_start": "2026-09-09"
+    }
+  },
+  "snapshot_date": "2026-08-23"
+}
