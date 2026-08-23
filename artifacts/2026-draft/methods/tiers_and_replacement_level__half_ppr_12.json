@@ -9,7 +9,7 @@
     "S14",
     "S38.1"
   ],
-  "generated_on": "2026-08-22",
+  "generated_on": "2026-08-23",
   "population": {
     "registry_id": "tiers_and_replacement_level",
     "profile_id": "half_ppr_12",
@@ -40,9 +40,9 @@
       "fantasypros",
       "sleeper"
     ],
-    "agreement_as_of": "2026-08-22",
-    "adp_snapshot_date": "2026-08-22",
-    "price_movement_since": "2026-08-15"
+    "agreement_as_of": "2026-08-23",
+    "adp_snapshot_date": "2026-08-23",
+    "price_movement_since": "2026-08-16"
   },
   "outcome": null,
   "sample_size": 497,
@@ -109,9 +109,9 @@
             "tier": 1,
             "projected_points": 361.3,
             "value_over_replacement": 73.37,
-            "adp": 32.9,
+            "adp": 33.0,
             "position_adp": 1,
-            "adp_delta": 4.7,
+            "adp_delta": 3.5,
             "provider_agreement": "high"
           },
           {
@@ -120,9 +120,9 @@
             "tier": 2,
             "projected_points": 315.3,
             "value_over_replacement": 27.41,
-            "adp": 56.7,
-            "position_adp": 4,
-            "adp_delta": 2.8,
+            "adp": 56.8,
+            "position_adp": 3,
+            "adp_delta": 1.7,
             "provider_agreement": "high"
           },
           {
@@ -131,9 +131,9 @@
             "tier": 3,
             "projected_points": 313.0,
             "value_over_replacement": 25.1,
-            "adp": 80.9,
+            "adp": 79.4,
             "position_adp": 8,
-            "adp_delta": 4.7,
+            "adp_delta": 2.6,
             "provider_agreement": "high"
           },
           {
@@ -142,9 +142,9 @@
             "tier": 3,
             "projected_points": 312.5,
             "value_over_replacement": 24.62,
-            "adp": 51.9,
+            "adp": 51.5,
             "position_adp": 2,
-            "adp_delta": 4.4,
+            "adp_delta": 1.2,
             "provider_agreement": "high"
           },
           {
@@ -153,9 +153,9 @@
             "tier": 4,
             "projected_points": 311.6,
             "value_over_replacement": 23.65,
-            "adp": 71.0,
+            "adp": 70.0,
             "position_adp": 6,
-            "adp_delta": -1.7,
+            "adp_delta": -2.2,
             "provider_agreement": "high"
           },
           {
@@ -164,9 +164,9 @@
             "tier": 5,
             "projected_points": 299.3,
             "value_over_replacement": 11.34,
-            "adp": 56.4,
-            "position_adp": 3,
-            "adp_delta": 0.6,
+            "adp": 57.3,
+            "position_adp": 4,
+            "adp_delta": 2.2,
             "provider_agreement": "high"
           },
           {
@@ -175,9 +175,9 @@
             "tier": 5,
             "projected_points": 298.9,
             "value_over_replacement": 10.93,
-            "adp": 122.3,
+            "adp": 120.4,
             "position_adp": 16,
-            "adp_delta": 11.4,
+            "adp_delta": 5.4,
             "provider_agreement": "high"
           },
           {
@@ -186,9 +186,9 @@
             "tier": 6,
             "projected_points": 294.9,
             "value_over_replacement": 6.94,
-            "adp": 65.5,
+            "adp": 65.7,
             "position_adp": 5,
-            "adp_delta": -0.6,
+            "adp_delta": -0.4,
             "provider_agreement": "high"
           },
           {
@@ -197,9 +197,9 @@
             "tier": 7,
             "projected_points": 293.2,
             "value_over_replacement": 5.31,
-            "adp": 95.6,
+            "adp": 94.6,
             "position_adp": 11,
-            "adp_delta": 4.3,
+            "adp_delta": 1.0,
             "provider_agreement": "high"
           },
           {
@@ -208,9 +208,9 @@
             "tier": 7,
             "projected_points": 293.2,
             "value_over_replacement": 5.3,
-            "adp": 87.0,
+            "adp": 88.4,
             "position_adp": 9,
-            "adp_delta": 2.8,
+            "adp_delta": 2.7,
             "provider_agreement": "high"
           },
           {
@@ -221,7 +221,7 @@
             "value_over_replacement": 4.19,
             "adp": 91.0,
             "position_adp": 10,
-            "adp_delta": -6.2,
+            "adp_delta": -1.2,
             "provider_agreement": "high"
           },
           {
@@ -230,9 +230,9 @@
             "tier": 8,
             "projected_points": 291.4,
             "value_over_replacement": 3.44,
-            "adp": 103.7,
+            "adp": 103.5,
             "position_adp": 13,
-            "adp_delta": 5.9,
+            "adp_delta": 4.2,
             "provider_agreement": "high"
           },
           {
@@ -241,9 +241,9 @@
             "tier": 9,
             "projected_points": 287.9,
             "value_over_replacement": 0.0,
-            "adp": 109.7,
+            "adp": 110.2,
             "position_adp": 14,
-            "adp_delta": 4.2,
+            "adp_delta": 4.0,
             "provider_agreement": "high"
           },
           {
@@ -252,9 +252,9 @@
             "tier": 9,
             "projected_points": 287.1,
             "value_over_replacement": -0.81,
-            "adp": 115.4,
+            "adp": 114.7,
             "position_adp": 15,
-            "adp_delta": -1.1,
+            "adp_delta": -2.5,
             "provider_agreement": "high"
           },
           {
@@ -263,9 +263,9 @@
             "tier": 10,
             "projected_points": 285.4,
             "value_over_replacement": -2.48,
-            "adp": 79.0,
+            "adp": 78.3,
             "position_adp": 7,
-            "adp_delta": 3.8,
+            "adp_delta": 2.7,
             "provider_agreement": "high"
           },
           {
@@ -274,9 +274,9 @@
             "tier": 11,
             "projected_points": 277.7,
             "value_over_replacement": -10.23,
-            "adp": 103.3,
+            "adp": 101.0,
             "position_adp": 12,
-            "adp_delta": -3.8,
+            "adp_delta": -4.6,
             "provider_agreement": "high"
           },
           {
@@ -285,9 +285,9 @@
             "tier": 12,
             "projected_points": 273.7,
             "value_over_replacement": -14.23,
-            "adp": 139.0,
+            "adp": 139.6,
             "position_adp": 19,
-            "adp_delta": 3.2,
+            "adp_delta": 4.6,
             "provider_agreement": "high"
           },
           {
@@ -296,9 +296,9 @@
             "tier": 13,
             "projected_points": 269.0,
             "value_over_replacement": -18.95,
-            "adp": 134.7,
+            "adp": 135.7,
             "position_adp": 17,
-            "adp_delta": 1.5,
+            "adp_delta": 2.3,
             "provider_agreement": "high"
           },
           {
@@ -307,9 +307,9 @@
             "tier": 14,
             "projected_points": 266.2,
             "value_over_replacement": -21.72,
-            "adp": 137.9,
+            "adp": 137.4,
             "position_adp": 18,
-            "adp_delta": -4.8,
+            "adp_delta": -4.4,
             "provider_agreement": "high"
           },
           {
@@ -318,9 +318,9 @@
             "tier": 15,
             "projected_points": 263.2,
             "value_over_replacement": -24.77,
-            "adp": 167.0,
+            "adp": 167.2,
             "position_adp": 24,
-            "adp_delta": 5.1,
+            "adp_delta": 2.4,
             "provider_agreement": "low"
           },
           {
@@ -329,9 +329,9 @@
             "tier": 16,
             "projected_points": 257.7,
             "value_over_replacement": -30.18,
-            "adp": 155.7,
+            "adp": 157.2,
             "position_adp": 22,
-            "adp_delta": -7.0,
+            "adp_delta": -6.9,
             "provider_agreement": "high"
           },
           {
@@ -342,7 +342,7 @@
             "value_over_replacement": -30.52,
             "adp": 151.8,
             "position_adp": 21,
-            "adp_delta": 2.9,
+            "adp_delta": 3.1,
             "provider_agreement": "high"
           },
           {
@@ -351,9 +351,9 @@
             "tier": 17,
             "projected_points": 253.1,
             "value_over_replacement": -34.79,
-            "adp": 150.1,
+            "adp": 148.7,
             "position_adp": 20,
-            "adp_delta": 4.3,
+            "adp_delta": 2.7,
             "provider_agreement": "high"
           },
           {
@@ -362,9 +362,9 @@
             "tier": 18,
             "projected_points": 249.5,
             "value_over_replacement": -38.43,
-            "adp": 163.1,
+            "adp": 162.8,
             "position_adp": 23,
-            "adp_delta": -2.1,
+            "adp_delta": -2.6,
             "provider_agreement": "high"
           },
           {
@@ -384,7 +384,7 @@
             "tier": 20,
             "projected_points": 222.0,
             "value_over_replacement": -65.95,
-            "adp": 170.4,
+            "adp": 167.4,
             "position_adp": 25,
             "adp_delta": null,
             "provider_agreement": "high"
@@ -1022,9 +1022,9 @@
             "tier": 3,
             "projected_points": 295.6,
             "value_over_replacement": 152.25,
-            "adp": 6.8,
+            "adp": 6.6,
             "position_adp": 4,
-            "adp_delta": 0.1,
+            "adp_delta": -0.1,
             "provider_agreement": "medium"
           },
           {
@@ -1044,9 +1044,9 @@
             "tier": 5,
             "projected_points": 264.6,
             "value_over_replacement": 121.25,
-            "adp": 9.9,
+            "adp": 9.7,
             "position_adp": 6,
-            "adp_delta": -0.5,
+            "adp_delta": -0.8,
             "provider_agreement": "high"
           },
           {
@@ -1055,9 +1055,9 @@
             "tier": 6,
             "projected_points": 259.8,
             "value_over_replacement": 116.39,
-            "adp": 11.5,
+            "adp": 11.7,
             "position_adp": 7,
-            "adp_delta": 0.2,
+            "adp_delta": 0.3,
             "provider_agreement": "medium"
           },
           {
@@ -1068,7 +1068,7 @@
             "value_over_replacement": 110.54,
             "adp": 9.2,
             "position_adp": 5,
-            "adp_delta": -1.4,
+            "adp_delta": -0.5,
             "provider_agreement": "high"
           },
           {
@@ -1077,9 +1077,9 @@
             "tier": 8,
             "projected_points": 247.4,
             "value_over_replacement": 104.0,
-            "adp": 15.1,
+            "adp": 14.8,
             "position_adp": 8,
-            "adp_delta": -0.2,
+            "adp_delta": -0.8,
             "provider_agreement": "high"
           },
           {
@@ -1088,9 +1088,9 @@
             "tier": 8,
             "projected_points": 246.7,
             "value_over_replacement": 103.3,
-            "adp": 15.1,
+            "adp": 15.3,
             "position_adp": 9,
-            "adp_delta": -0.1,
+            "adp_delta": 0.4,
             "provider_agreement": "high"
           },
           {
@@ -1099,9 +1099,9 @@
             "tier": 9,
             "projected_points": 243.8,
             "value_over_replacement": 100.42,
-            "adp": 17.3,
+            "adp": 17.4,
             "position_adp": 10,
-            "adp_delta": -0.9,
+            "adp_delta": -0.7,
             "provider_agreement": "high"
           },
           {
@@ -1110,9 +1110,9 @@
             "tier": 10,
             "projected_points": 235.1,
             "value_over_replacement": 91.72,
-            "adp": 21.6,
+            "adp": 21.5,
             "position_adp": 11,
-            "adp_delta": -3.3,
+            "adp_delta": -2.0,
             "provider_agreement": "high"
           },
           {
@@ -1121,9 +1121,9 @@
             "tier": 11,
             "projected_points": 230.9,
             "value_over_replacement": 87.57,
-            "adp": 24.9,
+            "adp": 24.0,
             "position_adp": 13,
-            "adp_delta": 0.3,
+            "adp_delta": -1.8,
             "provider_agreement": "low"
           },
           {
@@ -1132,9 +1132,9 @@
             "tier": 11,
             "projected_points": 229.1,
             "value_over_replacement": 85.72,
-            "adp": 23.6,
+            "adp": 24.0,
             "position_adp": 12,
-            "adp_delta": 1.8,
+            "adp_delta": 1.9,
             "provider_agreement": "high"
           },
           {
@@ -1143,9 +1143,9 @@
             "tier": 11,
             "projected_points": 228.0,
             "value_over_replacement": 84.68,
-            "adp": 30.0,
+            "adp": 29.4,
             "position_adp": 15,
-            "adp_delta": -0.2,
+            "adp_delta": -2.7,
             "provider_agreement": "medium"
           },
           {
@@ -1154,9 +1154,9 @@
             "tier": 12,
             "projected_points": 223.2,
             "value_over_replacement": 79.86,
-            "adp": 27.0,
+            "adp": 27.2,
             "position_adp": 14,
-            "adp_delta": -2.2,
+            "adp_delta": -1.3,
             "provider_agreement": "medium"
           },
           {
@@ -1165,9 +1165,9 @@
             "tier": 12,
             "projected_points": 222.2,
             "value_over_replacement": 78.86,
-            "adp": 34.9,
+            "adp": 35.9,
             "position_adp": 18,
-            "adp_delta": 6.7,
+            "adp_delta": 7.4,
             "provider_agreement": "medium"
           },
           {
@@ -1176,9 +1176,9 @@
             "tier": 13,
             "projected_points": 217.6,
             "value_over_replacement": 74.26,
-            "adp": 33.6,
+            "adp": 33.4,
             "position_adp": 16,
-            "adp_delta": -2.4,
+            "adp_delta": -1.7,
             "provider_agreement": "medium"
           },
           {
@@ -1187,9 +1187,9 @@
             "tier": 14,
             "projected_points": 213.3,
             "value_over_replacement": 69.96,
-            "adp": 34.3,
+            "adp": 35.3,
             "position_adp": 17,
-            "adp_delta": -0.7,
+            "adp_delta": 0.4,
             "provider_agreement": "medium"
           },
           {
@@ -1198,9 +1198,9 @@
             "tier": 14,
             "projected_points": 212.3,
             "value_over_replacement": 68.94,
-            "adp": 40.1,
+            "adp": 39.4,
             "position_adp": 19,
-            "adp_delta": -1.9,
+            "adp_delta": -3.3,
             "provider_agreement": "high"
           },
           {
@@ -1209,9 +1209,9 @@
             "tier": 15,
             "projected_points": 205.8,
             "value_over_replacement": 62.48,
-            "adp": 43.3,
+            "adp": 43.0,
             "position_adp": 20,
-            "adp_delta": -0.6,
+            "adp_delta": -0.3,
             "provider_agreement": "high"
           },
           {
@@ -1220,9 +1220,9 @@
             "tier": 15,
             "projected_points": 203.8,
             "value_over_replacement": 60.39,
-            "adp": 45.5,
+            "adp": 45.8,
             "position_adp": 21,
-            "adp_delta": -1.2,
+            "adp_delta": -2.3,
             "provider_agreement": "medium"
           },
           {
@@ -1231,9 +1231,9 @@
             "tier": 16,
             "projected_points": 198.4,
             "value_over_replacement": 55.07,
-            "adp": 51.4,
+            "adp": 51.6,
             "position_adp": 22,
-            "adp_delta": 0.2,
+            "adp_delta": -0.4,
             "provider_agreement": "high"
           },
           {
@@ -1242,9 +1242,9 @@
             "tier": 17,
             "projected_points": 192.7,
             "value_over_replacement": 49.31,
-            "adp": 53.4,
+            "adp": 53.3,
             "position_adp": 24,
-            "adp_delta": 0.8,
+            "adp_delta": 0.0,
             "provider_agreement": "medium"
           },
           {
@@ -1255,7 +1255,7 @@
             "value_over_replacement": 37.53,
             "adp": 55.0,
             "position_adp": 25,
-            "adp_delta": -4.4,
+            "adp_delta": -2.6,
             "provider_agreement": "high"
           },
           {
@@ -1264,9 +1264,9 @@
             "tier": 19,
             "projected_points": 176.6,
             "value_over_replacement": 33.26,
-            "adp": 75.3,
-            "position_adp": 31,
-            "adp_delta": 0.3,
+            "adp": 74.6,
+            "position_adp": 30,
+            "adp_delta": -2.0,
             "provider_agreement": "high"
           },
           {
@@ -1275,9 +1275,9 @@
             "tier": 19,
             "projected_points": 176.1,
             "value_over_replacement": 32.69,
-            "adp": 63.1,
+            "adp": 63.3,
             "position_adp": 27,
-            "adp_delta": -9.4,
+            "adp_delta": -4.7,
             "provider_agreement": "medium"
           },
           {
@@ -1286,9 +1286,9 @@
             "tier": 19,
             "projected_points": 174.3,
             "value_over_replacement": 30.89,
-            "adp": 60.2,
+            "adp": 61.1,
             "position_adp": 26,
-            "adp_delta": 2.3,
+            "adp_delta": 2.6,
             "provider_agreement": "medium"
           },
           {
@@ -1297,9 +1297,9 @@
             "tier": 19,
             "projected_points": 171.8,
             "value_over_replacement": 28.48,
-            "adp": 66.1,
-            "position_adp": 28,
-            "adp_delta": -0.6,
+            "adp": 67.1,
+            "position_adp": 29,
+            "adp_delta": 0.7,
             "provider_agreement": "medium"
           },
           {
@@ -1308,9 +1308,9 @@
             "tier": 19,
             "projected_points": 171.6,
             "value_over_replacement": 28.23,
-            "adp": 68.5,
-            "position_adp": 29,
-            "adp_delta": -2.3,
+            "adp": 67.1,
+            "position_adp": 28,
+            "adp_delta": -3.4,
             "provider_agreement": "high"
           },
           {
@@ -1319,9 +1319,9 @@
             "tier": 20,
             "projected_points": 166.4,
             "value_over_replacement": 23.01,
-            "adp": 83.3,
+            "adp": 80.6,
             "position_adp": 33,
-            "adp_delta": -6.1,
+            "adp_delta": -9.2,
             "provider_agreement": "medium"
           },
           {
@@ -1330,9 +1330,9 @@
             "tier": 20,
             "projected_points": 164.3,
             "value_over_replacement": 20.98,
-            "adp": 74.6,
-            "position_adp": 30,
-            "adp_delta": 0.5,
+            "adp": 75.5,
+            "position_adp": 31,
+            "adp_delta": -1.8,
             "provider_agreement": "medium"
           },
           {
@@ -1341,9 +1341,9 @@
             "tier": 21,
             "projected_points": 155.1,
             "value_over_replacement": 11.77,
-            "adp": 77.6,
+            "adp": 79.9,
             "position_adp": 32,
-            "adp_delta": 1.9,
+            "adp_delta": 6.9,
             "provider_agreement": "medium"
           },
           {
@@ -1352,9 +1352,9 @@
             "tier": 22,
             "projected_points": 149.1,
             "value_over_replacement": 5.79,
-            "adp": 101.0,
+            "adp": 97.1,
             "position_adp": 36,
-            "adp_delta": -9.4,
+            "adp_delta": -13.5,
             "provider_agreement": "high"
           },
           {
@@ -1363,9 +1363,9 @@
             "tier": 23,
             "projected_points": 144.8,
             "value_over_replacement": 1.41,
-            "adp": 101.8,
-            "position_adp": 37,
-            "adp_delta": -6.1,
+            "adp": 96.2,
+            "position_adp": 35,
+            "adp_delta": -14.5,
             "provider_agreement": "high"
           },
           {
@@ -1374,9 +1374,9 @@
             "tier": 23,
             "projected_points": 143.4,
             "value_over_replacement": -0.0,
-            "adp": 117.4,
-            "position_adp": 41,
-            "adp_delta": 7.9,
+            "adp": 121.8,
+            "position_adp": 42,
+            "adp_delta": 11.3,
             "provider_agreement": "low"
           },
           {
@@ -1386,8 +1386,8 @@
             "projected_points": 143.3,
             "value_over_replacement": -0.09,
             "adp": 100.1,
-            "position_adp": 35,
-            "adp_delta": -0.1,
+            "position_adp": 37,
+            "adp_delta": -1.0,
             "provider_agreement": "high"
           },
           {
@@ -1396,9 +1396,9 @@
             "tier": 23,
             "projected_points": 141.1,
             "value_over_replacement": -2.22,
-            "adp": 105.5,
-            "position_adp": 39,
-            "adp_delta": -2.8,
+            "adp": 105.0,
+            "position_adp": 38,
+            "adp_delta": -4.5,
             "provider_agreement": "medium"
           },
           {
@@ -1407,9 +1407,9 @@
             "tier": 23,
             "projected_points": 140.8,
             "value_over_replacement": -2.6,
-            "adp": 103.3,
-            "position_adp": 38,
-            "adp_delta": 5.1,
+            "adp": 105.4,
+            "position_adp": 39,
+            "adp_delta": 6.9,
             "provider_agreement": "medium"
           },
           {
@@ -1418,9 +1418,9 @@
             "tier": 23,
             "projected_points": 139.2,
             "value_over_replacement": -4.19,
-            "adp": 93.4,
+            "adp": 96.0,
             "position_adp": 34,
-            "adp_delta": 5.6,
+            "adp_delta": 9.0,
             "provider_agreement": "high"
           },
           {
@@ -1429,9 +1429,9 @@
             "tier": 23,
             "projected_points": 137.9,
             "value_over_replacement": -5.46,
-            "adp": 116.6,
+            "adp": 115.5,
             "position_adp": 40,
-            "adp_delta": 1.9,
+            "adp_delta": 1.7,
             "provider_agreement": "high"
           },
           {
@@ -1440,9 +1440,9 @@
             "tier": 24,
             "projected_points": 132.6,
             "value_over_replacement": -10.79,
-            "adp": 119.8,
-            "position_adp": 42,
-            "adp_delta": -1.4,
+            "adp": 120.8,
+            "position_adp": 41,
+            "adp_delta": -0.7,
             "provider_agreement": "high"
           },
           {
@@ -1451,9 +1451,9 @@
             "tier": 25,
             "projected_points": 115.2,
             "value_over_replacement": -28.19,
-            "adp": 141.8,
-            "position_adp": 44,
-            "adp_delta": -4.2,
+            "adp": 140.1,
+            "position_adp": 45,
+            "adp_delta": -6.1,
             "provider_agreement": "medium"
           },
           {
@@ -1462,9 +1462,9 @@
             "tier": 25,
             "projected_points": 113.2,
             "value_over_replacement": -30.18,
-            "adp": 132.6,
+            "adp": 131.3,
             "position_adp": 43,
-            "adp_delta": -1.2,
+            "adp_delta": -1.9,
             "provider_agreement": "low"
           },
           {
@@ -1473,9 +1473,9 @@
             "tier": 25,
             "projected_points": 112.6,
             "value_over_replacement": -30.75,
-            "adp": 142.0,
-            "position_adp": 45,
-            "adp_delta": -3.5,
+            "adp": 139.2,
+            "position_adp": 44,
+            "adp_delta": -7.0,
             "provider_agreement": "low"
           },
           {
@@ -1484,9 +1484,9 @@
             "tier": 26,
             "projected_points": 105.4,
             "value_over_replacement": -37.92,
-            "adp": 156.7,
-            "position_adp": 52,
-            "adp_delta": 7.0,
+            "adp": 156.6,
+            "position_adp": 50,
+            "adp_delta": 9.0,
             "provider_agreement": "low"
           },
           {
@@ -1495,9 +1495,9 @@
             "tier": 26,
             "projected_points": 104.5,
             "value_over_replacement": -38.82,
-            "adp": 146.3,
+            "adp": 147.2,
             "position_adp": 46,
-            "adp_delta": -1.0,
+            "adp_delta": -0.8,
             "provider_agreement": "low"
           },
           {
@@ -1506,7 +1506,7 @@
             "tier": 27,
             "projected_points": 95.8,
             "value_over_replacement": -47.59,
-            "adp": 173.4,
+            "adp": 174.2,
             "position_adp": 61,
             "adp_delta": null,
             "provider_agreement": "low"
@@ -1517,9 +1517,9 @@
             "tier": 28,
             "projected_points": 92.9,
             "value_over_replacement": -50.46,
-            "adp": 157.1,
-            "position_adp": 54,
-            "adp_delta": -0.7,
+            "adp": 156.7,
+            "position_adp": 51,
+            "adp_delta": 2.1,
             "provider_agreement": "low"
           },
           {
@@ -1528,9 +1528,9 @@
             "tier": 28,
             "projected_points": 90.8,
             "value_over_replacement": -52.54,
-            "adp": 153.9,
-            "position_adp": 49,
-            "adp_delta": 0.1,
+            "adp": 158.5,
+            "position_adp": 53,
+            "adp_delta": 6.9,
             "provider_agreement": "high"
           },
           {
@@ -1550,9 +1550,9 @@
             "tier": 28,
             "projected_points": 90.0,
             "value_over_replacement": -53.37,
-            "adp": 174.2,
+            "adp": 174.6,
             "position_adp": 62,
-            "adp_delta": -2.7,
+            "adp_delta": -3.7,
             "provider_agreement": "medium"
           },
           {
@@ -1561,9 +1561,9 @@
             "tier": 28,
             "projected_points": 89.8,
             "value_over_replacement": -53.59,
-            "adp": 155.5,
-            "position_adp": 51,
-            "adp_delta": -3.6,
+            "adp": 154.6,
+            "position_adp": 49,
+            "adp_delta": -4.8,
             "provider_agreement": "low"
           },
           {
@@ -1572,9 +1572,9 @@
             "tier": 28,
             "projected_points": 89.6,
             "value_over_replacement": -53.75,
-            "adp": 161.7,
-            "position_adp": 56,
-            "adp_delta": 17.3,
+            "adp": 159.6,
+            "position_adp": 54,
+            "adp_delta": -11.0,
             "provider_agreement": "low"
           },
           {
@@ -1585,7 +1585,7 @@
             "value_over_replacement": -53.76,
             "adp": 171.3,
             "position_adp": 60,
-            "adp_delta": null,
+            "adp_delta": 11.9,
             "provider_agreement": "low"
           },
           {
@@ -1605,9 +1605,9 @@
             "tier": 29,
             "projected_points": 83.4,
             "value_over_replacement": -60.01,
-            "adp": 165.0,
-            "position_adp": 58,
-            "adp_delta": 4.1,
+            "adp": 161.5,
+            "position_adp": 56,
+            "adp_delta": 0.8,
             "provider_agreement": "low"
           },
           {
@@ -1627,9 +1627,9 @@
             "tier": 29,
             "projected_points": 80.3,
             "value_over_replacement": -63.1,
-            "adp": 152.9,
-            "position_adp": 48,
-            "adp_delta": -6.9,
+            "adp": 152.8,
+            "position_adp": 47,
+            "adp_delta": -13.9,
             "provider_agreement": "low"
           },
           {
@@ -1638,9 +1638,9 @@
             "tier": 30,
             "projected_points": 76.6,
             "value_over_replacement": -66.73,
-            "adp": 155.5,
-            "position_adp": 50,
-            "adp_delta": 12.2,
+            "adp": 154.1,
+            "position_adp": 48,
+            "adp_delta": 3.7,
             "provider_agreement": "medium"
           },
           {
@@ -1649,9 +1649,9 @@
             "tier": 30,
             "projected_points": 75.7,
             "value_over_replacement": -67.65,
-            "adp": 159.4,
-            "position_adp": 55,
-            "adp_delta": -9.2,
+            "adp": 158.1,
+            "position_adp": 52,
+            "adp_delta": -7.0,
             "provider_agreement": "low"
           },
           {
@@ -1671,9 +1671,9 @@
             "tier": 31,
             "projected_points": 68.9,
             "value_over_replacement": -74.42,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
+            "adp": 166.8,
+            "position_adp": 58,
+            "adp_delta": 0.9,
             "provider_agreement": "low"
           },
           {
@@ -1748,9 +1748,9 @@
             "tier": 33,
             "projected_points": 49.8,
             "value_over_replacement": -93.61,
-            "adp": 157.1,
-            "position_adp": 53,
-            "adp_delta": 4.9,
+            "adp": 160.1,
+            "position_adp": 55,
+            "adp_delta": -8.8,
             "provider_agreement": "high"
           },
           {
@@ -1803,9 +1803,9 @@
             "tier": 33,
             "projected_points": 44.3,
             "value_over_replacement": -99.03,
-            "adp": 163.2,
+            "adp": 164.3,
             "position_adp": 57,
-            "adp_delta": 13.0,
+            "adp_delta": 12.2,
             "provider_agreement": "low"
           },
           {
@@ -1891,8 +1891,8 @@
             "tier": 35,
             "projected_points": 32.3,
             "value_over_replacement": -111.02,
-            "adp": 152.6,
-            "position_adp": 47,
+            "adp": null,
+            "position_adp": null,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -2161,17 +2161,6 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Demond Claiborne",
-            "team": "MIN",
-            "tier": 35,
-            "projected_points": 18.5,
-            "value_over_replacement": -124.88,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "medium"
-          },
-          {
             "player": "Tahj Brooks",
             "team": "CIN",
             "tier": 35,
@@ -2199,6 +2188,17 @@
             "tier": 35,
             "projected_points": 17.6,
             "value_over_replacement": -125.77,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
+            "player": "Demond Claiborne",
+            "team": "MIN",
+            "tier": 36,
+            "projected_points": 14.4,
+            "value_over_replacement": -128.92,
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
@@ -2331,9 +2331,9 @@
             "tier": 1,
             "projected_points": 281.3,
             "value_over_replacement": 136.7,
-            "adp": 3.1,
+            "adp": 3.0,
             "position_adp": 1,
-            "adp_delta": 0.2,
+            "adp_delta": 0.1,
             "provider_agreement": "high"
           },
           {
@@ -2353,9 +2353,9 @@
             "tier": 3,
             "projected_points": 268.7,
             "value_over_replacement": 124.13,
-            "adp": 5.4,
+            "adp": 5.2,
             "position_adp": 3,
-            "adp_delta": 0.0,
+            "adp_delta": -0.2,
             "provider_agreement": "medium"
           },
           {
@@ -2375,9 +2375,9 @@
             "tier": 5,
             "projected_points": 236.2,
             "value_over_replacement": 91.65,
-            "adp": 12.4,
+            "adp": 12.2,
             "position_adp": 5,
-            "adp_delta": 1.6,
+            "adp_delta": 0.9,
             "provider_agreement": "medium"
           },
           {
@@ -2386,9 +2386,9 @@
             "tier": 6,
             "projected_points": 224.5,
             "value_over_replacement": 79.93,
-            "adp": 15.9,
+            "adp": 15.3,
             "position_adp": 8,
-            "adp_delta": 1.5,
+            "adp_delta": -0.3,
             "provider_agreement": "medium"
           },
           {
@@ -2408,9 +2408,9 @@
             "tier": 6,
             "projected_points": 223.2,
             "value_over_replacement": 78.57,
-            "adp": 14.1,
+            "adp": 14.3,
             "position_adp": 7,
-            "adp_delta": -0.5,
+            "adp_delta": -0.1,
             "provider_agreement": "high"
           },
           {
@@ -2419,9 +2419,9 @@
             "tier": 7,
             "projected_points": 213.9,
             "value_over_replacement": 69.35,
-            "adp": 23.9,
+            "adp": 23.8,
             "position_adp": 12,
-            "adp_delta": 0.1,
+            "adp_delta": -0.3,
             "provider_agreement": "high"
           },
           {
@@ -2432,7 +2432,7 @@
             "value_over_replacement": 66.75,
             "adp": 19.6,
             "position_adp": 9,
-            "adp_delta": 0.9,
+            "adp_delta": 0.8,
             "provider_agreement": "high"
           },
           {
@@ -2441,7 +2441,7 @@
             "tier": 8,
             "projected_points": 211.1,
             "value_over_replacement": 66.48,
-            "adp": 21.5,
+            "adp": 20.9,
             "position_adp": 11,
             "adp_delta": -1.0,
             "provider_agreement": "high"
@@ -2452,9 +2452,9 @@
             "tier": 8,
             "projected_points": 210.7,
             "value_over_replacement": 66.17,
-            "adp": 19.6,
+            "adp": 19.8,
             "position_adp": 10,
-            "adp_delta": 0.3,
+            "adp_delta": 0.5,
             "provider_agreement": "high"
           },
           {
@@ -2463,9 +2463,9 @@
             "tier": 9,
             "projected_points": 201.1,
             "value_over_replacement": 56.55,
-            "adp": 25.3,
+            "adp": 25.7,
             "position_adp": 13,
-            "adp_delta": 0.5,
+            "adp_delta": 1.2,
             "provider_agreement": "high"
           },
           {
@@ -2474,9 +2474,9 @@
             "tier": 9,
             "projected_points": 199.8,
             "value_over_replacement": 55.24,
-            "adp": 28.2,
+            "adp": 28.0,
             "position_adp": 14,
-            "adp_delta": -0.5,
+            "adp_delta": 0.1,
             "provider_agreement": "high"
           },
           {
@@ -2487,7 +2487,7 @@
             "value_over_replacement": 50.14,
             "adp": 31.4,
             "position_adp": 15,
-            "adp_delta": 0.4,
+            "adp_delta": 0.6,
             "provider_agreement": "high"
           },
           {
@@ -2496,9 +2496,9 @@
             "tier": 10,
             "projected_points": 193.1,
             "value_over_replacement": 48.52,
-            "adp": 32.2,
-            "position_adp": 17,
-            "adp_delta": -3.4,
+            "adp": 31.5,
+            "position_adp": 16,
+            "adp_delta": -3.5,
             "provider_agreement": "high"
           },
           {
@@ -2507,9 +2507,9 @@
             "tier": 10,
             "projected_points": 193.0,
             "value_over_replacement": 48.38,
-            "adp": 32.0,
-            "position_adp": 16,
-            "adp_delta": 0.8,
+            "adp": 32.1,
+            "position_adp": 17,
+            "adp_delta": 0.9,
             "provider_agreement": "high"
           },
           {
@@ -2518,9 +2518,9 @@
             "tier": 10,
             "projected_points": 191.7,
             "value_over_replacement": 47.13,
-            "adp": 34.9,
+            "adp": 34.1,
             "position_adp": 18,
-            "adp_delta": -0.2,
+            "adp_delta": -2.6,
             "provider_agreement": "high"
           },
           {
@@ -2529,9 +2529,9 @@
             "tier": 11,
             "projected_points": 187.9,
             "value_over_replacement": 43.28,
-            "adp": 38.4,
+            "adp": 38.0,
             "position_adp": 20,
-            "adp_delta": 0.1,
+            "adp_delta": 0.6,
             "provider_agreement": "medium"
           },
           {
@@ -2540,9 +2540,9 @@
             "tier": 11,
             "projected_points": 186.3,
             "value_over_replacement": 41.73,
-            "adp": 36.5,
+            "adp": 36.6,
             "position_adp": 19,
-            "adp_delta": 0.0,
+            "adp_delta": 1.3,
             "provider_agreement": "high"
           },
           {
@@ -2551,9 +2551,9 @@
             "tier": 11,
             "projected_points": 185.0,
             "value_over_replacement": 40.45,
-            "adp": 40.4,
+            "adp": 40.2,
             "position_adp": 21,
-            "adp_delta": 0.5,
+            "adp_delta": 0.8,
             "provider_agreement": "high"
           },
           {
@@ -2562,9 +2562,9 @@
             "tier": 12,
             "projected_points": 180.7,
             "value_over_replacement": 36.08,
-            "adp": 41.2,
+            "adp": 40.9,
             "position_adp": 22,
-            "adp_delta": -2.0,
+            "adp_delta": -0.9,
             "provider_agreement": "high"
           },
           {
@@ -2573,9 +2573,9 @@
             "tier": 13,
             "projected_points": 175.4,
             "value_over_replacement": 30.84,
-            "adp": 45.0,
+            "adp": 44.7,
             "position_adp": 23,
-            "adp_delta": 1.6,
+            "adp_delta": 0.8,
             "provider_agreement": "high"
           },
           {
@@ -2584,9 +2584,9 @@
             "tier": 13,
             "projected_points": 173.9,
             "value_over_replacement": 29.35,
-            "adp": 47.3,
+            "adp": 47.8,
             "position_adp": 24,
-            "adp_delta": 2.2,
+            "adp_delta": 2.3,
             "provider_agreement": "high"
           },
           {
@@ -2595,9 +2595,9 @@
             "tier": 13,
             "projected_points": 173.7,
             "value_over_replacement": 29.14,
-            "adp": 50.6,
+            "adp": 48.8,
             "position_adp": 26,
-            "adp_delta": 1.2,
+            "adp_delta": -1.2,
             "provider_agreement": "medium"
           },
           {
@@ -2606,9 +2606,9 @@
             "tier": 13,
             "projected_points": 173.1,
             "value_over_replacement": 28.55,
-            "adp": 47.7,
+            "adp": 48.1,
             "position_adp": 25,
-            "adp_delta": -0.7,
+            "adp_delta": 1.2,
             "provider_agreement": "high"
           },
           {
@@ -2617,9 +2617,9 @@
             "tier": 13,
             "projected_points": 171.7,
             "value_over_replacement": 27.12,
-            "adp": 61.7,
+            "adp": 61.6,
             "position_adp": 31,
-            "adp_delta": 3.4,
+            "adp_delta": 3.3,
             "provider_agreement": "high"
           },
           {
@@ -2628,9 +2628,9 @@
             "tier": 13,
             "projected_points": 170.1,
             "value_over_replacement": 25.52,
-            "adp": 53.8,
+            "adp": 54.6,
             "position_adp": 27,
-            "adp_delta": -1.0,
+            "adp_delta": 1.2,
             "provider_agreement": "high"
           },
           {
@@ -2641,7 +2641,7 @@
             "value_over_replacement": 21.8,
             "adp": 56.3,
             "position_adp": 28,
-            "adp_delta": -3.6,
+            "adp_delta": -2.2,
             "provider_agreement": "high"
           },
           {
@@ -2650,9 +2650,9 @@
             "tier": 14,
             "projected_points": 164.9,
             "value_over_replacement": 20.34,
-            "adp": 59.7,
+            "adp": 59.1,
             "position_adp": 30,
-            "adp_delta": 0.4,
+            "adp_delta": -1.9,
             "provider_agreement": "medium"
           },
           {
@@ -2661,9 +2661,9 @@
             "tier": 14,
             "projected_points": 164.0,
             "value_over_replacement": 19.43,
-            "adp": 56.4,
+            "adp": 57.0,
             "position_adp": 29,
-            "adp_delta": 2.6,
+            "adp_delta": 2.0,
             "provider_agreement": "high"
           },
           {
@@ -2672,9 +2672,9 @@
             "tier": 14,
             "projected_points": 163.6,
             "value_over_replacement": 19.04,
-            "adp": 65.0,
-            "position_adp": 34,
-            "adp_delta": 2.9,
+            "adp": 64.7,
+            "position_adp": 33,
+            "adp_delta": 2.1,
             "provider_agreement": "high"
           },
           {
@@ -2683,9 +2683,9 @@
             "tier": 14,
             "projected_points": 163.1,
             "value_over_replacement": 18.49,
-            "adp": 63.3,
+            "adp": 63.6,
             "position_adp": 32,
-            "adp_delta": 0.5,
+            "adp_delta": 0.6,
             "provider_agreement": "high"
           },
           {
@@ -2694,9 +2694,9 @@
             "tier": 15,
             "projected_points": 153.1,
             "value_over_replacement": 8.52,
-            "adp": 64.7,
-            "position_adp": 33,
-            "adp_delta": -1.8,
+            "adp": 65.3,
+            "position_adp": 34,
+            "adp_delta": -0.3,
             "provider_agreement": "medium"
           },
           {
@@ -2707,7 +2707,7 @@
             "value_over_replacement": 7.49,
             "adp": 69.5,
             "position_adp": 35,
-            "adp_delta": -0.4,
+            "adp_delta": -0.8,
             "provider_agreement": "high"
           },
           {
@@ -2718,7 +2718,7 @@
             "value_over_replacement": 5.49,
             "adp": 81.0,
             "position_adp": 39,
-            "adp_delta": 0.2,
+            "adp_delta": -0.1,
             "provider_agreement": "high"
           },
           {
@@ -2727,9 +2727,9 @@
             "tier": 17,
             "projected_points": 145.8,
             "value_over_replacement": 1.21,
-            "adp": 73.9,
+            "adp": 74.4,
             "position_adp": 36,
-            "adp_delta": -0.5,
+            "adp_delta": 0.4,
             "provider_agreement": "high"
           },
           {
@@ -2738,9 +2738,9 @@
             "tier": 17,
             "projected_points": 144.8,
             "value_over_replacement": 0.22,
-            "adp": 90.4,
+            "adp": 91.2,
             "position_adp": 44,
-            "adp_delta": 0.6,
+            "adp_delta": 1.8,
             "provider_agreement": "medium"
           },
           {
@@ -2749,9 +2749,9 @@
             "tier": 17,
             "projected_points": 144.6,
             "value_over_replacement": -0.0,
-            "adp": 85.9,
+            "adp": 85.5,
             "position_adp": 40,
-            "adp_delta": 0.7,
+            "adp_delta": -1.9,
             "provider_agreement": "high"
           },
           {
@@ -2760,9 +2760,9 @@
             "tier": 17,
             "projected_points": 143.1,
             "value_over_replacement": -1.49,
-            "adp": 86.2,
+            "adp": 86.6,
             "position_adp": 41,
-            "adp_delta": 3.2,
+            "adp_delta": 2.4,
             "provider_agreement": "high"
           },
           {
@@ -2771,9 +2771,9 @@
             "tier": 17,
             "projected_points": 142.9,
             "value_over_replacement": -1.73,
-            "adp": 76.1,
+            "adp": 75.9,
             "position_adp": 37,
-            "adp_delta": -3.0,
+            "adp_delta": -0.9,
             "provider_agreement": "high"
           },
           {
@@ -2782,9 +2782,9 @@
             "tier": 17,
             "projected_points": 141.8,
             "value_over_replacement": -2.74,
-            "adp": 77.6,
+            "adp": 77.0,
             "position_adp": 38,
-            "adp_delta": -6.5,
+            "adp_delta": -4.0,
             "provider_agreement": "high"
           },
           {
@@ -2793,9 +2793,9 @@
             "tier": 17,
             "projected_points": 141.3,
             "value_over_replacement": -3.26,
-            "adp": 88.9,
+            "adp": 88.1,
             "position_adp": 43,
-            "adp_delta": -2.3,
+            "adp_delta": -2.5,
             "provider_agreement": "high"
           },
           {
@@ -2804,9 +2804,9 @@
             "tier": 17,
             "projected_points": 139.9,
             "value_over_replacement": -4.63,
-            "adp": 100.4,
+            "adp": 100.1,
             "position_adp": 47,
-            "adp_delta": -0.4,
+            "adp_delta": -0.8,
             "provider_agreement": "high"
           },
           {
@@ -2815,9 +2815,9 @@
             "tier": 17,
             "projected_points": 139.7,
             "value_over_replacement": -4.91,
-            "adp": 107.1,
-            "position_adp": 50,
-            "adp_delta": 9.8,
+            "adp": 106.4,
+            "position_adp": 49,
+            "adp_delta": 3.3,
             "provider_agreement": "high"
           },
           {
@@ -2826,9 +2826,9 @@
             "tier": 17,
             "projected_points": 139.1,
             "value_over_replacement": -5.49,
-            "adp": 93.5,
+            "adp": 93.2,
             "position_adp": 45,
-            "adp_delta": 6.9,
+            "adp_delta": 2.4,
             "provider_agreement": "high"
           },
           {
@@ -2837,9 +2837,9 @@
             "tier": 18,
             "projected_points": 133.5,
             "value_over_replacement": -11.04,
-            "adp": 101.8,
+            "adp": 102.2,
             "position_adp": 48,
-            "adp_delta": -12.0,
+            "adp_delta": -8.8,
             "provider_agreement": "high"
           },
           {
@@ -2848,9 +2848,9 @@
             "tier": 18,
             "projected_points": 132.8,
             "value_over_replacement": -11.83,
-            "adp": 94.1,
+            "adp": 94.2,
             "position_adp": 46,
-            "adp_delta": -1.9,
+            "adp_delta": -3.9,
             "provider_agreement": "high"
           },
           {
@@ -2859,9 +2859,9 @@
             "tier": 18,
             "projected_points": 131.9,
             "value_over_replacement": -12.72,
-            "adp": 119.9,
+            "adp": 119.4,
             "position_adp": 55,
-            "adp_delta": -0.3,
+            "adp_delta": -1.9,
             "provider_agreement": "medium"
           },
           {
@@ -2870,9 +2870,9 @@
             "tier": 18,
             "projected_points": 130.1,
             "value_over_replacement": -14.52,
-            "adp": 104.9,
-            "position_adp": 49,
-            "adp_delta": 0.9,
+            "adp": 106.7,
+            "position_adp": 50,
+            "adp_delta": 3.0,
             "provider_agreement": "high"
           },
           {
@@ -2881,9 +2881,9 @@
             "tier": 18,
             "projected_points": 129.7,
             "value_over_replacement": -14.92,
-            "adp": 117.5,
-            "position_adp": 54,
-            "adp_delta": -8.2,
+            "adp": 117.4,
+            "position_adp": 53,
+            "adp_delta": -7.2,
             "provider_agreement": "high"
           },
           {
@@ -2892,9 +2892,9 @@
             "tier": 18,
             "projected_points": 129.3,
             "value_over_replacement": -15.25,
-            "adp": 86.9,
+            "adp": 87.7,
             "position_adp": 42,
-            "adp_delta": -4.3,
+            "adp_delta": 0.6,
             "provider_agreement": "high"
           },
           {
@@ -2903,9 +2903,9 @@
             "tier": 18,
             "projected_points": 128.8,
             "value_over_replacement": -15.74,
-            "adp": 107.2,
+            "adp": 108.0,
             "position_adp": 51,
-            "adp_delta": -1.8,
+            "adp_delta": -0.2,
             "provider_agreement": "high"
           },
           {
@@ -2914,9 +2914,9 @@
             "tier": 18,
             "projected_points": 127.4,
             "value_over_replacement": -17.2,
-            "adp": 117.4,
-            "position_adp": 53,
-            "adp_delta": -0.1,
+            "adp": 117.5,
+            "position_adp": 54,
+            "adp_delta": 3.0,
             "provider_agreement": "high"
           },
           {
@@ -2925,9 +2925,9 @@
             "tier": 18,
             "projected_points": 125.8,
             "value_over_replacement": -18.79,
-            "adp": 136.0,
-            "position_adp": 63,
-            "adp_delta": -10.1,
+            "adp": 133.5,
+            "position_adp": 60,
+            "adp_delta": -10.9,
             "provider_agreement": "medium"
           },
           {
@@ -2936,9 +2936,9 @@
             "tier": 18,
             "projected_points": 124.8,
             "value_over_replacement": -19.76,
-            "adp": 138.2,
-            "position_adp": 64,
-            "adp_delta": 4.4,
+            "adp": 137.2,
+            "position_adp": 63,
+            "adp_delta": 0.5,
             "provider_agreement": "low"
           },
           {
@@ -2947,9 +2947,9 @@
             "tier": 18,
             "projected_points": 124.5,
             "value_over_replacement": -20.11,
-            "adp": 111.5,
+            "adp": 110.9,
             "position_adp": 52,
-            "adp_delta": 8.2,
+            "adp_delta": 5.8,
             "provider_agreement": "high"
           },
           {
@@ -2958,9 +2958,9 @@
             "tier": 18,
             "projected_points": 123.0,
             "value_over_replacement": -21.62,
-            "adp": 155.8,
-            "position_adp": 70,
-            "adp_delta": 3.2,
+            "adp": 155.0,
+            "position_adp": 69,
+            "adp_delta": -4.0,
             "provider_agreement": "low"
           },
           {
@@ -2969,9 +2969,9 @@
             "tier": 18,
             "projected_points": 121.7,
             "value_over_replacement": -22.83,
-            "adp": 138.6,
+            "adp": 140.3,
             "position_adp": 66,
-            "adp_delta": -6.3,
+            "adp_delta": -2.1,
             "provider_agreement": "medium"
           },
           {
@@ -2980,9 +2980,9 @@
             "tier": 18,
             "projected_points": 120.2,
             "value_over_replacement": -24.36,
-            "adp": 123.9,
-            "position_adp": 56,
-            "adp_delta": -0.9,
+            "adp": 127.1,
+            "position_adp": 57,
+            "adp_delta": 6.2,
             "provider_agreement": "low"
           },
           {
@@ -2991,9 +2991,9 @@
             "tier": 19,
             "projected_points": 118.1,
             "value_over_replacement": -26.47,
-            "adp": 127.4,
-            "position_adp": 58,
-            "adp_delta": -6.3,
+            "adp": 125.4,
+            "position_adp": 56,
+            "adp_delta": -8.2,
             "provider_agreement": "medium"
           },
           {
@@ -3003,8 +3003,8 @@
             "projected_points": 117.2,
             "value_over_replacement": -27.43,
             "adp": 132.4,
-            "position_adp": 60,
-            "adp_delta": -3.0,
+            "position_adp": 59,
+            "adp_delta": -3.4,
             "provider_agreement": "medium"
           },
           {
@@ -3013,9 +3013,9 @@
             "tier": 20,
             "projected_points": 114.8,
             "value_over_replacement": -29.74,
-            "adp": 133.5,
+            "adp": 133.6,
             "position_adp": 61,
-            "adp_delta": 0.3,
+            "adp_delta": 3.5,
             "provider_agreement": "low"
           },
           {
@@ -3024,8 +3024,8 @@
             "tier": 21,
             "projected_points": 112.5,
             "value_over_replacement": -32.12,
-            "adp": 130.7,
-            "position_adp": 59,
+            "adp": 132.2,
+            "position_adp": 58,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -3035,9 +3035,9 @@
             "tier": 22,
             "projected_points": 110.5,
             "value_over_replacement": -34.03,
-            "adp": 135.4,
+            "adp": 136.0,
             "position_adp": 62,
-            "adp_delta": -0.2,
+            "adp_delta": 2.0,
             "provider_agreement": "high"
           },
           {
@@ -3046,9 +3046,9 @@
             "tier": 22,
             "projected_points": 109.7,
             "value_over_replacement": -34.88,
-            "adp": 138.6,
+            "adp": 138.9,
             "position_adp": 65,
-            "adp_delta": -3.6,
+            "adp_delta": -1.5,
             "provider_agreement": "low"
           },
           {
@@ -3057,9 +3057,9 @@
             "tier": 22,
             "projected_points": 108.7,
             "value_over_replacement": -35.92,
-            "adp": 143.6,
+            "adp": 144.5,
             "position_adp": 67,
-            "adp_delta": 2.0,
+            "adp_delta": 3.8,
             "provider_agreement": "high"
           },
           {
@@ -3068,9 +3068,9 @@
             "tier": 23,
             "projected_points": 106.8,
             "value_over_replacement": -37.79,
-            "adp": 168.6,
+            "adp": 169.9,
             "position_adp": 77,
-            "adp_delta": 5.9,
+            "adp_delta": 7.3,
             "provider_agreement": "medium"
           },
           {
@@ -3090,9 +3090,9 @@
             "tier": 24,
             "projected_points": 101.5,
             "value_over_replacement": -43.11,
-            "adp": 156.4,
-            "position_adp": 71,
-            "adp_delta": 5.2,
+            "adp": 155.3,
+            "position_adp": 70,
+            "adp_delta": 4.9,
             "provider_agreement": "low"
           },
           {
@@ -3101,9 +3101,9 @@
             "tier": 25,
             "projected_points": 94.0,
             "value_over_replacement": -50.59,
-            "adp": 158.0,
-            "position_adp": 72,
-            "adp_delta": -2.4,
+            "adp": 158.7,
+            "position_adp": 71,
+            "adp_delta": -2.5,
             "provider_agreement": "medium"
           },
           {
@@ -3112,8 +3112,8 @@
             "tier": 25,
             "projected_points": 93.2,
             "value_over_replacement": -51.34,
-            "adp": 174.1,
-            "position_adp": 80,
+            "adp": 185.3,
+            "position_adp": 84,
             "adp_delta": null,
             "provider_agreement": "medium"
           },
@@ -3123,9 +3123,9 @@
             "tier": 25,
             "projected_points": 92.5,
             "value_over_replacement": -52.08,
-            "adp": 160.6,
-            "position_adp": 74,
-            "adp_delta": -4.6,
+            "adp": 161.0,
+            "position_adp": 72,
+            "adp_delta": -5.2,
             "provider_agreement": "medium"
           },
           {
@@ -3145,9 +3145,9 @@
             "tier": 25,
             "projected_points": 91.0,
             "value_over_replacement": -53.58,
-            "adp": 162.5,
-            "position_adp": 75,
-            "adp_delta": 3.2,
+            "adp": 163.7,
+            "position_adp": 74,
+            "adp_delta": 4.9,
             "provider_agreement": "medium"
           },
           {
@@ -3156,9 +3156,9 @@
             "tier": 25,
             "projected_points": 89.3,
             "value_over_replacement": -55.32,
-            "adp": 150.7,
+            "adp": 148.5,
             "position_adp": 68,
-            "adp_delta": -2.5,
+            "adp_delta": -0.9,
             "provider_agreement": "medium"
           },
           {
@@ -3167,7 +3167,7 @@
             "tier": 25,
             "projected_points": 88.6,
             "value_over_replacement": -55.98,
-            "adp": 184.2,
+            "adp": 186.8,
             "position_adp": 85,
             "adp_delta": null,
             "provider_agreement": "high"
@@ -3178,7 +3178,7 @@
             "tier": 25,
             "projected_points": 88.2,
             "value_over_replacement": -56.41,
-            "adp": 169.7,
+            "adp": 173.1,
             "position_adp": 78,
             "adp_delta": null,
             "provider_agreement": "low"
@@ -3189,9 +3189,9 @@
             "tier": 25,
             "projected_points": 87.9,
             "value_over_replacement": -56.68,
-            "adp": 126.9,
-            "position_adp": 57,
-            "adp_delta": 37.5,
+            "adp": 138.2,
+            "position_adp": 64,
+            "adp_delta": 46.4,
             "provider_agreement": "high"
           },
           {
@@ -3211,9 +3211,9 @@
             "tier": 25,
             "projected_points": 86.5,
             "value_over_replacement": -58.11,
-            "adp": 172.2,
-            "position_adp": 79,
-            "adp_delta": 12.0,
+            "adp": 177.7,
+            "position_adp": 83,
+            "adp_delta": null,
             "provider_agreement": "low"
           },
           {
@@ -3222,8 +3222,8 @@
             "tier": 26,
             "projected_points": 82.3,
             "value_over_replacement": -62.28,
-            "adp": null,
-            "position_adp": null,
+            "adp": 164.0,
+            "position_adp": 75,
             "adp_delta": null,
             "provider_agreement": "medium"
           },
@@ -3256,7 +3256,7 @@
             "projected_points": 79.0,
             "value_over_replacement": -65.56,
             "adp": 176.2,
-            "position_adp": 81,
+            "position_adp": 82,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -3288,9 +3288,9 @@
             "tier": 28,
             "projected_points": 75.8,
             "value_over_replacement": -68.76,
-            "adp": 158.3,
-            "position_adp": 73,
-            "adp_delta": -6.5,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
             "provider_agreement": "low"
           },
           {
@@ -3332,8 +3332,8 @@
             "tier": 28,
             "projected_points": 72.5,
             "value_over_replacement": -72.09,
-            "adp": 177.1,
-            "position_adp": 82,
+            "adp": 173.5,
+            "position_adp": 79,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -3343,9 +3343,9 @@
             "tier": 28,
             "projected_points": 72.4,
             "value_over_replacement": -72.17,
-            "adp": 180.7,
-            "position_adp": 84,
-            "adp_delta": 10.3,
+            "adp": 175.3,
+            "position_adp": 80,
+            "adp_delta": 6.2,
             "provider_agreement": "high"
           },
           {
@@ -3354,9 +3354,9 @@
             "tier": 28,
             "projected_points": 72.3,
             "value_over_replacement": -72.31,
-            "adp": 163.9,
+            "adp": 165.4,
             "position_adp": 76,
-            "adp_delta": 0.7,
+            "adp_delta": 2.6,
             "provider_agreement": "low"
           },
           {
@@ -3464,9 +3464,9 @@
             "tier": 31,
             "projected_points": 58.4,
             "value_over_replacement": -86.2,
-            "adp": 179.6,
-            "position_adp": 83,
-            "adp_delta": 11.3,
+            "adp": 176.2,
+            "position_adp": 81,
+            "adp_delta": 7.9,
             "provider_agreement": "low"
           },
           {
@@ -3717,8 +3717,8 @@
             "tier": 34,
             "projected_points": 35.7,
             "value_over_replacement": -108.84,
-            "adp": 155.4,
-            "position_adp": 69,
+            "adp": 161.7,
+            "position_adp": 73,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -4223,9 +4223,9 @@
             "tier": 1,
             "projected_points": 199.8,
             "value_over_replacement": 66.17,
-            "adp": 38.2,
+            "adp": 38.0,
             "position_adp": 1,
-            "adp_delta": -3.7,
+            "adp_delta": -2.5,
             "provider_agreement": "high"
           },
           {
@@ -4234,9 +4234,9 @@
             "tier": 2,
             "projected_points": 195.8,
             "value_over_replacement": 62.15,
-            "adp": 43.0,
+            "adp": 43.5,
             "position_adp": 2,
-            "adp_delta": -0.4,
+            "adp_delta": 1.0,
             "provider_agreement": "high"
           },
           {
@@ -4245,9 +4245,9 @@
             "tier": 3,
             "projected_points": 171.9,
             "value_over_replacement": 38.25,
-            "adp": 61.3,
+            "adp": 61.7,
             "position_adp": 3,
-            "adp_delta": -0.3,
+            "adp_delta": 1.5,
             "provider_agreement": "high"
           },
           {
@@ -4256,9 +4256,9 @@
             "tier": 4,
             "projected_points": 159.7,
             "value_over_replacement": 26.08,
-            "adp": 70.4,
+            "adp": 72.2,
             "position_adp": 4,
-            "adp_delta": 0.4,
+            "adp_delta": 2.3,
             "provider_agreement": "high"
           },
           {
@@ -4267,9 +4267,9 @@
             "tier": 5,
             "projected_points": 155.9,
             "value_over_replacement": 22.32,
-            "adp": 85.2,
+            "adp": 85.1,
             "position_adp": 6,
-            "adp_delta": 2.8,
+            "adp_delta": 3.0,
             "provider_agreement": "medium"
           },
           {
@@ -4278,9 +4278,9 @@
             "tier": 6,
             "projected_points": 151.8,
             "value_over_replacement": 18.23,
-            "adp": 83.8,
+            "adp": 84.0,
             "position_adp": 5,
-            "adp_delta": 0.9,
+            "adp_delta": 2.9,
             "provider_agreement": "high"
           },
           {
@@ -4289,9 +4289,9 @@
             "tier": 7,
             "projected_points": 147.7,
             "value_over_replacement": 14.06,
-            "adp": 100.5,
-            "position_adp": 8,
-            "adp_delta": 3.0,
+            "adp": 100.3,
+            "position_adp": 7,
+            "adp_delta": 6.1,
             "provider_agreement": "high"
           },
           {
@@ -4300,9 +4300,9 @@
             "tier": 8,
             "projected_points": 146.6,
             "value_over_replacement": 13.01,
-            "adp": 107.7,
-            "position_adp": 9,
-            "adp_delta": -6.2,
+            "adp": 104.0,
+            "position_adp": 8,
+            "adp_delta": -8.8,
             "provider_agreement": "low"
           },
           {
@@ -4311,9 +4311,9 @@
             "tier": 9,
             "projected_points": 145.3,
             "value_over_replacement": 11.68,
-            "adp": 94.2,
-            "position_adp": 7,
-            "adp_delta": 3.3,
+            "adp": 104.3,
+            "position_adp": 9,
+            "adp_delta": 15.3,
             "provider_agreement": "high"
           },
           {
@@ -4322,9 +4322,9 @@
             "tier": 9,
             "projected_points": 144.5,
             "value_over_replacement": 10.92,
-            "adp": 122.5,
+            "adp": 121.7,
             "position_adp": 11,
-            "adp_delta": -2.3,
+            "adp_delta": -0.6,
             "provider_agreement": "high"
           },
           {
@@ -4333,9 +4333,9 @@
             "tier": 10,
             "projected_points": 142.5,
             "value_over_replacement": 8.9,
-            "adp": 117.6,
+            "adp": 120.2,
             "position_adp": 10,
-            "adp_delta": 0.2,
+            "adp_delta": 4.7,
             "provider_agreement": "high"
           },
           {
@@ -4344,9 +4344,9 @@
             "tier": 11,
             "projected_points": 137.4,
             "value_over_replacement": 3.78,
-            "adp": 135.0,
+            "adp": 132.1,
             "position_adp": 12,
-            "adp_delta": -1.7,
+            "adp_delta": -1.5,
             "provider_agreement": "high"
           },
           {
@@ -4355,9 +4355,9 @@
             "tier": 12,
             "projected_points": 133.6,
             "value_over_replacement": -0.0,
-            "adp": 136.3,
+            "adp": 135.2,
             "position_adp": 13,
-            "adp_delta": -1.3,
+            "adp_delta": -2.2,
             "provider_agreement": "high"
           },
           {
@@ -4366,9 +4366,9 @@
             "tier": 13,
             "projected_points": 131.7,
             "value_over_replacement": -1.93,
-            "adp": 154.1,
+            "adp": 153.8,
             "position_adp": 15,
-            "adp_delta": 11.9,
+            "adp_delta": 9.9,
             "provider_agreement": "high"
           },
           {
@@ -4377,7 +4377,7 @@
             "tier": 14,
             "projected_points": 130.5,
             "value_over_replacement": -3.12,
-            "adp": 144.2,
+            "adp": 145.3,
             "position_adp": 14,
             "adp_delta": -1.9,
             "provider_agreement": "high"
@@ -4388,9 +4388,9 @@
             "tier": 15,
             "projected_points": 122.6,
             "value_over_replacement": -11.05,
-            "adp": 157.7,
+            "adp": 159.3,
             "position_adp": 16,
-            "adp_delta": 9.8,
+            "adp_delta": 14.8,
             "provider_agreement": "high"
           },
           {
@@ -4399,9 +4399,9 @@
             "tier": 15,
             "projected_points": 122.4,
             "value_over_replacement": -11.22,
-            "adp": 162.5,
+            "adp": 161.3,
             "position_adp": 17,
-            "adp_delta": -0.8,
+            "adp_delta": -7.1,
             "provider_agreement": "high"
           },
           {
@@ -4410,9 +4410,9 @@
             "tier": 15,
             "projected_points": 121.7,
             "value_over_replacement": -11.89,
-            "adp": 167.0,
+            "adp": 165.8,
             "position_adp": 18,
-            "adp_delta": 7.5,
+            "adp_delta": 6.5,
             "provider_agreement": "high"
           },
           {
@@ -4432,9 +4432,9 @@
             "tier": 17,
             "projected_points": 108.7,
             "value_over_replacement": -24.93,
-            "adp": 178.7,
+            "adp": 179.3,
             "position_adp": 20,
-            "adp_delta": 16.5,
+            "adp_delta": 14.3,
             "provider_agreement": "medium"
           },
           {
@@ -4702,20 +4702,9 @@
             "provider_agreement": "high"
           },
           {
-            "player": "Elijah Arroyo",
-            "team": "SEA",
-            "tier": 34,
-            "projected_points": 46.6,
-            "value_over_replacement": -87.0,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Charlie Kolar",
             "team": "LAC",
-            "tier": 35,
+            "tier": 34,
             "projected_points": 45.2,
             "value_over_replacement": -88.37,
             "adp": null,
@@ -4726,7 +4715,7 @@
           {
             "player": "Austin Hooper",
             "team": "ATL",
-            "tier": 35,
+            "tier": 34,
             "projected_points": 44.4,
             "value_over_replacement": -89.19,
             "adp": null,
@@ -4737,7 +4726,7 @@
           {
             "player": "Brock Wright",
             "team": "DET",
-            "tier": 36,
+            "tier": 35,
             "projected_points": 43.0,
             "value_over_replacement": -90.65,
             "adp": null,
@@ -4748,7 +4737,7 @@
           {
             "player": "Josh Oliver",
             "team": "MIN",
-            "tier": 36,
+            "tier": 35,
             "projected_points": 42.8,
             "value_over_replacement": -90.8,
             "adp": null,
@@ -4759,7 +4748,7 @@
           {
             "player": "Daniel Bellinger",
             "team": "TEN",
-            "tier": 36,
+            "tier": 35,
             "projected_points": 42.3,
             "value_over_replacement": -91.32,
             "adp": null,
@@ -4770,7 +4759,7 @@
           {
             "player": "Noah Gray",
             "team": "KC",
-            "tier": 37,
+            "tier": 36,
             "projected_points": 40.4,
             "value_over_replacement": -93.17,
             "adp": null,
@@ -4781,7 +4770,7 @@
           {
             "player": "Eli Stowers",
             "team": "PHI",
-            "tier": 38,
+            "tier": 37,
             "projected_points": 39.1,
             "value_over_replacement": -94.49,
             "adp": null,
@@ -4792,7 +4781,7 @@
           {
             "player": "Tommy Tremble",
             "team": "CAR",
-            "tier": 38,
+            "tier": 37,
             "projected_points": 38.8,
             "value_over_replacement": -94.81,
             "adp": null,
@@ -4801,9 +4790,20 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Elijah Arroyo",
+            "team": "SEA",
+            "tier": 37,
+            "projected_points": 38.6,
+            "value_over_replacement": -94.98,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Adam Trautman",
             "team": "DEN",
-            "tier": 38,
+            "tier": 37,
             "projected_points": 38.3,
             "value_over_replacement": -95.31,
             "adp": null,
@@ -4814,7 +4814,7 @@
           {
             "player": "Luke Musgrave",
             "team": "GB",
-            "tier": 39,
+            "tier": 38,
             "projected_points": 37.0,
             "value_over_replacement": -96.66,
             "adp": null,
@@ -4825,7 +4825,7 @@
           {
             "player": "Eli Raridon",
             "team": "NE",
-            "tier": 39,
+            "tier": 38,
             "projected_points": 36.9,
             "value_over_replacement": -96.76,
             "adp": null,
@@ -4836,7 +4836,7 @@
           {
             "player": "Marlin Klein",
             "team": "HOU",
-            "tier": 40,
+            "tier": 39,
             "projected_points": 35.5,
             "value_over_replacement": -98.09,
             "adp": null,
@@ -4847,7 +4847,7 @@
           {
             "player": "Davis Allen",
             "team": "LAR",
-            "tier": 40,
+            "tier": 39,
             "projected_points": 35.3,
             "value_over_replacement": -98.26,
             "adp": null,
@@ -4858,7 +4858,7 @@
           {
             "player": "Ben Sims",
             "team": "MIA",
-            "tier": 40,
+            "tier": 39,
             "projected_points": 35.2,
             "value_over_replacement": -98.44,
             "adp": null,
@@ -4869,7 +4869,7 @@
           {
             "player": "Ja'Tavion Sanders",
             "team": "CAR",
-            "tier": 40,
+            "tier": 39,
             "projected_points": 35.1,
             "value_over_replacement": -98.56,
             "adp": null,
@@ -4880,7 +4880,7 @@
           {
             "player": "Elijah Higgins",
             "team": "ARI",
-            "tier": 40,
+            "tier": 39,
             "projected_points": 34.5,
             "value_over_replacement": -99.15,
             "adp": null,
@@ -4891,7 +4891,7 @@
           {
             "player": "John Bates",
             "team": "WAS",
-            "tier": 40,
+            "tier": 39,
             "projected_points": 33.9,
             "value_over_replacement": -99.75,
             "adp": null,
@@ -4902,7 +4902,7 @@
           {
             "player": "Jake Tonges",
             "team": "SF",
-            "tier": 40,
+            "tier": 39,
             "projected_points": 33.1,
             "value_over_replacement": -100.52,
             "adp": null,
@@ -4913,7 +4913,7 @@
           {
             "player": "Jeremy Ruckert",
             "team": "NYJ",
-            "tier": 40,
+            "tier": 39,
             "projected_points": 32.1,
             "value_over_replacement": -101.53,
             "adp": null,
@@ -4922,9 +4922,20 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Drew Sample",
+            "team": "CIN",
+            "tier": 40,
+            "projected_points": 30.1,
+            "value_over_replacement": -103.54,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "medium"
+          },
+          {
             "player": "Nate Boerkircher",
             "team": "JAC",
-            "tier": 41,
+            "tier": 40,
             "projected_points": 29.8,
             "value_over_replacement": -103.86,
             "adp": null,
@@ -4935,7 +4946,7 @@
           {
             "player": "Connor Heyward",
             "team": "LV",
-            "tier": 41,
+            "tier": 40,
             "projected_points": 29.3,
             "value_over_replacement": -104.31,
             "adp": null,
@@ -4946,7 +4957,7 @@
           {
             "player": "Nick Vannett",
             "team": "SEA",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 26.5,
             "value_over_replacement": -107.11,
             "adp": null,
@@ -4955,20 +4966,9 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Drew Sample",
-            "team": "CIN",
-            "tier": 42,
-            "projected_points": 26.3,
-            "value_over_replacement": -107.29,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "high"
-          },
-          {
             "player": "Cade Stover",
             "team": "HOU",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 25.8,
             "value_over_replacement": -107.82,
             "adp": null,
@@ -4979,7 +4979,7 @@
           {
             "player": "Nate Adkins",
             "team": "DEN",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 25.8,
             "value_over_replacement": -107.83,
             "adp": null,
@@ -4990,7 +4990,7 @@
           {
             "player": "Jackson Hawes",
             "team": "BUF",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 25.4,
             "value_over_replacement": -108.21,
             "adp": null,
@@ -5001,7 +5001,7 @@
           {
             "player": "Ben Sinnott",
             "team": "WAS",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 25.3,
             "value_over_replacement": -108.26,
             "adp": null,
@@ -5012,7 +5012,7 @@
           {
             "player": "Zack Kuntz",
             "team": "DAL",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 24.8,
             "value_over_replacement": -108.81,
             "adp": null,
@@ -5023,7 +5023,7 @@
           {
             "player": "Jack Endries",
             "team": "CIN",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 24.8,
             "value_over_replacement": -108.81,
             "adp": null,
@@ -5034,7 +5034,7 @@
           {
             "player": "Luke Schoonmaker",
             "team": "DAL",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 24.4,
             "value_over_replacement": -109.23,
             "adp": null,
@@ -5045,7 +5045,7 @@
           {
             "player": "Will Mallory",
             "team": "IND",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 24.0,
             "value_over_replacement": -109.61,
             "adp": null,
@@ -5056,7 +5056,7 @@
           {
             "player": "Hayden Rucci",
             "team": "SF",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 23.8,
             "value_over_replacement": -109.81,
             "adp": null,
@@ -5067,7 +5067,7 @@
           {
             "player": "Charlie Woerner",
             "team": "ATL",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 23.5,
             "value_over_replacement": -110.14,
             "adp": null,
@@ -5078,7 +5078,7 @@
           {
             "player": "Grant Calcaterra",
             "team": "PHI",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 23.0,
             "value_over_replacement": -110.61,
             "adp": null,
@@ -5089,7 +5089,7 @@
           {
             "player": "Foster Moreau",
             "team": "HOU",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 23.0,
             "value_over_replacement": -110.65,
             "adp": null,
@@ -5100,7 +5100,7 @@
           {
             "player": "Travis Vokolek",
             "team": "FA",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.9,
             "value_over_replacement": -110.71,
             "adp": null,
@@ -5111,7 +5111,7 @@
           {
             "player": "Rivaldo Fairweather",
             "team": "ARI",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.9,
             "value_over_replacement": -110.71,
             "adp": null,
@@ -5122,7 +5122,7 @@
           {
             "player": "Teagan Quitoriano",
             "team": "ARI",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.9,
             "value_over_replacement": -110.71,
             "adp": null,
@@ -5133,7 +5133,7 @@
           {
             "player": "Bauer Sharp",
             "team": "TB",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.8,
             "value_over_replacement": -110.81,
             "adp": null,
@@ -5144,7 +5144,7 @@
           {
             "player": "Tanner Hudson",
             "team": "CIN",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.8,
             "value_over_replacement": -110.82,
             "adp": null,
@@ -5155,7 +5155,7 @@
           {
             "player": "Dallen Bentley",
             "team": "DEN",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.5,
             "value_over_replacement": -111.11,
             "adp": null,
@@ -5166,7 +5166,7 @@
           {
             "player": "Cam Grandy",
             "team": "CIN",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.5,
             "value_over_replacement": -111.11,
             "adp": null,
@@ -5177,7 +5177,7 @@
           {
             "player": "Zaire Mitchell-Paden",
             "team": "NO",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.3,
             "value_over_replacement": -111.31,
             "adp": null,
@@ -5188,7 +5188,7 @@
           {
             "player": "Anthony Firkser",
             "team": "FA",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.3,
             "value_over_replacement": -111.31,
             "adp": null,
@@ -5199,7 +5199,7 @@
           {
             "player": "Tanner Conner",
             "team": "NYG",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.3,
             "value_over_replacement": -111.31,
             "adp": null,
@@ -5210,7 +5210,7 @@
           {
             "player": "Mo Alie-Cox",
             "team": "IND",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 22.1,
             "value_over_replacement": -111.56,
             "adp": null,
@@ -5221,7 +5221,7 @@
           {
             "player": "Jared Wiley",
             "team": "KC",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 21.1,
             "value_over_replacement": -112.51,
             "adp": null,
@@ -5232,7 +5232,7 @@
           {
             "player": "Thomas Fidone II",
             "team": "NYG",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 21.1,
             "value_over_replacement": -112.51,
             "adp": null,
@@ -5243,7 +5243,7 @@
           {
             "player": "Jaheim Bell",
             "team": "PIT",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 20.8,
             "value_over_replacement": -112.81,
             "adp": null,
@@ -5254,7 +5254,7 @@
           {
             "player": "Jaren Kanak",
             "team": "TEN",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 20.6,
             "value_over_replacement": -113.01,
             "adp": null,
@@ -5265,7 +5265,7 @@
           {
             "player": "Donald Parham Jr.",
             "team": "FA",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 20.5,
             "value_over_replacement": -113.11,
             "adp": null,
@@ -5276,7 +5276,7 @@
           {
             "player": "Drake Dabney",
             "team": "GB",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 20.5,
             "value_over_replacement": -113.11,
             "adp": null,
@@ -5287,7 +5287,7 @@
           {
             "player": "Zach Ertz",
             "team": "FA",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 20.1,
             "value_over_replacement": -113.51,
             "adp": null,
@@ -5298,7 +5298,7 @@
           {
             "player": "John FitzPatrick",
             "team": "FA",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 19.6,
             "value_over_replacement": -114.01,
             "adp": null,
@@ -5309,7 +5309,7 @@
           {
             "player": "Seydou Traore",
             "team": "MIA",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 19.3,
             "value_over_replacement": -114.31,
             "adp": null,
@@ -5320,7 +5320,7 @@
           {
             "player": "Durham Smythe",
             "team": "BAL",
-            "tier": 42,
+            "tier": 41,
             "projected_points": 18.6,
             "value_over_replacement": -115.01,
             "adp": null,
@@ -5329,9 +5329,20 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Oscar Delp",
+            "team": "NO",
+            "tier": 41,
+            "projected_points": 18.6,
+            "value_over_replacement": -115.02,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Mitchell Evans",
             "team": "CAR",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 17.1,
             "value_over_replacement": -116.46,
             "adp": null,
@@ -5340,20 +5351,9 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Joe Royer",
-            "team": "CLE",
-            "tier": 43,
-            "projected_points": 16.5,
-            "value_over_replacement": -117.1,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Max Klare",
             "team": "LAR",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 16.3,
             "value_over_replacement": -117.31,
             "adp": null,
@@ -5362,20 +5362,9 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Justin Joly",
-            "team": "DEN",
-            "tier": 44,
-            "projected_points": 15.0,
-            "value_over_replacement": -118.6,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Devin Culp",
             "team": "TB",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 14.7,
             "value_over_replacement": -118.96,
             "adp": null,
@@ -5386,7 +5375,7 @@
           {
             "player": "Sam Roush",
             "team": "CHI",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 14.5,
             "value_over_replacement": -119.16,
             "adp": null,
@@ -5397,7 +5386,7 @@
           {
             "player": "Payne Durham",
             "team": "TB",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 14.3,
             "value_over_replacement": -119.26,
             "adp": null,
@@ -5406,20 +5395,9 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Oscar Delp",
-            "team": "NO",
-            "tier": 44,
-            "projected_points": 14.1,
-            "value_over_replacement": -119.52,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Jack Stoll",
             "team": "CLE",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 13.7,
             "value_over_replacement": -119.94,
             "adp": null,
@@ -5430,7 +5408,7 @@
           {
             "player": "Josh Cuevas",
             "team": "BAL",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 13.4,
             "value_over_replacement": -120.25,
             "adp": null,
@@ -5439,9 +5417,20 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Josh Whyle",
+            "team": "GB",
+            "tier": 43,
+            "projected_points": 13.3,
+            "value_over_replacement": -120.34,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Ian Thomas",
             "team": "LV",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 13.1,
             "value_over_replacement": -120.5,
             "adp": null,
@@ -5452,7 +5441,7 @@
           {
             "player": "Hunter Long",
             "team": "JAC",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 13.0,
             "value_over_replacement": -120.61,
             "adp": null,
@@ -5461,22 +5450,22 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Chris Manhertz",
-            "team": "NYG",
-            "tier": 45,
-            "projected_points": 11.1,
-            "value_over_replacement": -122.5,
+            "player": "Joe Royer",
+            "team": "CLE",
+            "tier": 43,
+            "projected_points": 12.5,
+            "value_over_replacement": -121.16,
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
             "provider_agreement": "low"
           },
           {
-            "player": "Lucas Krull",
-            "team": "DEN",
-            "tier": 45,
-            "projected_points": 10.4,
-            "value_over_replacement": -123.16,
+            "player": "Cole Turner",
+            "team": "MIA",
+            "tier": 44,
+            "projected_points": 9.7,
+            "value_over_replacement": -123.96,
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
@@ -5485,7 +5474,7 @@
           {
             "player": "Luke Farrell",
             "team": "SF",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 7.8,
             "value_over_replacement": -125.82,
             "adp": null,
@@ -5494,9 +5483,20 @@
             "provider_agreement": "high"
           },
           {
+            "player": "Justin Joly",
+            "team": "DEN",
+            "tier": 45,
+            "projected_points": 7.5,
+            "value_over_replacement": -126.08,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Brevyn Spann-Ford",
             "team": "DAL",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 7.5,
             "value_over_replacement": -126.09,
             "adp": null,
@@ -5507,7 +5507,7 @@
           {
             "player": "Tanner Koziol",
             "team": "JAC",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 7.2,
             "value_over_replacement": -126.37,
             "adp": null,
@@ -5518,7 +5518,7 @@
           {
             "player": "CJ Dippre",
             "team": "NE",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 7.2,
             "value_over_replacement": -126.37,
             "adp": null,
@@ -5529,7 +5529,7 @@
           {
             "player": "Ko Kieft",
             "team": "TB",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 7.2,
             "value_over_replacement": -126.43,
             "adp": null,
@@ -5540,7 +5540,7 @@
           {
             "player": "Tyler Conklin",
             "team": "DET",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 7.1,
             "value_over_replacement": -126.54,
             "adp": null,
@@ -5551,7 +5551,7 @@
           {
             "player": "Drew Ogletree",
             "team": "IND",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 7.0,
             "value_over_replacement": -126.63,
             "adp": null,
@@ -5560,20 +5560,9 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Josh Whyle",
-            "team": "GB",
-            "tier": 46,
-            "projected_points": 7.0,
-            "value_over_replacement": -126.65,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Eric Saubert",
             "team": "SEA",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 6.9,
             "value_over_replacement": -126.7,
             "adp": null,
@@ -5584,7 +5573,7 @@
           {
             "player": "Tip Reiman",
             "team": "ARI",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 6.5,
             "value_over_replacement": -127.11,
             "adp": null,
@@ -5595,9 +5584,20 @@
           {
             "player": "Johnny Mundt",
             "team": "PHI",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 6.5,
             "value_over_replacement": -127.13,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
+            "player": "Chris Manhertz",
+            "team": "NYG",
+            "tier": 46,
+            "projected_points": 3.2,
+            "value_over_replacement": -130.37,
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
@@ -5614,8 +5614,8 @@
       ],
       "board_provider": "fantasypros",
       "other_provider": "sleeper",
-      "board_as_of": "2026-08-22",
-      "comparison_as_of": "2026-08-22",
+      "board_as_of": "2026-08-23",
+      "comparison_as_of": "2026-08-23",
       "comparison_pinned_to_shared_capture": true,
       "days_behind_board": 0,
       "max_vintage_gap_days": 7,
@@ -5627,11 +5627,11 @@
       "players_compared": 489,
       "unpriced_by_other": 8,
       "counts_by_agreement": {
-        "high": 159,
+        "high": 158,
         "medium": 80,
-        "low": 250
+        "low": 251
       },
-      "median_cv": 0.1623,
+      "median_cv": 0.1692,
       "median_spread_points": 12.5,
       "scored_stats_compared": [
         "fumbles_lost",
@@ -5663,9 +5663,9 @@
       "snapshot_dates": [
         "2026-08-16",
         "2026-08-19",
-        "2026-08-20",
         "2026-08-21",
-        "2026-08-22"
+        "2026-08-22",
+        "2026-08-23"
       ]
     },
     "adp_coverage": {
@@ -5675,28 +5675,28 @@
       "priced_share": 0.3863,
       "market_rows_in_scope": 192,
       "matched_share_of_market": 1.0,
-      "adp_snapshot_date": "2026-08-22"
+      "adp_snapshot_date": "2026-08-23"
     },
     "price_movement": {
       "available": true,
-      "latest_snapshot_date": "2026-08-22",
-      "prior_snapshot_date": "2026-08-15",
+      "latest_snapshot_date": "2026-08-23",
+      "prior_snapshot_date": "2026-08-16",
       "span_days": 7,
       "lookback_days_requested": 7,
       "mover_threshold_picks": 6.0,
       "mover_threshold_rule": "0.5 of a round in a 12-team league",
       "matched_across_captures": 212,
-      "unmatched_in_prior_capture": 18,
-      "movers": 50,
+      "unmatched_in_prior_capture": 17,
+      "movers": 47,
       "latest_window": {
-        "window_start": "2026-08-17",
-        "window_end": "2026-08-22",
-        "total_drafts": 2828
+        "window_start": "2026-08-18",
+        "window_end": "2026-08-23",
+        "total_drafts": 2810
       },
       "prior_window": {
-        "window_start": "2026-08-10",
-        "window_end": "2026-08-15",
-        "total_drafts": 2429
+        "window_start": "2026-08-11",
+        "window_end": "2026-08-16",
+        "total_drafts": 2364
       }
     },
     "n": 497
