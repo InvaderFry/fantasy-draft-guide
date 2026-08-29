@@ -9,7 +9,7 @@
     "S14",
     "S38.1"
   ],
-  "generated_on": "2026-08-28",
+  "generated_on": "2026-08-29",
   "population": {
     "registry_id": "tiers_and_replacement_level",
     "profile_id": "half_ppr_12",
@@ -40,12 +40,12 @@
       "fantasypros",
       "sleeper"
     ],
-    "agreement_as_of": "2026-08-28",
-    "adp_snapshot_date": "2026-08-28",
-    "price_movement_since": "2026-08-21"
+    "agreement_as_of": "2026-08-29",
+    "adp_snapshot_date": "2026-08-29",
+    "price_movement_since": "2026-08-22"
   },
   "outcome": null,
-  "sample_size": 500,
+  "sample_size": 501,
   "primary_results": {
     "profile_id": "half_ppr_12",
     "profile_label": "12-team half-PPR, 1QB",
@@ -111,7 +111,7 @@
             "value_over_replacement": 73.36,
             "adp": 33.2,
             "position_adp": 1,
-            "adp_delta": 0.0,
+            "adp_delta": 0.3,
             "provider_agreement": "high"
           },
           {
@@ -120,9 +120,9 @@
             "tier": 2,
             "projected_points": 315.4,
             "value_over_replacement": 27.48,
-            "adp": 55.4,
+            "adp": 55.9,
             "position_adp": 3,
-            "adp_delta": -1.1,
+            "adp_delta": -0.8,
             "provider_agreement": "high"
           },
           {
@@ -131,9 +131,9 @@
             "tier": 3,
             "projected_points": 313.0,
             "value_over_replacement": 25.12,
-            "adp": 81.9,
+            "adp": 81.5,
             "position_adp": 8,
-            "adp_delta": 1.5,
+            "adp_delta": 0.6,
             "provider_agreement": "high"
           },
           {
@@ -142,9 +142,9 @@
             "tier": 4,
             "projected_points": 311.6,
             "value_over_replacement": 23.63,
-            "adp": 73.2,
+            "adp": 73.0,
             "position_adp": 6,
-            "adp_delta": 2.7,
+            "adp_delta": 2.0,
             "provider_agreement": "high"
           },
           {
@@ -153,9 +153,9 @@
             "tier": 5,
             "projected_points": 310.0,
             "value_over_replacement": 22.06,
-            "adp": 50.6,
+            "adp": 51.3,
             "position_adp": 2,
-            "adp_delta": -1.5,
+            "adp_delta": -0.6,
             "provider_agreement": "high"
           },
           {
@@ -164,9 +164,9 @@
             "tier": 6,
             "projected_points": 299.2,
             "value_over_replacement": 11.31,
-            "adp": 57.5,
+            "adp": 57.6,
             "position_adp": 4,
-            "adp_delta": 0.2,
+            "adp_delta": 1.2,
             "provider_agreement": "high"
           },
           {
@@ -175,9 +175,9 @@
             "tier": 6,
             "projected_points": 298.7,
             "value_over_replacement": 10.8,
-            "adp": 121.5,
+            "adp": 119.2,
             "position_adp": 16,
-            "adp_delta": -0.3,
+            "adp_delta": -3.1,
             "provider_agreement": "high"
           },
           {
@@ -186,9 +186,9 @@
             "tier": 7,
             "projected_points": 294.9,
             "value_over_replacement": 6.96,
-            "adp": 65.0,
+            "adp": 64.2,
             "position_adp": 5,
-            "adp_delta": -0.7,
+            "adp_delta": -1.3,
             "provider_agreement": "high"
           },
           {
@@ -197,9 +197,9 @@
             "tier": 8,
             "projected_points": 293.3,
             "value_over_replacement": 5.32,
-            "adp": 91.2,
+            "adp": 90.2,
             "position_adp": 10,
-            "adp_delta": -3.6,
+            "adp_delta": -5.4,
             "provider_agreement": "high"
           },
           {
@@ -208,9 +208,9 @@
             "tier": 8,
             "projected_points": 293.2,
             "value_over_replacement": 5.31,
-            "adp": 89.4,
+            "adp": 88.4,
             "position_adp": 9,
-            "adp_delta": 1.8,
+            "adp_delta": 1.4,
             "provider_agreement": "high"
           },
           {
@@ -221,7 +221,7 @@
             "value_over_replacement": 4.16,
             "adp": 92.3,
             "position_adp": 11,
-            "adp_delta": 2.2,
+            "adp_delta": 1.3,
             "provider_agreement": "high"
           },
           {
@@ -230,9 +230,9 @@
             "tier": 9,
             "projected_points": 291.5,
             "value_over_replacement": 3.52,
-            "adp": 102.6,
+            "adp": 103.3,
             "position_adp": 13,
-            "adp_delta": -1.6,
+            "adp_delta": -0.4,
             "provider_agreement": "high"
           },
           {
@@ -241,9 +241,9 @@
             "tier": 10,
             "projected_points": 287.9,
             "value_over_replacement": 0.0,
-            "adp": 108.2,
+            "adp": 108.5,
             "position_adp": 14,
-            "adp_delta": -1.4,
+            "adp_delta": -1.2,
             "provider_agreement": "high"
           },
           {
@@ -252,9 +252,9 @@
             "tier": 10,
             "projected_points": 287.1,
             "value_over_replacement": -0.84,
-            "adp": 113.6,
+            "adp": 113.1,
             "position_adp": 15,
-            "adp_delta": -2.6,
+            "adp_delta": -2.3,
             "provider_agreement": "high"
           },
           {
@@ -263,9 +263,9 @@
             "tier": 11,
             "projected_points": 285.4,
             "value_over_replacement": -2.49,
-            "adp": 75.5,
+            "adp": 74.9,
             "position_adp": 7,
-            "adp_delta": -3.2,
+            "adp_delta": -4.1,
             "provider_agreement": "high"
           },
           {
@@ -274,9 +274,9 @@
             "tier": 12,
             "projected_points": 277.8,
             "value_over_replacement": -10.13,
-            "adp": 100.7,
+            "adp": 99.9,
             "position_adp": 12,
-            "adp_delta": -4.6,
+            "adp_delta": -3.4,
             "provider_agreement": "high"
           },
           {
@@ -285,9 +285,9 @@
             "tier": 13,
             "projected_points": 273.7,
             "value_over_replacement": -14.21,
-            "adp": 139.7,
+            "adp": 139.6,
             "position_adp": 19,
-            "adp_delta": 2.2,
+            "adp_delta": 0.6,
             "provider_agreement": "high"
           },
           {
@@ -296,9 +296,9 @@
             "tier": 14,
             "projected_points": 269.0,
             "value_over_replacement": -18.96,
-            "adp": 134.8,
+            "adp": 135.1,
             "position_adp": 17,
-            "adp_delta": 0.2,
+            "adp_delta": 0.4,
             "provider_agreement": "high"
           },
           {
@@ -307,9 +307,9 @@
             "tier": 15,
             "projected_points": 266.2,
             "value_over_replacement": -21.69,
-            "adp": 136.3,
+            "adp": 136.2,
             "position_adp": 18,
-            "adp_delta": 0.9,
+            "adp_delta": -1.7,
             "provider_agreement": "high"
           },
           {
@@ -318,9 +318,9 @@
             "tier": 16,
             "projected_points": 263.2,
             "value_over_replacement": -24.76,
-            "adp": 169.2,
+            "adp": 165.4,
             "position_adp": 26,
-            "adp_delta": 3.3,
+            "adp_delta": -1.6,
             "provider_agreement": "low"
           },
           {
@@ -329,9 +329,9 @@
             "tier": 17,
             "projected_points": 260.4,
             "value_over_replacement": -27.52,
-            "adp": 152.8,
+            "adp": 153.6,
             "position_adp": 22,
-            "adp_delta": -1.3,
+            "adp_delta": 1.8,
             "provider_agreement": "high"
           },
           {
@@ -340,7 +340,7 @@
             "tier": 18,
             "projected_points": 257.8,
             "value_over_replacement": -30.18,
-            "adp": 164.6,
+            "adp": 163.8,
             "position_adp": 25,
             "adp_delta": 8.1,
             "provider_agreement": "high"
@@ -351,9 +351,9 @@
             "tier": 19,
             "projected_points": 253.8,
             "value_over_replacement": -34.09,
-            "adp": 148.8,
+            "adp": 145.4,
             "position_adp": 20,
-            "adp_delta": 1.4,
+            "adp_delta": -4.7,
             "provider_agreement": "high"
           },
           {
@@ -362,7 +362,7 @@
             "tier": 20,
             "projected_points": 249.5,
             "value_over_replacement": -38.45,
-            "adp": 160.9,
+            "adp": 158.0,
             "position_adp": 23,
             "adp_delta": -5.1,
             "provider_agreement": "high"
@@ -373,8 +373,8 @@
             "tier": 21,
             "projected_points": 243.8,
             "value_over_replacement": -44.12,
-            "adp": null,
-            "position_adp": null,
+            "adp": 174.0,
+            "position_adp": 27,
             "adp_delta": null,
             "provider_agreement": "high"
           },
@@ -386,7 +386,7 @@
             "value_over_replacement": -65.96,
             "adp": 163.6,
             "position_adp": 24,
-            "adp_delta": null,
+            "adp_delta": -6.8,
             "provider_agreement": "high"
           },
           {
@@ -1013,7 +1013,7 @@
             "value_over_replacement": 174.99,
             "adp": 2.3,
             "position_adp": 2,
-            "adp_delta": 0.1,
+            "adp_delta": 0.0,
             "provider_agreement": "high"
           },
           {
@@ -1022,7 +1022,7 @@
             "tier": 3,
             "projected_points": 295.4,
             "value_over_replacement": 152.04,
-            "adp": 6.6,
+            "adp": 6.7,
             "position_adp": 4,
             "adp_delta": -0.1,
             "provider_agreement": "medium"
@@ -1033,9 +1033,9 @@
             "tier": 4,
             "projected_points": 288.7,
             "value_over_replacement": 145.3,
-            "adp": 5.7,
+            "adp": 5.8,
             "position_adp": 3,
-            "adp_delta": -0.3,
+            "adp_delta": -0.2,
             "provider_agreement": "medium"
           },
           {
@@ -1046,7 +1046,7 @@
             "value_over_replacement": 121.35,
             "adp": 9.8,
             "position_adp": 6,
-            "adp_delta": -0.2,
+            "adp_delta": -0.1,
             "provider_agreement": "high"
           },
           {
@@ -1057,7 +1057,7 @@
             "value_over_replacement": 116.3,
             "adp": 11.7,
             "position_adp": 7,
-            "adp_delta": 0.1,
+            "adp_delta": 0.2,
             "provider_agreement": "medium"
           },
           {
@@ -1068,7 +1068,7 @@
             "value_over_replacement": 110.54,
             "adp": 9.3,
             "position_adp": 5,
-            "adp_delta": -0.1,
+            "adp_delta": 0.1,
             "provider_agreement": "high"
           },
           {
@@ -1077,9 +1077,9 @@
             "tier": 8,
             "projected_points": 246.7,
             "value_over_replacement": 103.34,
-            "adp": 14.9,
+            "adp": 14.8,
             "position_adp": 8,
-            "adp_delta": -0.4,
+            "adp_delta": -0.3,
             "provider_agreement": "high"
           },
           {
@@ -1088,9 +1088,9 @@
             "tier": 9,
             "projected_points": 243.8,
             "value_over_replacement": 100.39,
-            "adp": 17.1,
+            "adp": 17.2,
             "position_adp": 9,
-            "adp_delta": 0.1,
+            "adp_delta": -0.1,
             "provider_agreement": "high"
           },
           {
@@ -1099,9 +1099,9 @@
             "tier": 10,
             "projected_points": 235.2,
             "value_over_replacement": 91.79,
-            "adp": 20.3,
+            "adp": 20.2,
             "position_adp": 10,
-            "adp_delta": -1.5,
+            "adp_delta": -1.4,
             "provider_agreement": "high"
           },
           {
@@ -1110,9 +1110,9 @@
             "tier": 10,
             "projected_points": 232.5,
             "value_over_replacement": 89.06,
-            "adp": 21.9,
-            "position_adp": 11,
-            "adp_delta": 7.0,
+            "adp": 23.8,
+            "position_adp": 12,
+            "adp_delta": 8.7,
             "provider_agreement": "high"
           },
           {
@@ -1121,9 +1121,9 @@
             "tier": 11,
             "projected_points": 229.0,
             "value_over_replacement": 85.65,
-            "adp": 23.8,
-            "position_adp": 12,
-            "adp_delta": 0.3,
+            "adp": 23.4,
+            "position_adp": 11,
+            "adp_delta": -0.2,
             "provider_agreement": "high"
           },
           {
@@ -1132,9 +1132,9 @@
             "tier": 11,
             "projected_points": 228.6,
             "value_over_replacement": 85.25,
-            "adp": 29.4,
+            "adp": 29.9,
             "position_adp": 15,
-            "adp_delta": -0.5,
+            "adp_delta": -0.1,
             "provider_agreement": "medium"
           },
           {
@@ -1143,9 +1143,9 @@
             "tier": 12,
             "projected_points": 225.5,
             "value_over_replacement": 82.15,
-            "adp": 26.0,
+            "adp": 26.3,
             "position_adp": 13,
-            "adp_delta": 0.7,
+            "adp_delta": 1.4,
             "provider_agreement": "medium"
           },
           {
@@ -1154,9 +1154,9 @@
             "tier": 12,
             "projected_points": 223.2,
             "value_over_replacement": 79.83,
-            "adp": 27.6,
+            "adp": 27.7,
             "position_adp": 14,
-            "adp_delta": 1.0,
+            "adp_delta": 0.7,
             "provider_agreement": "medium"
           },
           {
@@ -1165,9 +1165,9 @@
             "tier": 12,
             "projected_points": 222.1,
             "value_over_replacement": 78.74,
-            "adp": 32.7,
+            "adp": 33.0,
             "position_adp": 16,
-            "adp_delta": -1.2,
+            "adp_delta": -1.9,
             "provider_agreement": "medium"
           },
           {
@@ -1176,7 +1176,7 @@
             "tier": 13,
             "projected_points": 217.7,
             "value_over_replacement": 74.35,
-            "adp": 33.3,
+            "adp": 33.7,
             "position_adp": 17,
             "adp_delta": 0.1,
             "provider_agreement": "medium"
@@ -1187,9 +1187,9 @@
             "tier": 14,
             "projected_points": 214.0,
             "value_over_replacement": 70.57,
-            "adp": 37.1,
+            "adp": 37.0,
             "position_adp": 18,
-            "adp_delta": -3.3,
+            "adp_delta": -3.1,
             "provider_agreement": "medium"
           },
           {
@@ -1200,7 +1200,7 @@
             "value_over_replacement": 68.8,
             "adp": 38.9,
             "position_adp": 19,
-            "adp_delta": 5.3,
+            "adp_delta": 4.6,
             "provider_agreement": "medium"
           },
           {
@@ -1209,9 +1209,9 @@
             "tier": 15,
             "projected_points": 205.9,
             "value_over_replacement": 62.55,
-            "adp": 43.0,
+            "adp": 43.1,
             "position_adp": 20,
-            "adp_delta": 0.4,
+            "adp_delta": -0.2,
             "provider_agreement": "high"
           },
           {
@@ -1220,9 +1220,9 @@
             "tier": 16,
             "projected_points": 200.1,
             "value_over_replacement": 56.72,
-            "adp": 51.2,
+            "adp": 51.4,
             "position_adp": 22,
-            "adp_delta": 0.7,
+            "adp_delta": 0.0,
             "provider_agreement": "high"
           },
           {
@@ -1231,9 +1231,9 @@
             "tier": 16,
             "projected_points": 199.8,
             "value_over_replacement": 56.38,
-            "adp": 47.3,
+            "adp": 47.5,
             "position_adp": 21,
-            "adp_delta": 2.9,
+            "adp_delta": 2.0,
             "provider_agreement": "high"
           },
           {
@@ -1242,9 +1242,9 @@
             "tier": 17,
             "projected_points": 192.7,
             "value_over_replacement": 49.28,
-            "adp": 52.6,
+            "adp": 52.9,
             "position_adp": 23,
-            "adp_delta": -0.2,
+            "adp_delta": -0.5,
             "provider_agreement": "medium"
           },
           {
@@ -1253,9 +1253,9 @@
             "tier": 18,
             "projected_points": 180.5,
             "value_over_replacement": 37.11,
-            "adp": 56.1,
+            "adp": 56.3,
             "position_adp": 24,
-            "adp_delta": 1.0,
+            "adp_delta": 1.3,
             "provider_agreement": "high"
           },
           {
@@ -1264,9 +1264,9 @@
             "tier": 19,
             "projected_points": 176.8,
             "value_over_replacement": 33.39,
-            "adp": 72.6,
+            "adp": 72.8,
             "position_adp": 29,
-            "adp_delta": -4.0,
+            "adp_delta": -2.5,
             "provider_agreement": "high"
           },
           {
@@ -1275,9 +1275,9 @@
             "tier": 20,
             "projected_points": 173.8,
             "value_over_replacement": 30.41,
-            "adp": 63.1,
+            "adp": 63.3,
             "position_adp": 27,
-            "adp_delta": 3.8,
+            "adp_delta": 3.1,
             "provider_agreement": "medium"
           },
           {
@@ -1286,9 +1286,9 @@
             "tier": 20,
             "projected_points": 173.0,
             "value_over_replacement": 29.65,
-            "adp": 63.0,
-            "position_adp": 26,
-            "adp_delta": -5.2,
+            "adp": 62.8,
+            "position_adp": 25,
+            "adp_delta": -5.7,
             "provider_agreement": "medium"
           },
           {
@@ -1297,9 +1297,9 @@
             "tier": 20,
             "projected_points": 172.2,
             "value_over_replacement": 28.77,
-            "adp": 62.2,
-            "position_adp": 25,
-            "adp_delta": -0.2,
+            "adp": 63.0,
+            "position_adp": 26,
+            "adp_delta": -0.1,
             "provider_agreement": "medium"
           },
           {
@@ -1308,9 +1308,9 @@
             "tier": 20,
             "projected_points": 171.8,
             "value_over_replacement": 28.45,
-            "adp": 67.5,
+            "adp": 67.3,
             "position_adp": 28,
-            "adp_delta": 2.5,
+            "adp_delta": 1.2,
             "provider_agreement": "medium"
           },
           {
@@ -1319,9 +1319,9 @@
             "tier": 21,
             "projected_points": 166.4,
             "value_over_replacement": 22.98,
-            "adp": 77.6,
+            "adp": 78.0,
             "position_adp": 31,
-            "adp_delta": -5.9,
+            "adp_delta": -5.3,
             "provider_agreement": "medium"
           },
           {
@@ -1330,9 +1330,9 @@
             "tier": 21,
             "projected_points": 164.4,
             "value_over_replacement": 20.99,
-            "adp": 74.5,
+            "adp": 75.1,
             "position_adp": 30,
-            "adp_delta": -0.3,
+            "adp_delta": 0.5,
             "provider_agreement": "medium"
           },
           {
@@ -1341,9 +1341,9 @@
             "tier": 22,
             "projected_points": 155.4,
             "value_over_replacement": 12.0,
-            "adp": 86.0,
+            "adp": 86.3,
             "position_adp": 32,
-            "adp_delta": 11.9,
+            "adp_delta": 8.7,
             "provider_agreement": "medium"
           },
           {
@@ -1352,9 +1352,9 @@
             "tier": 23,
             "projected_points": 149.3,
             "value_over_replacement": 5.92,
-            "adp": 89.9,
+            "adp": 90.2,
             "position_adp": 33,
-            "adp_delta": -13.6,
+            "adp_delta": -10.8,
             "provider_agreement": "high"
           },
           {
@@ -1363,9 +1363,9 @@
             "tier": 23,
             "projected_points": 146.7,
             "value_over_replacement": 3.26,
-            "adp": 100.8,
+            "adp": 101.3,
             "position_adp": 35,
-            "adp_delta": 2.3,
+            "adp_delta": 1.2,
             "provider_agreement": "medium"
           },
           {
@@ -1374,9 +1374,9 @@
             "tier": 23,
             "projected_points": 144.8,
             "value_over_replacement": 1.44,
-            "adp": 99.7,
-            "position_adp": 34,
-            "adp_delta": -6.6,
+            "adp": 101.9,
+            "position_adp": 36,
+            "adp_delta": 0.1,
             "provider_agreement": "high"
           },
           {
@@ -1385,9 +1385,9 @@
             "tier": 23,
             "projected_points": 143.4,
             "value_over_replacement": -0.0,
-            "adp": 118.4,
+            "adp": 119.0,
             "position_adp": 40,
-            "adp_delta": 3.9,
+            "adp_delta": 1.6,
             "provider_agreement": "low"
           },
           {
@@ -1396,9 +1396,9 @@
             "tier": 23,
             "projected_points": 141.2,
             "value_over_replacement": -2.21,
-            "adp": 100.8,
-            "position_adp": 36,
-            "adp_delta": -5.5,
+            "adp": 101.2,
+            "position_adp": 34,
+            "adp_delta": -4.3,
             "provider_agreement": "medium"
           },
           {
@@ -1407,7 +1407,7 @@
             "tier": 23,
             "projected_points": 140.8,
             "value_over_replacement": -2.57,
-            "adp": 110.1,
+            "adp": 111.3,
             "position_adp": 38,
             "adp_delta": 8.0,
             "provider_agreement": "medium"
@@ -1418,9 +1418,9 @@
             "tier": 23,
             "projected_points": 139.2,
             "value_over_replacement": -4.22,
-            "adp": 103.2,
+            "adp": 103.8,
             "position_adp": 37,
-            "adp_delta": 14.4,
+            "adp_delta": 10.4,
             "provider_agreement": "high"
           },
           {
@@ -1429,9 +1429,9 @@
             "tier": 23,
             "projected_points": 138.0,
             "value_over_replacement": -5.43,
-            "adp": 114.1,
+            "adp": 114.0,
             "position_adp": 39,
-            "adp_delta": -3.7,
+            "adp_delta": -2.6,
             "provider_agreement": "high"
           },
           {
@@ -1440,9 +1440,9 @@
             "tier": 24,
             "projected_points": 132.6,
             "value_over_replacement": -10.82,
-            "adp": 120.9,
+            "adp": 121.0,
             "position_adp": 41,
-            "adp_delta": 1.1,
+            "adp_delta": 1.2,
             "provider_agreement": "high"
           },
           {
@@ -1451,9 +1451,9 @@
             "tier": 25,
             "projected_points": 115.2,
             "value_over_replacement": -28.22,
-            "adp": 142.8,
-            "position_adp": 44,
-            "adp_delta": -1.9,
+            "adp": 140.8,
+            "position_adp": 43,
+            "adp_delta": -1.0,
             "provider_agreement": "medium"
           },
           {
@@ -1462,9 +1462,9 @@
             "tier": 25,
             "projected_points": 113.6,
             "value_over_replacement": -29.8,
-            "adp": 154.4,
-            "position_adp": 49,
-            "adp_delta": -2.2,
+            "adp": 154.6,
+            "position_adp": 50,
+            "adp_delta": -2.1,
             "provider_agreement": "low"
           },
           {
@@ -1473,9 +1473,9 @@
             "tier": 25,
             "projected_points": 113.2,
             "value_over_replacement": -30.22,
-            "adp": 132.4,
+            "adp": 133.3,
             "position_adp": 42,
-            "adp_delta": 1.2,
+            "adp_delta": 0.7,
             "provider_agreement": "low"
           },
           {
@@ -1484,9 +1484,9 @@
             "tier": 25,
             "projected_points": 112.3,
             "value_over_replacement": -31.1,
-            "adp": 141.5,
-            "position_adp": 43,
-            "adp_delta": -0.5,
+            "adp": 141.6,
+            "position_adp": 44,
+            "adp_delta": -0.4,
             "provider_agreement": "low"
           },
           {
@@ -1495,9 +1495,9 @@
             "tier": 26,
             "projected_points": 101.6,
             "value_over_replacement": -41.78,
-            "adp": 157.3,
-            "position_adp": 51,
-            "adp_delta": 12.4,
+            "adp": 158.4,
+            "position_adp": 53,
+            "adp_delta": 12.1,
             "provider_agreement": "low"
           },
           {
@@ -1506,9 +1506,9 @@
             "tier": 27,
             "projected_points": 97.1,
             "value_over_replacement": -46.24,
-            "adp": 162.1,
-            "position_adp": 56,
-            "adp_delta": -0.7,
+            "adp": 157.0,
+            "position_adp": 51,
+            "adp_delta": -0.1,
             "provider_agreement": "low"
           },
           {
@@ -1528,9 +1528,9 @@
             "tier": 28,
             "projected_points": 92.9,
             "value_over_replacement": -50.49,
-            "adp": 157.6,
-            "position_adp": 52,
-            "adp_delta": 0.4,
+            "adp": 153.5,
+            "position_adp": 47,
+            "adp_delta": -3.6,
             "provider_agreement": "low"
           },
           {
@@ -1539,9 +1539,9 @@
             "tier": 28,
             "projected_points": 92.1,
             "value_over_replacement": -51.31,
-            "adp": 174.2,
+            "adp": 172.0,
             "position_adp": 60,
-            "adp_delta": 1.4,
+            "adp_delta": -2.2,
             "provider_agreement": "medium"
           },
           {
@@ -1550,9 +1550,9 @@
             "tier": 28,
             "projected_points": 92.1,
             "value_over_replacement": -51.32,
-            "adp": 153.5,
-            "position_adp": 47,
-            "adp_delta": -11.8,
+            "adp": 154.2,
+            "position_adp": 48,
+            "adp_delta": -5.2,
             "provider_agreement": "high"
           },
           {
@@ -1572,8 +1572,8 @@
             "tier": 28,
             "projected_points": 90.1,
             "value_over_replacement": -53.32,
-            "adp": 154.6,
-            "position_adp": 50,
+            "adp": 154.5,
+            "position_adp": 49,
             "adp_delta": -1.0,
             "provider_agreement": "low"
           },
@@ -1583,9 +1583,9 @@
             "tier": 28,
             "projected_points": 89.6,
             "value_over_replacement": -53.8,
-            "adp": 160.1,
+            "adp": 160.7,
             "position_adp": 55,
-            "adp_delta": -8.1,
+            "adp_delta": -10.6,
             "provider_agreement": "low"
           },
           {
@@ -1605,9 +1605,9 @@
             "tier": 29,
             "projected_points": 83.4,
             "value_over_replacement": -60.0,
-            "adp": 159.9,
-            "position_adp": 54,
-            "adp_delta": -4.4,
+            "adp": 165.2,
+            "position_adp": 57,
+            "adp_delta": 0.2,
             "provider_agreement": "low"
           },
           {
@@ -1616,9 +1616,9 @@
             "tier": 29,
             "projected_points": 83.1,
             "value_over_replacement": -60.27,
-            "adp": 166.2,
-            "position_adp": 58,
-            "adp_delta": 15.3,
+            "adp": 159.4,
+            "position_adp": 54,
+            "adp_delta": 5.5,
             "provider_agreement": "medium"
           },
           {
@@ -1638,9 +1638,9 @@
             "tier": 29,
             "projected_points": 82.4,
             "value_over_replacement": -60.94,
-            "adp": 163.5,
-            "position_adp": 57,
-            "adp_delta": 1.8,
+            "adp": 163.7,
+            "position_adp": 56,
+            "adp_delta": 2.0,
             "provider_agreement": "low"
           },
           {
@@ -1649,9 +1649,9 @@
             "tier": 29,
             "projected_points": 80.3,
             "value_over_replacement": -63.13,
-            "adp": 153.5,
-            "position_adp": 46,
-            "adp_delta": -1.3,
+            "adp": 150.3,
+            "position_adp": 45,
+            "adp_delta": -2.6,
             "provider_agreement": "low"
           },
           {
@@ -1660,9 +1660,9 @@
             "tier": 30,
             "projected_points": 76.6,
             "value_over_replacement": -66.76,
-            "adp": 158.9,
-            "position_adp": 53,
-            "adp_delta": 3.2,
+            "adp": 167.1,
+            "position_adp": 59,
+            "adp_delta": 11.6,
             "provider_agreement": "medium"
           },
           {
@@ -1748,9 +1748,9 @@
             "tier": 34,
             "projected_points": 50.3,
             "value_over_replacement": -93.1,
-            "adp": 154.2,
-            "position_adp": 48,
-            "adp_delta": -12.8,
+            "adp": 158.2,
+            "position_adp": 52,
+            "adp_delta": -8.8,
             "provider_agreement": "high"
           },
           {
@@ -1792,9 +1792,9 @@
             "tier": 34,
             "projected_points": 44.3,
             "value_over_replacement": -99.06,
-            "adp": 167.5,
-            "position_adp": 59,
-            "adp_delta": 7.0,
+            "adp": 166.6,
+            "position_adp": 58,
+            "adp_delta": 3.4,
             "provider_agreement": "low"
           },
           {
@@ -1902,9 +1902,9 @@
             "tier": 35,
             "projected_points": 32.4,
             "value_over_replacement": -111.03,
-            "adp": 149.0,
-            "position_adp": 45,
-            "adp_delta": null,
+            "adp": 153.2,
+            "position_adp": 46,
+            "adp_delta": 0.6,
             "provider_agreement": "low"
           },
           {
@@ -2375,9 +2375,9 @@
             "tier": 4,
             "projected_points": 261.1,
             "value_over_replacement": 116.56,
-            "adp": 8.0,
+            "adp": 7.9,
             "position_adp": 4,
-            "adp_delta": 0.1,
+            "adp_delta": 0.0,
             "provider_agreement": "medium"
           },
           {
@@ -2386,7 +2386,7 @@
             "tier": 5,
             "projected_points": 227.1,
             "value_over_replacement": 82.54,
-            "adp": 12.1,
+            "adp": 12.4,
             "position_adp": 5,
             "adp_delta": 0.0,
             "provider_agreement": "high"
@@ -2397,9 +2397,9 @@
             "tier": 6,
             "projected_points": 224.3,
             "value_over_replacement": 79.74,
-            "adp": 12.5,
+            "adp": 12.4,
             "position_adp": 6,
-            "adp_delta": 0.0,
+            "adp_delta": -0.1,
             "provider_agreement": "high"
           },
           {
@@ -2408,9 +2408,9 @@
             "tier": 6,
             "projected_points": 223.3,
             "value_over_replacement": 78.75,
-            "adp": 14.2,
+            "adp": 14.0,
             "position_adp": 7,
-            "adp_delta": 0.0,
+            "adp_delta": -0.1,
             "provider_agreement": "high"
           },
           {
@@ -2419,9 +2419,9 @@
             "tier": 7,
             "projected_points": 219.8,
             "value_over_replacement": 75.27,
-            "adp": 15.2,
+            "adp": 16.0,
             "position_adp": 8,
-            "adp_delta": -0.6,
+            "adp_delta": 0.1,
             "provider_agreement": "medium"
           },
           {
@@ -2432,7 +2432,7 @@
             "value_over_replacement": 69.52,
             "adp": 22.7,
             "position_adp": 12,
-            "adp_delta": -1.3,
+            "adp_delta": -1.2,
             "provider_agreement": "high"
           },
           {
@@ -2441,9 +2441,9 @@
             "tier": 8,
             "projected_points": 212.4,
             "value_over_replacement": 67.86,
-            "adp": 19.1,
+            "adp": 18.7,
             "position_adp": 9,
-            "adp_delta": -0.6,
+            "adp_delta": -0.9,
             "provider_agreement": "high"
           },
           {
@@ -2452,9 +2452,9 @@
             "tier": 8,
             "projected_points": 210.8,
             "value_over_replacement": 66.19,
-            "adp": 19.6,
+            "adp": 19.4,
             "position_adp": 10,
-            "adp_delta": 0.4,
+            "adp_delta": -0.2,
             "provider_agreement": "high"
           },
           {
@@ -2463,9 +2463,9 @@
             "tier": 9,
             "projected_points": 206.7,
             "value_over_replacement": 62.09,
-            "adp": 20.0,
+            "adp": 20.5,
             "position_adp": 11,
-            "adp_delta": -1.9,
+            "adp_delta": -1.0,
             "provider_agreement": "high"
           },
           {
@@ -2474,9 +2474,9 @@
             "tier": 10,
             "projected_points": 201.1,
             "value_over_replacement": 56.56,
-            "adp": 24.9,
+            "adp": 24.6,
             "position_adp": 13,
-            "adp_delta": -0.2,
+            "adp_delta": -0.7,
             "provider_agreement": "high"
           },
           {
@@ -2485,9 +2485,9 @@
             "tier": 10,
             "projected_points": 199.9,
             "value_over_replacement": 55.31,
-            "adp": 25.9,
+            "adp": 25.7,
             "position_adp": 14,
-            "adp_delta": -2.4,
+            "adp_delta": -2.5,
             "provider_agreement": "high"
           },
           {
@@ -2496,9 +2496,9 @@
             "tier": 11,
             "projected_points": 194.6,
             "value_over_replacement": 50.02,
-            "adp": 30.9,
-            "position_adp": 16,
-            "adp_delta": -0.8,
+            "adp": 31.4,
+            "position_adp": 17,
+            "adp_delta": 0.0,
             "provider_agreement": "high"
           },
           {
@@ -2509,7 +2509,7 @@
             "value_over_replacement": 48.6,
             "adp": 30.4,
             "position_adp": 15,
-            "adp_delta": -2.1,
+            "adp_delta": -1.8,
             "provider_agreement": "high"
           },
           {
@@ -2518,8 +2518,8 @@
             "tier": 11,
             "projected_points": 193.0,
             "value_over_replacement": 48.38,
-            "adp": 31.2,
-            "position_adp": 17,
+            "adp": 31.0,
+            "position_adp": 16,
             "adp_delta": -1.0,
             "provider_agreement": "high"
           },
@@ -2529,9 +2529,9 @@
             "tier": 11,
             "projected_points": 191.6,
             "value_over_replacement": 47.08,
-            "adp": 34.1,
+            "adp": 33.9,
             "position_adp": 18,
-            "adp_delta": -0.9,
+            "adp_delta": -1.0,
             "provider_agreement": "high"
           },
           {
@@ -2540,9 +2540,9 @@
             "tier": 12,
             "projected_points": 187.7,
             "value_over_replacement": 43.12,
-            "adp": 37.8,
+            "adp": 37.5,
             "position_adp": 20,
-            "adp_delta": -1.0,
+            "adp_delta": -0.9,
             "provider_agreement": "medium"
           },
           {
@@ -2551,9 +2551,9 @@
             "tier": 12,
             "projected_points": 186.3,
             "value_over_replacement": 41.74,
-            "adp": 36.0,
+            "adp": 36.1,
             "position_adp": 19,
-            "adp_delta": -1.2,
+            "adp_delta": -0.4,
             "provider_agreement": "high"
           },
           {
@@ -2562,9 +2562,9 @@
             "tier": 12,
             "projected_points": 185.1,
             "value_over_replacement": 40.49,
-            "adp": 39.2,
+            "adp": 39.4,
             "position_adp": 21,
-            "adp_delta": -1.9,
+            "adp_delta": -1.0,
             "provider_agreement": "high"
           },
           {
@@ -2575,7 +2575,7 @@
             "value_over_replacement": 36.09,
             "adp": 40.8,
             "position_adp": 22,
-            "adp_delta": -0.3,
+            "adp_delta": -0.4,
             "provider_agreement": "high"
           },
           {
@@ -2584,9 +2584,9 @@
             "tier": 14,
             "projected_points": 175.3,
             "value_over_replacement": 30.78,
-            "adp": 45.3,
-            "position_adp": 23,
-            "adp_delta": -0.1,
+            "adp": 45.8,
+            "position_adp": 24,
+            "adp_delta": 0.8,
             "provider_agreement": "high"
           },
           {
@@ -2595,9 +2595,9 @@
             "tier": 14,
             "projected_points": 173.9,
             "value_over_replacement": 29.36,
-            "adp": 49.1,
+            "adp": 49.4,
             "position_adp": 26,
-            "adp_delta": 3.1,
+            "adp_delta": 2.1,
             "provider_agreement": "high"
           },
           {
@@ -2606,9 +2606,9 @@
             "tier": 14,
             "projected_points": 173.7,
             "value_over_replacement": 29.15,
-            "adp": 45.6,
-            "position_adp": 24,
-            "adp_delta": -5.1,
+            "adp": 45.8,
+            "position_adp": 23,
+            "adp_delta": -4.8,
             "provider_agreement": "medium"
           },
           {
@@ -2617,9 +2617,9 @@
             "tier": 14,
             "projected_points": 173.1,
             "value_over_replacement": 28.53,
-            "adp": 47.6,
+            "adp": 47.3,
             "position_adp": 25,
-            "adp_delta": -1.8,
+            "adp_delta": -0.4,
             "provider_agreement": "high"
           },
           {
@@ -2628,9 +2628,9 @@
             "tier": 14,
             "projected_points": 171.7,
             "value_over_replacement": 27.1,
-            "adp": 57.1,
+            "adp": 57.5,
             "position_adp": 29,
-            "adp_delta": -5.3,
+            "adp_delta": -4.2,
             "provider_agreement": "high"
           },
           {
@@ -2639,9 +2639,9 @@
             "tier": 15,
             "projected_points": 169.4,
             "value_over_replacement": 24.83,
-            "adp": 53.9,
+            "adp": 53.8,
             "position_adp": 27,
-            "adp_delta": -1.1,
+            "adp_delta": 0.0,
             "provider_agreement": "high"
           },
           {
@@ -2650,9 +2650,9 @@
             "tier": 16,
             "projected_points": 165.2,
             "value_over_replacement": 20.65,
-            "adp": 67.0,
+            "adp": 67.2,
             "position_adp": 34,
-            "adp_delta": 1.8,
+            "adp_delta": 2.2,
             "provider_agreement": "high"
           },
           {
@@ -2661,9 +2661,9 @@
             "tier": 16,
             "projected_points": 165.0,
             "value_over_replacement": 20.38,
-            "adp": 55.8,
+            "adp": 56.0,
             "position_adp": 28,
-            "adp_delta": -0.6,
+            "adp_delta": -0.3,
             "provider_agreement": "high"
           },
           {
@@ -2672,7 +2672,7 @@
             "tier": 16,
             "projected_points": 164.9,
             "value_over_replacement": 20.32,
-            "adp": 59.8,
+            "adp": 59.9,
             "position_adp": 30,
             "adp_delta": 0.2,
             "provider_agreement": "medium"
@@ -2683,9 +2683,9 @@
             "tier": 16,
             "projected_points": 164.0,
             "value_over_replacement": 19.43,
-            "adp": 62.7,
+            "adp": 63.3,
             "position_adp": 31,
-            "adp_delta": 8.8,
+            "adp_delta": 6.9,
             "provider_agreement": "high"
           },
           {
@@ -2694,9 +2694,9 @@
             "tier": 16,
             "projected_points": 163.1,
             "value_over_replacement": 18.53,
-            "adp": 64.9,
+            "adp": 64.5,
             "position_adp": 32,
-            "adp_delta": 1.1,
+            "adp_delta": 1.2,
             "provider_agreement": "high"
           },
           {
@@ -2707,7 +2707,7 @@
             "value_over_replacement": 8.53,
             "adp": 64.9,
             "position_adp": 33,
-            "adp_delta": -0.4,
+            "adp_delta": 0.2,
             "provider_agreement": "medium"
           },
           {
@@ -2716,9 +2716,9 @@
             "tier": 17,
             "projected_points": 152.1,
             "value_over_replacement": 7.49,
-            "adp": 70.5,
+            "adp": 70.2,
             "position_adp": 35,
-            "adp_delta": 1.1,
+            "adp_delta": 0.7,
             "provider_agreement": "high"
           },
           {
@@ -2727,9 +2727,9 @@
             "tier": 18,
             "projected_points": 150.1,
             "value_over_replacement": 5.5,
-            "adp": 81.0,
+            "adp": 81.2,
             "position_adp": 39,
-            "adp_delta": -0.4,
+            "adp_delta": 0.2,
             "provider_agreement": "high"
           },
           {
@@ -2738,9 +2738,9 @@
             "tier": 19,
             "projected_points": 145.8,
             "value_over_replacement": 1.26,
-            "adp": 75.7,
+            "adp": 76.0,
             "position_adp": 37,
-            "adp_delta": 3.1,
+            "adp_delta": 2.1,
             "provider_agreement": "high"
           },
           {
@@ -2749,9 +2749,9 @@
             "tier": 19,
             "projected_points": 144.6,
             "value_over_replacement": 0.0,
-            "adp": 86.8,
-            "position_adp": 41,
-            "adp_delta": 0.1,
+            "adp": 87.5,
+            "position_adp": 42,
+            "adp_delta": 1.6,
             "provider_agreement": "high"
           },
           {
@@ -2760,9 +2760,9 @@
             "tier": 19,
             "projected_points": 144.2,
             "value_over_replacement": -0.38,
-            "adp": 74.6,
+            "adp": 75.2,
             "position_adp": 36,
-            "adp_delta": -1.5,
+            "adp_delta": -0.9,
             "provider_agreement": "high"
           },
           {
@@ -2771,9 +2771,9 @@
             "tier": 19,
             "projected_points": 144.1,
             "value_over_replacement": -0.47,
-            "adp": 87.7,
-            "position_adp": 42,
-            "adp_delta": -5.1,
+            "adp": 88.7,
+            "position_adp": 43,
+            "adp_delta": -1.7,
             "provider_agreement": "medium"
           },
           {
@@ -2782,9 +2782,9 @@
             "tier": 19,
             "projected_points": 143.1,
             "value_over_replacement": -1.45,
-            "adp": 87.7,
-            "position_adp": 43,
-            "adp_delta": 2.3,
+            "adp": 87.5,
+            "position_adp": 41,
+            "adp_delta": 1.3,
             "provider_agreement": "high"
           },
           {
@@ -2793,9 +2793,9 @@
             "tier": 19,
             "projected_points": 141.8,
             "value_over_replacement": -2.73,
-            "adp": 76.3,
+            "adp": 76.8,
             "position_adp": 38,
-            "adp_delta": -1.5,
+            "adp_delta": -0.8,
             "provider_agreement": "high"
           },
           {
@@ -2804,9 +2804,9 @@
             "tier": 19,
             "projected_points": 141.3,
             "value_over_replacement": -3.25,
-            "adp": 86.0,
+            "adp": 86.2,
             "position_adp": 40,
-            "adp_delta": -3.3,
+            "adp_delta": -2.7,
             "provider_agreement": "high"
           },
           {
@@ -2815,9 +2815,9 @@
             "tier": 19,
             "projected_points": 140.1,
             "value_over_replacement": -4.49,
-            "adp": 99.4,
+            "adp": 100.0,
             "position_adp": 47,
-            "adp_delta": -0.6,
+            "adp_delta": -0.4,
             "provider_agreement": "high"
           },
           {
@@ -2827,8 +2827,8 @@
             "projected_points": 139.1,
             "value_over_replacement": -5.49,
             "adp": 93.0,
-            "position_adp": 45,
-            "adp_delta": 0.5,
+            "position_adp": 44,
+            "adp_delta": -0.5,
             "provider_agreement": "high"
           },
           {
@@ -2837,9 +2837,9 @@
             "tier": 19,
             "projected_points": 138.0,
             "value_over_replacement": -6.57,
-            "adp": 117.5,
+            "adp": 117.9,
             "position_adp": 53,
-            "adp_delta": -1.1,
+            "adp_delta": 0.4,
             "provider_agreement": "high"
           },
           {
@@ -2848,9 +2848,9 @@
             "tier": 20,
             "projected_points": 135.1,
             "value_over_replacement": -9.42,
-            "adp": 107.0,
+            "adp": 106.4,
             "position_adp": 50,
-            "adp_delta": -0.1,
+            "adp_delta": -0.8,
             "provider_agreement": "high"
           },
           {
@@ -2859,9 +2859,9 @@
             "tier": 20,
             "projected_points": 134.8,
             "value_over_replacement": -9.77,
-            "adp": 100.5,
+            "adp": 102.3,
             "position_adp": 48,
-            "adp_delta": -8.0,
+            "adp_delta": -4.8,
             "provider_agreement": "high"
           },
           {
@@ -2870,9 +2870,9 @@
             "tier": 20,
             "projected_points": 133.5,
             "value_over_replacement": -11.1,
-            "adp": 128.9,
+            "adp": 128.0,
             "position_adp": 57,
-            "adp_delta": -11.4,
+            "adp_delta": -8.0,
             "provider_agreement": "low"
           },
           {
@@ -2881,9 +2881,9 @@
             "tier": 20,
             "projected_points": 132.7,
             "value_over_replacement": -11.85,
-            "adp": 95.7,
+            "adp": 94.8,
             "position_adp": 46,
-            "adp_delta": 1.5,
+            "adp_delta": 0.7,
             "provider_agreement": "high"
           },
           {
@@ -2892,9 +2892,9 @@
             "tier": 20,
             "projected_points": 132.5,
             "value_over_replacement": -12.03,
-            "adp": 102.3,
+            "adp": 102.5,
             "position_adp": 49,
-            "adp_delta": 0.6,
+            "adp_delta": 0.7,
             "provider_agreement": "high"
           },
           {
@@ -2903,9 +2903,9 @@
             "tier": 20,
             "projected_points": 131.9,
             "value_over_replacement": -12.71,
-            "adp": 119.3,
+            "adp": 119.7,
             "position_adp": 55,
-            "adp_delta": -0.3,
+            "adp_delta": -0.2,
             "provider_agreement": "medium"
           },
           {
@@ -2914,9 +2914,9 @@
             "tier": 20,
             "projected_points": 130.1,
             "value_over_replacement": -14.51,
-            "adp": 109.4,
+            "adp": 109.9,
             "position_adp": 51,
-            "adp_delta": 4.1,
+            "adp_delta": 5.0,
             "provider_agreement": "high"
           },
           {
@@ -2925,9 +2925,9 @@
             "tier": 20,
             "projected_points": 129.3,
             "value_over_replacement": -15.24,
-            "adp": 92.5,
-            "position_adp": 44,
-            "adp_delta": 7.2,
+            "adp": 93.7,
+            "position_adp": 45,
+            "adp_delta": 6.8,
             "provider_agreement": "high"
           },
           {
@@ -2936,9 +2936,9 @@
             "tier": 21,
             "projected_points": 127.4,
             "value_over_replacement": -17.14,
-            "adp": 117.6,
+            "adp": 117.9,
             "position_adp": 54,
-            "adp_delta": -1.4,
+            "adp_delta": 0.5,
             "provider_agreement": "high"
           },
           {
@@ -2947,9 +2947,9 @@
             "tier": 21,
             "projected_points": 127.0,
             "value_over_replacement": -17.6,
-            "adp": 140.9,
+            "adp": 140.5,
             "position_adp": 63,
-            "adp_delta": 2.6,
+            "adp_delta": 1.9,
             "provider_agreement": "medium"
           },
           {
@@ -2958,9 +2958,9 @@
             "tier": 21,
             "projected_points": 126.1,
             "value_over_replacement": -18.5,
-            "adp": 125.2,
+            "adp": 124.2,
             "position_adp": 56,
-            "adp_delta": -2.0,
+            "adp_delta": -3.2,
             "provider_agreement": "low"
           },
           {
@@ -2969,9 +2969,9 @@
             "tier": 21,
             "projected_points": 124.8,
             "value_over_replacement": -19.75,
-            "adp": 138.6,
+            "adp": 140.3,
             "position_adp": 62,
-            "adp_delta": 1.4,
+            "adp_delta": 2.1,
             "provider_agreement": "low"
           },
           {
@@ -2980,9 +2980,9 @@
             "tier": 21,
             "projected_points": 124.5,
             "value_over_replacement": -20.11,
-            "adp": 111.2,
+            "adp": 115.1,
             "position_adp": 52,
-            "adp_delta": 0.2,
+            "adp_delta": 3.6,
             "provider_agreement": "high"
           },
           {
@@ -3002,9 +3002,9 @@
             "tier": 23,
             "projected_points": 117.0,
             "value_over_replacement": -27.62,
-            "adp": 129.0,
+            "adp": 129.7,
             "position_adp": 58,
-            "adp_delta": -4.1,
+            "adp_delta": -2.7,
             "provider_agreement": "medium"
           },
           {
@@ -3013,9 +3013,9 @@
             "tier": 24,
             "projected_points": 114.8,
             "value_over_replacement": -29.73,
-            "adp": 133.2,
-            "position_adp": 59,
-            "adp_delta": -1.3,
+            "adp": 138.3,
+            "position_adp": 61,
+            "adp_delta": 4.8,
             "provider_agreement": "low"
           },
           {
@@ -3024,9 +3024,9 @@
             "tier": 25,
             "projected_points": 112.5,
             "value_over_replacement": -32.11,
-            "adp": 137.7,
-            "position_adp": 61,
-            "adp_delta": 3.8,
+            "adp": 135.8,
+            "position_adp": 60,
+            "adp_delta": 5.1,
             "provider_agreement": "low"
           },
           {
@@ -3036,8 +3036,8 @@
             "projected_points": 110.5,
             "value_over_replacement": -34.02,
             "adp": 134.8,
-            "position_adp": 60,
-            "adp_delta": -2.6,
+            "position_adp": 59,
+            "adp_delta": -0.6,
             "provider_agreement": "high"
           },
           {
@@ -3046,9 +3046,9 @@
             "tier": 26,
             "projected_points": 109.7,
             "value_over_replacement": -34.87,
-            "adp": 140.9,
+            "adp": 140.8,
             "position_adp": 64,
-            "adp_delta": 2.1,
+            "adp_delta": 2.2,
             "provider_agreement": "low"
           },
           {
@@ -3058,8 +3058,8 @@
             "projected_points": 106.8,
             "value_over_replacement": -37.78,
             "adp": 162.2,
-            "position_adp": 74,
-            "adp_delta": -4.6,
+            "position_adp": 75,
+            "adp_delta": -6.4,
             "provider_agreement": "medium"
           },
           {
@@ -3068,9 +3068,9 @@
             "tier": 27,
             "projected_points": 105.4,
             "value_over_replacement": -39.21,
-            "adp": 145.5,
-            "position_adp": 65,
-            "adp_delta": -0.4,
+            "adp": 147.8,
+            "position_adp": 67,
+            "adp_delta": 4.2,
             "provider_agreement": "high"
           },
           {
@@ -3079,7 +3079,7 @@
             "tier": 28,
             "projected_points": 102.1,
             "value_over_replacement": -42.43,
-            "adp": 162.0,
+            "adp": 161.6,
             "position_adp": 73,
             "adp_delta": null,
             "provider_agreement": "medium"
@@ -3090,9 +3090,9 @@
             "tier": 28,
             "projected_points": 101.8,
             "value_over_replacement": -42.79,
-            "adp": 164.9,
-            "position_adp": 76,
-            "adp_delta": 4.2,
+            "adp": 165.0,
+            "position_adp": 77,
+            "adp_delta": 4.4,
             "provider_agreement": "high"
           },
           {
@@ -3101,9 +3101,9 @@
             "tier": 28,
             "projected_points": 101.5,
             "value_over_replacement": -43.1,
-            "adp": 152.7,
-            "position_adp": 67,
-            "adp_delta": -2.1,
+            "adp": 152.0,
+            "position_adp": 68,
+            "adp_delta": -4.4,
             "provider_agreement": "low"
           },
           {
@@ -3112,9 +3112,9 @@
             "tier": 29,
             "projected_points": 98.2,
             "value_over_replacement": -46.35,
-            "adp": 154.3,
-            "position_adp": 68,
-            "adp_delta": -3.5,
+            "adp": 156.5,
+            "position_adp": 71,
+            "adp_delta": 0.7,
             "provider_agreement": "low"
           },
           {
@@ -3123,9 +3123,9 @@
             "tier": 30,
             "projected_points": 94.3,
             "value_over_replacement": -50.32,
-            "adp": 161.8,
+            "adp": 161.5,
             "position_adp": 72,
-            "adp_delta": 1.4,
+            "adp_delta": 3.5,
             "provider_agreement": "medium"
           },
           {
@@ -3134,9 +3134,9 @@
             "tier": 31,
             "projected_points": 91.0,
             "value_over_replacement": -53.57,
-            "adp": 162.9,
-            "position_adp": 75,
-            "adp_delta": 4.7,
+            "adp": 163.1,
+            "position_adp": 76,
+            "adp_delta": 0.6,
             "provider_agreement": "medium"
           },
           {
@@ -3145,9 +3145,9 @@
             "tier": 32,
             "projected_points": 88.9,
             "value_over_replacement": -55.63,
-            "adp": 147.0,
+            "adp": 145.3,
             "position_adp": 66,
-            "adp_delta": -2.3,
+            "adp_delta": -5.4,
             "provider_agreement": "medium"
           },
           {
@@ -3162,25 +3162,14 @@
             "provider_agreement": "high"
           },
           {
-            "player": "Dontayvion Wicks",
-            "team": "PHI",
-            "tier": 32,
-            "projected_points": 88.2,
-            "value_over_replacement": -56.4,
-            "adp": 174.0,
-            "position_adp": 79,
-            "adp_delta": 6.7,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Jordyn Tyson",
             "team": "NO",
             "tier": 32,
             "projected_points": 87.9,
             "value_over_replacement": -56.67,
-            "adp": 157.1,
+            "adp": 156.4,
             "position_adp": 70,
-            "adp_delta": 42.5,
+            "adp_delta": 29.5,
             "provider_agreement": "high"
           },
           {
@@ -3222,9 +3211,9 @@
             "tier": 32,
             "projected_points": 85.1,
             "value_over_replacement": -59.46,
-            "adp": 167.8,
+            "adp": 165.5,
             "position_adp": 78,
-            "adp_delta": -5.9,
+            "adp_delta": -8.6,
             "provider_agreement": "high"
           },
           {
@@ -3250,6 +3239,17 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Dontayvion Wicks",
+            "team": "PHI",
+            "tier": 32,
+            "projected_points": 82.8,
+            "value_over_replacement": -61.78,
+            "adp": 174.2,
+            "position_adp": 81,
+            "adp_delta": 4.5,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Tory Horton",
             "team": "SEA",
             "tier": 32,
@@ -3266,8 +3266,8 @@
             "tier": 32,
             "projected_points": 82.3,
             "value_over_replacement": -62.29,
-            "adp": 166.0,
-            "position_adp": 77,
+            "adp": 161.8,
+            "position_adp": 74,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -3277,9 +3277,9 @@
             "tier": 32,
             "projected_points": 82.0,
             "value_over_replacement": -62.55,
-            "adp": 189.7,
-            "position_adp": 81,
-            "adp_delta": null,
+            "adp": 168.2,
+            "position_adp": 79,
+            "adp_delta": -8.0,
             "provider_agreement": "low"
           },
           {
@@ -3332,9 +3332,9 @@
             "tier": 34,
             "projected_points": 72.5,
             "value_over_replacement": -72.08,
-            "adp": 174.7,
+            "adp": 172.0,
             "position_adp": 80,
-            "adp_delta": -1.4,
+            "adp_delta": -5.1,
             "provider_agreement": "low"
           },
           {
@@ -3343,9 +3343,9 @@
             "tier": 34,
             "projected_points": 72.4,
             "value_over_replacement": -72.16,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
+            "adp": 191.8,
+            "position_adp": 82,
+            "adp_delta": 11.1,
             "provider_agreement": "high"
           },
           {
@@ -3354,9 +3354,9 @@
             "tier": 34,
             "projected_points": 72.3,
             "value_over_replacement": -72.3,
-            "adp": 157.0,
+            "adp": 155.5,
             "position_adp": 69,
-            "adp_delta": -8.9,
+            "adp_delta": -8.4,
             "provider_agreement": "low"
           },
           {
@@ -3569,17 +3569,6 @@
             "provider_agreement": "high"
           },
           {
-            "player": "Zavion Thomas",
-            "team": "CHI",
-            "tier": 37,
-            "projected_points": 53.3,
-            "value_over_replacement": -91.3,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "medium"
-          },
-          {
             "player": "Devontez Walker",
             "team": "BAL",
             "tier": 37,
@@ -3673,9 +3662,9 @@
             "tier": 39,
             "projected_points": 43.2,
             "value_over_replacement": -101.38,
-            "adp": 158.6,
-            "position_adp": 71,
-            "adp_delta": -2.4,
+            "adp": 142.5,
+            "position_adp": 65,
+            "adp_delta": -12.9,
             "provider_agreement": "low"
           },
           {
@@ -3776,6 +3765,17 @@
             "position_adp": null,
             "adp_delta": null,
             "provider_agreement": "high"
+          },
+          {
+            "player": "Zavion Thomas",
+            "team": "CHI",
+            "tier": 42,
+            "projected_points": 28.6,
+            "value_over_replacement": -115.92,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
           },
           {
             "player": "Jaylin Lane",
@@ -4245,9 +4245,9 @@
             "tier": 1,
             "projected_points": 201.6,
             "value_over_replacement": 67.83,
-            "adp": 38.4,
+            "adp": 38.3,
             "position_adp": 1,
-            "adp_delta": -0.3,
+            "adp_delta": 0.1,
             "provider_agreement": "high"
           },
           {
@@ -4256,9 +4256,9 @@
             "tier": 2,
             "projected_points": 195.4,
             "value_over_replacement": 61.61,
-            "adp": 43.0,
+            "adp": 43.2,
             "position_adp": 2,
-            "adp_delta": -0.4,
+            "adp_delta": 0.2,
             "provider_agreement": "high"
           },
           {
@@ -4267,9 +4267,9 @@
             "tier": 3,
             "projected_points": 171.8,
             "value_over_replacement": 38.07,
-            "adp": 61.4,
+            "adp": 61.3,
             "position_adp": 3,
-            "adp_delta": -0.5,
+            "adp_delta": 0.0,
             "provider_agreement": "high"
           },
           {
@@ -4278,9 +4278,9 @@
             "tier": 4,
             "projected_points": 159.7,
             "value_over_replacement": 25.97,
-            "adp": 71.8,
+            "adp": 72.1,
             "position_adp": 4,
-            "adp_delta": 1.2,
+            "adp_delta": 1.7,
             "provider_agreement": "high"
           },
           {
@@ -4289,9 +4289,9 @@
             "tier": 5,
             "projected_points": 157.5,
             "value_over_replacement": 23.79,
-            "adp": 80.5,
+            "adp": 81.7,
             "position_adp": 5,
-            "adp_delta": -3.4,
+            "adp_delta": -2.1,
             "provider_agreement": "high"
           },
           {
@@ -4300,9 +4300,9 @@
             "tier": 6,
             "projected_points": 150.4,
             "value_over_replacement": 16.62,
-            "adp": 109.1,
+            "adp": 103.9,
             "position_adp": 9,
-            "adp_delta": -10.9,
+            "adp_delta": -13.7,
             "provider_agreement": "high"
           },
           {
@@ -4311,9 +4311,9 @@
             "tier": 7,
             "projected_points": 149.2,
             "value_over_replacement": 15.41,
-            "adp": 83.2,
+            "adp": 85.0,
             "position_adp": 6,
-            "adp_delta": -1.7,
+            "adp_delta": -0.2,
             "provider_agreement": "high"
           },
           {
@@ -4322,9 +4322,9 @@
             "tier": 7,
             "projected_points": 148.9,
             "value_over_replacement": 15.18,
-            "adp": 124.2,
-            "position_adp": 12,
-            "adp_delta": 29.8,
+            "adp": 124.6,
+            "position_adp": 11,
+            "adp_delta": 30.4,
             "provider_agreement": "high"
           },
           {
@@ -4333,9 +4333,9 @@
             "tier": 8,
             "projected_points": 146.7,
             "value_over_replacement": 12.9,
-            "adp": 99.3,
+            "adp": 96.2,
             "position_adp": 8,
-            "adp_delta": -0.2,
+            "adp_delta": -11.5,
             "provider_agreement": "low"
           },
           {
@@ -4344,9 +4344,9 @@
             "tier": 8,
             "projected_points": 146.0,
             "value_over_replacement": 12.28,
-            "adp": 94.6,
+            "adp": 95.0,
             "position_adp": 7,
-            "adp_delta": -7.9,
+            "adp_delta": -5.5,
             "provider_agreement": "high"
           },
           {
@@ -4355,9 +4355,9 @@
             "tier": 9,
             "projected_points": 144.9,
             "value_over_replacement": 11.11,
-            "adp": 119.3,
+            "adp": 119.9,
             "position_adp": 10,
-            "adp_delta": -3.9,
+            "adp_delta": -2.6,
             "provider_agreement": "high"
           },
           {
@@ -4366,9 +4366,9 @@
             "tier": 10,
             "projected_points": 137.4,
             "value_over_replacement": 3.64,
-            "adp": 124.1,
-            "position_adp": 11,
-            "adp_delta": -11.1,
+            "adp": 124.8,
+            "position_adp": 12,
+            "adp_delta": -10.2,
             "provider_agreement": "high"
           },
           {
@@ -4377,9 +4377,9 @@
             "tier": 11,
             "projected_points": 133.7,
             "value_over_replacement": -0.0,
-            "adp": 135.3,
+            "adp": 135.7,
             "position_adp": 13,
-            "adp_delta": -2.3,
+            "adp_delta": -0.6,
             "provider_agreement": "high"
           },
           {
@@ -4388,9 +4388,9 @@
             "tier": 12,
             "projected_points": 131.6,
             "value_over_replacement": -2.11,
-            "adp": 149.9,
+            "adp": 149.5,
             "position_adp": 15,
-            "adp_delta": -0.9,
+            "adp_delta": -4.6,
             "provider_agreement": "high"
           },
           {
@@ -4399,9 +4399,9 @@
             "tier": 13,
             "projected_points": 130.5,
             "value_over_replacement": -3.25,
-            "adp": 139.8,
+            "adp": 139.2,
             "position_adp": 14,
-            "adp_delta": -6.5,
+            "adp_delta": -5.0,
             "provider_agreement": "high"
           },
           {
@@ -4410,9 +4410,9 @@
             "tier": 14,
             "projected_points": 125.2,
             "value_over_replacement": -8.59,
-            "adp": 163.4,
-            "position_adp": 17,
-            "adp_delta": 2.1,
+            "adp": 165.9,
+            "position_adp": 18,
+            "adp_delta": 8.2,
             "provider_agreement": "high"
           },
           {
@@ -4421,9 +4421,9 @@
             "tier": 15,
             "projected_points": 122.4,
             "value_over_replacement": -11.36,
-            "adp": 161.9,
+            "adp": 160.8,
             "position_adp": 16,
-            "adp_delta": -2.0,
+            "adp_delta": -1.7,
             "provider_agreement": "high"
           },
           {
@@ -4432,9 +4432,9 @@
             "tier": 15,
             "projected_points": 121.7,
             "value_over_replacement": -12.04,
-            "adp": 175.7,
-            "position_adp": 20,
-            "adp_delta": 13.7,
+            "adp": 172.5,
+            "position_adp": 19,
+            "adp_delta": 5.5,
             "provider_agreement": "high"
           },
           {
@@ -4443,9 +4443,9 @@
             "tier": 16,
             "projected_points": 115.4,
             "value_over_replacement": -18.32,
-            "adp": 179.1,
-            "position_adp": 21,
-            "adp_delta": null,
+            "adp": 175.9,
+            "position_adp": 22,
+            "adp_delta": -1.9,
             "provider_agreement": "high"
           },
           {
@@ -4454,9 +4454,9 @@
             "tier": 17,
             "projected_points": 108.7,
             "value_over_replacement": -25.07,
-            "adp": 173.3,
-            "position_adp": 18,
-            "adp_delta": -3.8,
+            "adp": 172.9,
+            "position_adp": 20,
+            "adp_delta": -5.8,
             "provider_agreement": "medium"
           },
           {
@@ -4487,8 +4487,8 @@
             "tier": 19,
             "projected_points": 103.3,
             "value_over_replacement": -30.46,
-            "adp": 188.2,
-            "position_adp": 22,
+            "adp": 187.1,
+            "position_adp": 23,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -4509,8 +4509,8 @@
             "tier": 20,
             "projected_points": 100.8,
             "value_over_replacement": -32.97,
-            "adp": 174.1,
-            "position_adp": 19,
+            "adp": 175.4,
+            "position_adp": 21,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -4597,8 +4597,8 @@
             "tier": 24,
             "projected_points": 82.2,
             "value_over_replacement": -51.58,
-            "adp": null,
-            "position_adp": null,
+            "adp": 164.4,
+            "position_adp": 17,
             "adp_delta": null,
             "provider_agreement": "low"
           },
@@ -4955,17 +4955,6 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Drew Sample",
-            "team": "CIN",
-            "tier": 41,
-            "projected_points": 30.1,
-            "value_over_replacement": -103.68,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "medium"
-          },
-          {
             "player": "Nate Boerkircher",
             "team": "JAC",
             "tier": 41,
@@ -4997,6 +4986,17 @@
             "position_adp": null,
             "adp_delta": null,
             "provider_agreement": "low"
+          },
+          {
+            "player": "Drew Sample",
+            "team": "CIN",
+            "tier": 42,
+            "projected_points": 26.3,
+            "value_over_replacement": -107.43,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "high"
           },
           {
             "player": "Nate Adkins",
@@ -5169,6 +5169,17 @@
             "tier": 42,
             "projected_points": 22.8,
             "value_over_replacement": -110.96,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
+            "player": "Tanner McLachlan",
+            "team": "FA",
+            "tier": 42,
+            "projected_points": 22.6,
+            "value_over_replacement": -111.15,
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
@@ -5395,6 +5406,17 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Justin Joly",
+            "team": "DEN",
+            "tier": 44,
+            "projected_points": 15.0,
+            "value_over_replacement": -118.74,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Brevyn Spann-Ford",
             "team": "DAL",
             "tier": 44,
@@ -5450,20 +5472,9 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Josh Whyle",
-            "team": "GB",
-            "tier": 44,
-            "projected_points": 13.3,
-            "value_over_replacement": -120.48,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Hunter Long",
             "team": "JAC",
-            "tier": 44,
+            "tier": 45,
             "projected_points": 13.0,
             "value_over_replacement": -120.75,
             "adp": null,
@@ -5474,7 +5485,7 @@
           {
             "player": "Joe Royer",
             "team": "CLE",
-            "tier": 44,
+            "tier": 45,
             "projected_points": 12.5,
             "value_over_replacement": -121.21,
             "adp": null,
@@ -5483,9 +5494,20 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Chris Manhertz",
+            "team": "NYG",
+            "tier": 46,
+            "projected_points": 11.1,
+            "value_over_replacement": -122.64,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Lucas Krull",
             "team": "DEN",
-            "tier": 45,
+            "tier": 46,
             "projected_points": 10.4,
             "value_over_replacement": -123.3,
             "adp": null,
@@ -5494,20 +5516,9 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Justin Joly",
-            "team": "DEN",
-            "tier": 46,
-            "projected_points": 7.5,
-            "value_over_replacement": -126.22,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Luke Farrell",
             "team": "SF",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 7.3,
             "value_over_replacement": -126.42,
             "adp": null,
@@ -5518,7 +5529,7 @@
           {
             "player": "CJ Dippre",
             "team": "NE",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 7.3,
             "value_over_replacement": -126.45,
             "adp": null,
@@ -5529,7 +5540,7 @@
           {
             "player": "Ko Kieft",
             "team": "TB",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 7.2,
             "value_over_replacement": -126.57,
             "adp": null,
@@ -5540,7 +5551,7 @@
           {
             "player": "Tyler Conklin",
             "team": "DET",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 7.1,
             "value_over_replacement": -126.68,
             "adp": null,
@@ -5551,7 +5562,7 @@
           {
             "player": "Drew Ogletree",
             "team": "IND",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 7.0,
             "value_over_replacement": -126.77,
             "adp": null,
@@ -5560,9 +5571,20 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Josh Whyle",
+            "team": "GB",
+            "tier": 47,
+            "projected_points": 7.0,
+            "value_over_replacement": -126.79,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Josh Cuevas",
             "team": "BAL",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 6.9,
             "value_over_replacement": -126.8,
             "adp": null,
@@ -5573,7 +5595,7 @@
           {
             "player": "Eric Saubert",
             "team": "SEA",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 6.9,
             "value_over_replacement": -126.84,
             "adp": null,
@@ -5584,7 +5606,7 @@
           {
             "player": "Tip Reiman",
             "team": "ARI",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 6.5,
             "value_over_replacement": -127.25,
             "adp": null,
@@ -5595,7 +5617,7 @@
           {
             "player": "Johnny Mundt",
             "team": "PHI",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 6.5,
             "value_over_replacement": -127.27,
             "adp": null,
@@ -5606,7 +5628,7 @@
           {
             "player": "Ian Thomas",
             "team": "LV",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 6.4,
             "value_over_replacement": -127.39,
             "adp": null,
@@ -5617,20 +5639,9 @@
           {
             "player": "Blake Whiteheart",
             "team": "CLE",
-            "tier": 46,
+            "tier": 47,
             "projected_points": 5.9,
             "value_over_replacement": -127.82,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
-            "player": "Chris Manhertz",
-            "team": "NYG",
-            "tier": 47,
-            "projected_points": 3.2,
-            "value_over_replacement": -130.51,
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
@@ -5647,8 +5658,8 @@
       ],
       "board_provider": "fantasypros",
       "other_provider": "sleeper",
-      "board_as_of": "2026-08-28",
-      "comparison_as_of": "2026-08-28",
+      "board_as_of": "2026-08-29",
+      "comparison_as_of": "2026-08-29",
       "comparison_pinned_to_shared_capture": true,
       "days_behind_board": 0,
       "max_vintage_gap_days": 7,
@@ -5656,16 +5667,16 @@
         "high_below": 0.08,
         "medium_below": 0.15
       },
-      "board_rows": 500,
-      "players_compared": 492,
+      "board_rows": 501,
+      "players_compared": 493,
       "unpriced_by_other": 8,
       "counts_by_agreement": {
-        "high": 157,
-        "medium": 73,
-        "low": 262
+        "high": 158,
+        "medium": 71,
+        "low": 264
       },
-      "median_cv": 0.1769,
-      "median_spread_points": 12.8,
+      "median_cv": 0.1782,
+      "median_spread_points": 13.0,
       "scored_stats_compared": [
         "fumbles_lost",
         "interceptions",
@@ -5685,8 +5696,8 @@
       }
     },
     "coverage": {
-      "rows": 1051,
-      "matched": 1033,
+      "rows": 1052,
+      "matched": 1034,
       "matched_share": 0.9829,
       "unmatched": 18,
       "providers": [
@@ -5699,41 +5710,42 @@
         "2026-08-25",
         "2026-08-26",
         "2026-08-27",
-        "2026-08-28"
+        "2026-08-28",
+        "2026-08-29"
       ]
     },
     "adp_coverage": {
-      "board_rows": 500,
-      "priced": 189,
-      "unpriced": 311,
-      "priced_share": 0.378,
-      "market_rows_in_scope": 189,
+      "board_rows": 501,
+      "priced": 192,
+      "unpriced": 309,
+      "priced_share": 0.3832,
+      "market_rows_in_scope": 192,
       "matched_share_of_market": 1.0,
-      "adp_snapshot_date": "2026-08-28"
+      "adp_snapshot_date": "2026-08-29"
     },
     "price_movement": {
       "available": true,
-      "latest_snapshot_date": "2026-08-28",
-      "prior_snapshot_date": "2026-08-21",
+      "latest_snapshot_date": "2026-08-29",
+      "prior_snapshot_date": "2026-08-22",
       "span_days": 7,
       "lookback_days_requested": 7,
       "mover_threshold_picks": 6.0,
       "mover_threshold_rule": "0.5 of a round in a 12-team league",
-      "matched_across_captures": 216,
-      "unmatched_in_prior_capture": 12,
-      "movers": 34,
+      "matched_across_captures": 222,
+      "unmatched_in_prior_capture": 10,
+      "movers": 35,
       "latest_window": {
-        "window_start": "2026-08-23",
-        "window_end": "2026-08-28",
-        "total_drafts": 3268
+        "window_start": "2026-08-24",
+        "window_end": "2026-08-29",
+        "total_drafts": 3302
       },
       "prior_window": {
-        "window_start": "2026-08-16",
-        "window_end": "2026-08-21",
-        "total_drafts": 2741
+        "window_start": "2026-08-17",
+        "window_end": "2026-08-22",
+        "total_drafts": 2828
       }
     },
-    "n": 500
+    "n": 501
   },
   "limitations": [
     "DESCRIPTIVE (S88). A tier board is a construction from somebody else's projections, not a finding: it inherits every error in them and adds the replacement level as an assumption.",
