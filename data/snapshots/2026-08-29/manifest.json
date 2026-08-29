@@ -1,0 +1,50 @@
+{
+  "files": {
+    "depth_charts_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 2205031,
+      "capture_reason": "decision date",
+      "dataset": "depth_charts",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "preseason depth chart rank as a role signal (S86)",
+      "retrieved_at": "2026-08-29T13:37:58+00:00",
+      "season": 2026,
+      "sha256": "e34fb333a85cd9986d8a07573777123c954de4978eef44158a175d4eabbe7692",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.parquet",
+      "week1_start": "2026-09-09"
+    },
+    "roster_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 529160,
+      "capture_reason": "decision date",
+      "dataset": "rosters",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "team, position, age, experience",
+      "retrieved_at": "2026-08-29T13:37:58+00:00",
+      "season": 2026,
+      "sha256": "adffe8732b3044828eb887c094a60a31d6dd4c95fb6760c4d43874052f6e8345",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2026.parquet",
+      "week1_start": "2026-09-09"
+    },
+    "roster_weekly_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 529209,
+      "capture_reason": "decision date",
+      "dataset": "weekly_rosters",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "in-season roster status by week",
+      "retrieved_at": "2026-08-29T13:37:58+00:00",
+      "season": 2026,
+      "sha256": "b9e81d98f06cdfffc2f8197a6dfb35bf4f4ac756f2775513acd9f29b9f0e87ad",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2026.parquet",
+      "week1_start": "2026-09-09"
+    }
+  },
+  "snapshot_date": "2026-08-29"
+}
