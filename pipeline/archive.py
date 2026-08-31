@@ -178,13 +178,22 @@ class ArchiveHealth:
     def watching(self) -> bool:
         """Whether a stall is still worth failing over.
 
-        Only before Week 1. After it the draft has happened and an archive that
-        stops costs nothing, while an alarm that reds from September onward is an
-        alarm nobody reads in July. An unknown opener keeps watching -- the same
-        rule `preseason.capture_due` applies, because not knowing the window has
-        closed is not evidence that it has.
+        Only inside the window the capture programs actually run in. After Week 1
+        the draft has happened and an archive that stops costs nothing, while an
+        alarm that reds from September onward is an alarm nobody reads in July.
+
+        The lower bound matters as much, now that the programs sleep through the
+        off-season rather than capturing year-round: on the morning they wake
+        there is no capture yet for the new season, and reading only the opener
+        would red with "no capture at all" on resume day, every year. Sharing
+        `preseason.dormant` with the workflows that gate the jobs is what keeps
+        the alarm and the schedule describing the same window.
+
+        An unknown opener keeps watching -- the same rule `preseason.capture_due`
+        applies, because not knowing the window has closed is not evidence that
+        it has.
         """
-        return not preseason.window_closed(self.today, self.opener)
+        return preseason.dormant(self.today, self.opener) is None
 
     @property
     def stalled(self) -> list[str]:
@@ -195,7 +204,18 @@ class ArchiveHealth:
         for f in self.formats:
             age = f.age(self.today)
             if age is None:
-                out.append(f"{f.label()}: no capture at all for {self.season}")
+                # No capture to measure from, so the deadline runs from the
+                # morning the programs were due to start. An empty series on
+                # resume day is a season that has not begun, not one that
+                # stopped, and the two are identical to look at.
+                opened = preseason.window_opened(self.today)
+                waited = (self.today - opened).days
+                if waited <= tolerance(self.today, opened):
+                    continue
+                out.append(
+                    f"{f.label()}: no capture at all for {self.season}, "
+                    f"{waited} days after the window opened {opened}"
+                )
                 continue
             limit = tolerance(self.today, f.newest)
             if age > limit:

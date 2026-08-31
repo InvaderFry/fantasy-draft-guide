@@ -46,7 +46,83 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The season guard. S84's captures are worth taking in the run-up to a draft
+  # and worth nothing after it: FFC freezes, the board nobody will read again is
+  # re-rendered anyway, and the fit gate re-measures it every morning. So the
+  # jobs below sleep from Week 1 until mid-July, and `research season-window`
+  # (pipeline/preseason.py `dormant`) is the single place that decides it -- the
+  # same predicate `archive-status` reads, so the alarm and the schedule cannot
+  # drift into describing different windows.
+  #
+  # A gate job rather than a step in each: `capture` must not start at all on a
+  # dormant morning, and GitHub cannot evaluate a Python predicate in an `if`.
+  window:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      active: ${{ steps.check.outputs.active }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install project
+        run: uv sync
+
+      - name: Decide whether today is inside the capture window
+        id: check
+        # Exits 0 either way. A dormant day is the system working, and a red run
+        # every morning of the off-season teaches people to stop reading them.
+        run: uv run research season-window
+
+      # Dormancy cannot be silent. GitHub disables cron workflows in a repository
+      # with no activity for 60 days and the off-season is ten months, so the
+      # schedules that are supposed to wake in July would already be off -- the
+      # guard would have killed the thing it guards. One commit a month keeps
+      # them alive on exactly the mechanism the archive has always relied on, and
+      # leaves a record of why nothing else ran.
+      #
+      # This workflow owns the heartbeat alone. Three workflows committing to
+      # main on the same morning is the rebase loop `sleeper` is sequenced to
+      # avoid.
+      - name: File the dormancy heartbeat
+        if: steps.check.outputs.heartbeat == 'true'
+        run: |
+          # The date is what makes this a heartbeat: the reason line alone is
+          # identical all winter, so there would be nothing to commit.
+          {
+            date -u +%Y-%m-%d
+            uv run research season-window
+          } > artifacts/dormancy.txt
+          # Both crons fire on the 1st. The second one writes the same date, so
+          # without this `git commit` exits non-zero on an empty index and reds
+          # a run whose only job that morning was to prove the schedule is alive.
+          if [ -z "$(git status --porcelain artifacts/dormancy.txt)" ]; then
+            echo "heartbeat already filed today - nothing to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/dormancy.txt
+          git commit -m "Dormant: $(date -u +%Y-%m-%d) [skip ci]"
+          for attempt in 1 2 3 4; do
+            git pull --rebase origin main && git push origin main && exit 0
+            sleep $((2 ** attempt))
+          done
+          exit 1
+
   capture:
+    needs: window
+    # A manual dispatch always bypasses the guard: retrying a capture in February
+    # has to keep working, and the guard is about what the schedule does
+    # unattended, not about what a person may ask for.
+    if: needs.window.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       # main, explicitly: the archive has to land on the default branch whatever
@@ -123,7 +199,8 @@ jobs:
   # shown" in its own legend. A failure that is visible on the deliverable does
   # not need a second channel.
   sleeper:
-    needs: capture
+    needs: [window, capture]
+    if: needs.window.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
@@ -182,7 +259,8 @@ jobs:
     # Both, so the re-rendered board carries the second provider. `sleeper` is
     # continue-on-error, so its failure resolves as success here and this job
     # still runs -- which is the intent: a board with no error bar beats no board.
-    needs: [capture, sleeper]
+    needs: [window, capture, sleeper]
+    if: needs.window.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     # Job-level, which REPLACES the workflow-level grant rather than adding to
     # it, so `contents` has to be named again here. `issues` is for the

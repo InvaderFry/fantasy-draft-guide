@@ -21,6 +21,7 @@ from __future__ import annotations
 import dataclasses
 import datetime as dt
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Annotated, Any
@@ -1125,9 +1126,14 @@ def _archive_report(today: dt.date | None = None) -> tuple[list[str], list[str]]
             f"{holes}; S31.3 span {span if span is not None else 'none yet'}"
         )
     if not state.watching:
+        # Two different reasons now reach here -- the season has opened, or the
+        # programs have not woken for the next one yet -- and naming the opener
+        # for both would print "week 1 opened 2027-09-13" in February. The
+        # predicate that decided it is the one that says why.
+        why = preseason.dormant(today, state.opener)
         lines.append(
-            f"archive: week 1 opened {state.opener}, so a quiet archive no longer "
-            "costs a draft -- reported, not watched (S84)"
+            f"archive: {why}, so a quiet archive no longer costs a draft -- "
+            "reported, not watched (S84)"
         )
     # One job captures every format, so they stall together. Six identical lines
     # in a CI log bury the one number that matters, which is how far behind.
@@ -1143,6 +1149,58 @@ def _archive_report(today: dt.date | None = None) -> tuple[list[str], list[str]]
                 "across the days it went quiet"
             ]
     return lines, stalled
+
+
+@app.command("season-window")
+def season_window(
+    date: Annotated[str, typer.Option(help="evaluate as of this date, default today (UTC)")] = "",
+) -> None:
+    """Report whether the daily capture programs should run today, for CI to gate on.
+
+    The archive, the sheet refresh with its fit gate, the preseason bundle and
+    the stall alarm all sleep from Week 1 until the following mid-July, because
+    after the draft there is nothing left for them to catch. `preseason.dormant`
+    decides it; this reports the decision and hands it to GitHub Actions.
+
+    Always exits 0. This is a gate, not an alarm -- a dormant day is the system
+    working, and a command that exits non-zero for it would put a red run in the
+    log every morning of the off-season, which is the fastest way to teach
+    somebody to stop reading them.
+
+    Writes two outputs when $GITHUB_OUTPUT is set:
+
+      active     -- run the jobs today
+      heartbeat  -- dormant, and it is the first of the month
+
+    `heartbeat` exists because dormancy cannot be silent. GitHub disables cron
+    workflows in a repository with no activity for 60 days, and the off-season is
+    ten months; the schedules that are supposed to wake in July would already be
+    off. A monthly commit keeps them alive on exactly the mechanism the archive
+    itself has always relied on.
+    """
+    today = dt.date.fromisoformat(date) if date else dt.datetime.now(dt.UTC).date()
+    # allow_fetch, like `preseason-status`: on a fresh CI checkout neither the
+    # raw calendar nor a manifest is on disk, and a window that cannot see the
+    # opener would keep the programs running all winter.
+    opener = preseason.season_opener(today.year, allow_fetch=True)
+    why = preseason.dormant(today, opener)
+    heartbeat = why is not None and today.day == 1
+
+    if why is None:
+        typer.echo(
+            f"window: open -- {today} is inside the capture window "
+            f"(week 1 {opener or 'unknown'})"
+        )
+    else:
+        typer.echo(f"window: closed -- {why}")
+        if heartbeat:
+            typer.echo("window: first of the month, so today files the dormancy heartbeat")
+
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as fh:
+            fh.write(f"active={'true' if why is None else 'false'}\n")
+            fh.write(f"heartbeat={'true' if heartbeat else 'false'}\n")
 
 
 @app.command("archive-status")

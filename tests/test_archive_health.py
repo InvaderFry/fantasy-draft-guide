@@ -182,6 +182,62 @@ def test_an_unknown_opener_keeps_watching(tmp_path, monkeypatch):
     assert health.stalled
 
 
+# -- the off-season, and the morning after it ---------------------------------
+#
+# The capture programs sleep from Week 1 to mid-July, so `watching` is bounded at
+# both ends now. The lower bound is the one that bites: without it the alarm
+# wakes on resume day, finds no capture yet for the season that has not started
+# capturing, and reds every July.
+
+
+def test_the_alarm_sleeps_through_the_off_season(tmp_path, monkeypatch):
+    """February has nothing to alarm about. The programs are not running, and an
+    alarm for a job that is deliberately not running is noise with a red tick."""
+    for spec in adp_capture_formats():
+        write_archive(tmp_path, [AUGUST], fmt=spec["format"], teams=int(spec["teams"]))
+    monkeypatch.setattr(archive.preseason, "season_opener", lambda *a, **k: None)
+    health = archive.health(2027, today=dt.date(2027, 2, 1), root=tmp_path)
+    assert not health.watching
+    assert health.stalled == []
+
+
+def test_resume_day_is_not_a_stall(tmp_path, monkeypatch):
+    """The false alarm this bound exists to prevent.
+
+    July 15 is the first morning the programs run again, and the season's series
+    is empty because nothing has captured it yet -- which reads identically to an
+    archive that stopped. Reading only the opener would red here every year, on
+    the one morning the archive is working exactly as designed.
+    """
+    monkeypatch.setattr(archive.preseason, "season_opener", lambda *a, **k: None)
+    health = archive.health(2027, today=dt.date(2027, 7, 15), root=tmp_path)
+    assert health.formats and all(f.captures == 0 for f in health.formats)
+    assert health.stalled == []
+
+
+def test_a_window_that_opened_and_never_captured_is_still_caught(tmp_path, monkeypatch):
+    """The grace period is the window's own cadence, not an amnesty. A resume
+    that silently never captured is exactly the failure the alarm is for."""
+    monkeypatch.setattr(archive.preseason, "season_opener", lambda *a, **k: None)
+    health = archive.health(2027, today=dt.date(2027, 7, 25), root=tmp_path)
+    assert health.watching
+    assert any("no capture at all" in s for s in health.stalled)
+
+
+def test_the_alarm_returns_once_the_season_s_captures_have_started(tmp_path, monkeypatch):
+    """Sleeping through the off-season must not sleep through a real stall in
+    August, which is the week the alarm exists for."""
+    for spec in adp_capture_formats():
+        write_archive(
+            tmp_path, [dt.date(2027, 7, 20)], fmt=spec["format"],
+            teams=int(spec["teams"]), season=2027,
+        )
+    monkeypatch.setattr(archive.preseason, "season_opener", lambda *a, **k: dt.date(2027, 9, 9))
+    health = archive.health(2027, today=dt.date(2027, 8, 10), root=tmp_path)
+    assert health.watching
+    assert health.stalled
+
+
 # -- the command -------------------------------------------------------------
 
 

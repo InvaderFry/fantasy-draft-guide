@@ -118,8 +118,28 @@ def test_a_failed_refresh_cannot_cost_a_capture_day():
     jobs = _workflow()["jobs"]
     assert "sheets" in jobs and "capture" in jobs
     assert "capture" in _needs(jobs["sheets"])
-    assert not _needs(jobs["capture"])          # nothing runs before the capture
+    # Nothing that could cost a capture day runs before the capture. The season
+    # gate is the one permitted predecessor: it decides whether today is a
+    # capture day at all, exits 0 either way, and touches neither a source nor
+    # the board -- so there is no day for it to lose.
+    assert _needs(jobs["capture"]) in ([], ["window"])
     assert "artifacts" not in _run_script("capture")
+
+
+def test_the_season_gate_cannot_cost_a_capture_day():
+    """The one job allowed to run before the capture, held to why it is allowed.
+
+    It reads a date and writes a job output. If it ever grew a step that fetched
+    a source, rendered a board, or could red the run, it would be a step that
+    stands between the archive and a day it cannot buy back.
+    """
+    jobs = _workflow()["jobs"]
+    if "window" not in jobs:
+        return
+    script = _run_script("window")
+    assert "season-window" in script
+    for forbidden in ("snapshot", "run-research", "research sheet", "ingest"):
+        assert forbidden not in script, forbidden
 
 
 def test_the_second_provider_cannot_cost_a_capture_day_either():
@@ -132,7 +152,9 @@ def test_the_second_provider_cannot_cost_a_capture_day_either():
     """
     jobs = _workflow()["jobs"]
     assert "sleeper" in jobs
-    assert _needs(jobs["sleeper"]) == ["capture"]
+    # After the capture, whatever else the workflow has grown in front of it.
+    assert "capture" in _needs(jobs["sleeper"])
+    assert "sheets" not in _needs(jobs["sleeper"])
     assert jobs["sleeper"]["continue-on-error"] is True
     assert "sleeper" not in _run_script("capture")
 

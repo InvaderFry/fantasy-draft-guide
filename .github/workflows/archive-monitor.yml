@@ -65,8 +65,18 @@ jobs:
       - name: Install project
         run: uv sync
 
+      # The same season guard the capture programs use (pipeline/preseason.py
+      # `dormant`). `archive-status` would already report the dormancy and exit 0
+      # on its own -- `ArchiveHealth.watching` reads the same predicate -- so
+      # this skips the work rather than preventing a false alarm. The alarm's
+      # own correctness lives in Python, where it is tested.
+      - name: Decide whether today is inside the capture window
+        id: window
+        run: uv run research season-window
+
       - name: Check the archive is still moving
         id: status
+        if: steps.window.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           uv run research archive-status \
             ${{ inputs.date && format('--date {0}', inputs.date) || '' }} \

@@ -332,3 +332,49 @@ def test_a_capture_that_does_not_read_as_parquet_is_a_finding(archive):
     coverage = preseason.depth_chart_coverage(2026)
     assert coverage is not None and not coverage.usable and coverage.error
     assert status_exit(dt.date(2026, 8, 29)) == 1
+
+
+# -- the window the daily programs run in -------------------------------------
+#
+# The archive, the sheet refresh with its fit gate, the preseason bundle and the
+# stall alarm all sleep from Week 1 until mid-July. These pin the boundaries,
+# because the boundaries are the whole of the decision and neither of them is
+# observable from a run: a dormant morning and a broken schedule produce exactly
+# the same thing, which is nothing.
+
+
+def test_the_window_is_open_through_the_day_before_week_1():
+    """The last captures are the ones the draft is about to read."""
+    assert preseason.dormant(OPENER - dt.timedelta(days=1), OPENER) is None
+
+
+def test_the_window_closes_on_the_opener():
+    why = preseason.dormant(OPENER, OPENER)
+    assert why is not None
+    assert "2026 season opened 2026-09-09" in why
+    assert "2027-07-15" in why
+
+
+def test_the_window_stays_closed_through_the_off_season():
+    """September to mid-July is one continuous sleep, across the year boundary."""
+    for day in (dt.date(2026, 11, 1), dt.date(2027, 1, 15), dt.date(2027, 6, 30)):
+        assert preseason.dormant(day, None if day.year == 2027 else OPENER) is not None
+
+
+def test_the_window_reopens_on_july_15():
+    """Mid-July, and the day before it is still asleep -- the boundary is the point."""
+    assert preseason.dormant(dt.date(2027, 7, 14), None) is not None
+    assert preseason.dormant(dt.date(2027, 7, 15), None) is None
+
+
+def test_an_unknown_opener_keeps_the_programs_running():
+    """The same rule `capture_due` applies: not knowing the window has closed is
+    not evidence that it has. A July that cannot see September must capture."""
+    assert preseason.dormant(dt.date(2026, 8, 31), None) is None
+
+
+def test_the_off_season_reason_names_the_date_it_resumes():
+    """A skipped job has to say when it will stop skipping, or the first person
+    to notice cannot tell dormant from broken."""
+    why = preseason.dormant(dt.date(2027, 2, 1), None)
+    assert why is not None and "2027-07-15" in why

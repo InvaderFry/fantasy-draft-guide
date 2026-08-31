@@ -18,7 +18,7 @@ Built here:
 | Piece | Spec | Notes |
 |---|---|---|
 | Config gates | §14, §6.1, §46, §15, §3.1, §68 | league profiles, decision dates, sources, outcomes, evidence rules, question registry |
-| ADP archival | §84 | daily GitHub Actions capture — the only item whose value expires — followed by a second job that re-renders the sheets from it |
+| ADP archival | §84 | daily GitHub Actions capture from mid-July to Week 1 — the only item whose value expires — followed by a second job that re-renders the sheets from it |
 | Preseason bundle | §84, §86 | the second capture program: nflverse depth charts, rosters and injuries archived before Week 1, on a cadence the code decides |
 | Price movement | §31.3 | what the archive is *for*: how each price has moved since the prior capture, marked on the board and in the pick blocks |
 | Provider spread | §38.1 | a second projection provider carried beside the board, and where the two disagree marked on the value — the error bar the board had never had |
@@ -856,7 +856,8 @@ uv run research preseason-status                        # what the archive holds
 
 ### Which days are capture days
 
-`.github/workflows/preseason-bundle.yml` runs daily and
+`.github/workflows/preseason-bundle.yml` runs daily inside the season window
+(mid-July to Week 1 — see *The season window*) and
 `pipeline/preseason.py::capture_due` decides, in this order:
 
 | Condition | Outcome |
@@ -952,9 +953,46 @@ one: an archive that stopped on August 29 read healthy through September 8 — t
 day before the 2026 opener. The same hole opens in reverse on July 1. So the
 strictest cadence anywhere between the newest capture and today is the one
 applied, which holds a late-August silence to two days into September. That is
-stricter than the spec's letter for those eight days, deliberately: the job
-captures daily year-round, the watch ends at Week 1 anyway, and those are the
-last captures the draft will read.
+stricter than the spec's letter for those eight days, deliberately: the watch
+ends at Week 1 anyway, and those are the last captures the draft will read.
+
+**The watch is bounded at both ends**, because the capture programs are (see
+*The season window* below). With no capture at all for a season the deadline runs
+from the morning the window opened rather than from a capture that does not
+exist — otherwise the alarm would red on resume day every July, when an archive
+that has not started yet looks exactly like one that stopped. A window that
+opened and then never captured is still caught: the grace is the window's own
+cadence, not an amnesty.
+
+### The season window
+
+The daily programs sleep from Week 1 until **July 15**. After the opener there is
+nothing left for them to catch: FFC freezes, and the board nobody will read again
+would still be re-rendered and re-measured every morning. `preseason.dormant` is
+the single place that decides it, `research season-window` reports the decision,
+and the workflows gate on it — so the alarm and the schedule cannot drift into
+describing different windows. A `workflow_dispatch` always bypasses the guard:
+the guard is about what the schedule does unattended, not what a person may ask
+for.
+
+July 15 sits two weeks inside `DAILY_MONTHS = (7, 8)`, and the two are different
+questions: DAILY_MONTHS is how tight the cadence is *while* captures are
+happening, the window is *whether* they happen at all.
+
+**Dormancy is not silence, and that is not a detail.** GitHub disables cron
+workflows in a repository with no activity for 60 days; the off-season is ten
+months. A guard that simply stopped everything would let the schedules be
+disabled in November and they would never wake in July — it would kill precisely
+what it guards. So the gate commits `artifacts/dormancy.txt` on the first of each
+month, keeping the schedules alive on the same mechanism the archive has always
+relied on, and leaving a record of why nothing else ran. The archive workflow
+owns that commit alone; three workflows pushing to main on one morning is the
+rebase loop the `sleeper` job is sequenced to avoid.
+
+One consequence worth knowing: `pages.yml` fires on the archive workflow
+*completing*, and a run whose jobs all skip still completes, so Pages
+republishes daily through the off-season. It republishes an unchanged board, so
+this is waste rather than a fault.
 
 **The alarm runs on its own schedule, not in the archive workflow.** The failure
 being caught is that workflow *not running*: a schedule that stops firing
