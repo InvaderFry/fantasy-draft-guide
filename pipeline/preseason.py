@@ -38,6 +38,12 @@ from pipeline.ingest import nflverse
 # that must exist is roughly four captures for a preseason.
 CADENCE_DAYS = 7
 
+# When the daily capture programs wake after the season. Mid-July: a calendar
+# rule in the same idiom as `decision_dates.yaml`'s "last week of August", and
+# the point where next summer's ADP starts being worth archiving.
+RESUME_MONTH = 7
+RESUME_DAY = 15
+
 
 def bundle_filenames(season: int, *, include_static: bool = True) -> list[str]:
     """The archive filenames one bundle capture writes, in capture order."""
@@ -80,6 +86,52 @@ def capture_due(
 def window_closed(today: dt.date, opener: dt.date | None) -> bool:
     """True once the season has started and there is no preseason left to capture."""
     return opener is not None and today >= opener
+
+
+def dormant(today: dt.date, opener: dt.date | None) -> str | None:
+    """Why the daily capture programs stand down today, or None if they run.
+
+    The archive exists to catch ADP movement before a draft. After the opener
+    there is no draft left to catch it for: FFC freezes, the board nobody will
+    read again is re-rendered anyway, and the fit gate re-measures it every
+    morning. So the daily programs sleep from Week 1 until the following
+    mid-July, and this is the one place that decides it.
+
+    Shaped like `capture_due`: a reason, or None meaning run. Callers report the
+    reason rather than skipping in silence -- a job that quietly does nothing is
+    indistinguishable from a job that has broken.
+
+    RESUME_DAY sits two weeks inside `archive.DAILY_MONTHS`, and the two are not
+    the same question. DAILY_MONTHS is how tight the cadence is *while* captures
+    are happening; this is *whether* they happen at all. July 1-14 is therefore a
+    stretch the cadence would call daily and this calls asleep, which is only
+    coherent because `ArchiveHealth.watching` reads this predicate too.
+
+    An unknown opener keeps the programs running, the same rule `capture_due`
+    applies: not knowing the window has closed is not evidence that it has.
+    """
+    resume = dt.date(today.year, RESUME_MONTH, RESUME_DAY)
+    if window_closed(today, opener):
+        assert opener is not None  # window_closed is False for None
+        next_resume = dt.date(today.year + 1, RESUME_MONTH, RESUME_DAY)
+        return (
+            f"the {opener.year} season opened {opener}; the daily programs "
+            f"resume {next_resume}"
+        )
+    if today < resume:
+        return f"the off-season; the daily programs resume {resume}"
+    return None
+
+
+def window_opened(today: dt.date) -> dt.date:
+    """The date the window `today` sits in opened. Only meaningful while open.
+
+    The alarm needs it: with no capture at all for a season, "how late is this"
+    has to be measured from the morning the programs were supposed to start,
+    because there is no capture to measure from and an empty series on resume day
+    is not a stall.
+    """
+    return dt.date(today.year, RESUME_MONTH, RESUME_DAY)
 
 
 def season_opener(season: int, *, allow_fetch: bool = False) -> dt.date | None:

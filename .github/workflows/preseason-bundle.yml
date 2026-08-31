@@ -63,7 +63,21 @@ jobs:
       - name: Install project
         run: uv sync
 
+      # The season guard, shared with the archive (pipeline/preseason.py
+      # `dormant`). A step rather than a gate job because this workflow is one
+      # job: a second job to skip a first one would cost the `uv sync` it saves.
+      #
+      # Not merely a saving here. `capture_due` reads `decision_date(season)`,
+      # which raises for a season not yet in config/decision_dates.yaml -- so
+      # from January this would red every morning until somebody configured a
+      # draft that is six months away. Sleeping until mid-July puts that prompt
+      # where it can be acted on.
+      - name: Decide whether today is inside the capture window
+        id: window
+        run: uv run research season-window
+
       - name: Capture the preseason bundle
+        if: steps.window.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
         # nflverse serves `injuries_{season}` only once the season's injury
         # reports begin, so in August that asset 404s. The capture reports it by
         # name and keeps the three that ARE published -- those are the ones that
@@ -76,9 +90,11 @@ jobs:
             ${{ inputs.force && '--force' || '' }}
 
       - name: Verify hashes
+        if: steps.window.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
         run: uv run research validate
 
       - name: Commit the bundle
+        if: steps.window.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           if [ -z "$(git status --porcelain data/snapshots)" ]; then
             echo "nothing new to capture - the capture step reported why and exited 0"
@@ -102,4 +118,5 @@ jobs:
       # and no run recovers what they said in August, so it is reported as a
       # permanent gap rather than as a job to redo forever.
       - name: Check the decision-date capture
+        if: steps.window.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
         run: uv run research preseason-status
