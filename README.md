@@ -448,12 +448,21 @@ survival artifact behind it at all.
 ### Checking it is still one page
 
 §83's one-page rule is the constraint the sheet is most likely to break as
-sections fill in, and it has broken twice. First when TIERS and SURVIVAL started
-carrying content: 24 players a position printed on two pages, and 16 fitted.
-Then again the moment the ADP column arrived — five columns in a 171px cell wrap
-the longer names, and a wrapped name costs height. `MAX_TIER_PLAYERS` in
-`research/sheet.py` is now **12**, measured rather than guessed: across all 26
+sections fill in, and it has broken three times. First when TIERS and SURVIVAL
+started carrying content: 24 players a position printed on two pages, and 16
+fitted. Then again the moment the ADP column arrived — five columns in a 171px
+cell wrap the longer names, and a wrapped name costs height; across all 26
 sheets, 13 put two of them onto a second page and 12 put none.
+
+The third break, on 2026-08-31, added nothing at all. Same 12 rows a position,
+same players, same names — what moved was the **clustering**. Every half-PPR
+sheet went from 40 tier boundaries to 42, and `tr.tier-start td` carries a 1px
+top border, so two more tiers is height the page did not have: it had been
+sitting at one row to spare the day before. Slots 9, 10 and 11 of `half_ppr_12`
+went to two pages, while the PPR sheets took the same two extra tiers and had
+the slack to absorb them. `MAX_TIER_PLAYERS` in `research/sheet.py` is now
+**11**, measured rather than guessed: 11 fitted all 26, and it is the largest
+value that does — the tightest seat reports **0** rows to spare.
 
 Sweep all 26, not one. The survival block is a different height at different
 seats, and a sweep of a single slot says 13 is fine.
@@ -463,14 +472,19 @@ the team code costs about two players a position — kept, because it is what ma
 the §25 regression flags usable at the table: you read `FADE LA` and scan the
 board for LA.
 
-**Both breaks were found by hand, and only because somebody thought to look.**
-Every other failure on the draft-night path has a guard that runs unattended —
-`refresh-check` refuses a blocked or thinned board, `archive-status` files an
-issue when the price series stalls, `preseason-status` reds while a missed
-bundle is still worth taking. The one-page rule had a human with a shell loop.
-Meanwhile the refresh re-renders all 26 sheets every morning from a board that
-moves daily, so the next break is a longer name away, on a morning nobody is
-watching.
+**The first two breaks were found by hand, and only because somebody thought to
+look.** Every other failure on the draft-night path has a guard that runs
+unattended — `refresh-check` refuses a blocked or thinned board, `archive-status`
+files an issue when the price series stalls, `preseason-status` reds while a
+missed bundle is still worth taking. The one-page rule had a human with a shell
+loop. Meanwhile the refresh re-renders all 26 sheets every morning from a board
+that moves daily, so the next break was a longer name away, on a morning nobody
+was watching.
+
+That morning was 2026-08-31, and nobody was watching. The gate caught it, filed
+the issue, and the break turned out not to be a longer name at all — which is
+the case a shell loop run after a suspicious-looking change would have missed
+entirely.
 
 ```bash
 make fit                      # every sheet, measured
@@ -485,9 +499,10 @@ written; every render goes to a temporary directory.
 
 It also reports the number the constant actually encodes: **how many more players
 a position the tightest sheet would take before it breaks.** A page count alone
-says "fine" right up to the morning it says "broken". On the 2026.08.13-r1 board
-the tightest seat is slot 9 with **0** rows to spare — one long name from two
-pages, which is the answer to "can we add a column" and it is no. Headroom is
+says "fine" right up to the morning it says "broken" — and on 2026-08-30 it said
+one row to spare, which is the reading that turned out to matter. On the
+2026-08-31 board at 11 the tightest seat is again slot 9 with **0** rows to
+spare, which is the answer to "can we add a column" and it is no. Headroom is
 reported and never enforced: zero means the constant is exactly right, not that
 something is wrong.
 
