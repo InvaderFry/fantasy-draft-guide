@@ -81,9 +81,9 @@ DEAD_ZONE_MIN_GAP_PP = 10.0
 # Cut lists so the page stays one page at arm's length.
 #
 # MAX_TIER_PLAYERS is the one that binds, and it is measured rather than guessed.
-# It has been re-measured twice, and both times the measurement is the page count
-# of the rendered PDF rather than a pixel height -- pixel heights depend on which
-# instrument took them and do not survive being compared across two of them.
+# It has been re-measured three times, and every time the measurement is the page
+# count of the rendered PDF rather than a pixel height -- pixel heights depend on
+# which instrument took them and do not survive being compared across two of them.
 #
 #   24 players a position printed on two pages, and 16 fitted, once the S14 gate
 #   opened and TIERS and SURVIVAL started carrying real content.
@@ -92,11 +92,24 @@ DEAD_ZONE_MIN_GAP_PP = 10.0
 #   height. Across all 26 sheets, 13 put two of them onto a second page and 12
 #   put none -- and it has to be all 26, because the survival block is a
 #   different height at different seats and a sweep of one slot says 13 is fine.
+#   12 then broke on the board of 2026-08-31, and this one broke on nothing that
+#   was added: same 12 rows a position, same players, same names. What moved was
+#   the clustering. Every half-PPR sheet went from 40 tier boundaries to 42, and
+#   `tr.tier-start td` carries a 1px top border, so two more tiers is height the
+#   page did not have -- it had been sitting at one row to spare the day before.
+#   Slots 9, 10 and 11 of half_ppr_12 went to two pages; the PPR sheets took the
+#   same two extra tiers and had the slack to absorb them. 11 fitted all 26.
 #
-# So 12. Four rows a position is what the price costs, and it is worth paying:
-# a ranked player with no price beside him cannot be acted on at a live pick,
-# and the players given up are the 13th to 16th at a position, who by then are
-# being read off the survival block anyway.
+# So 11, and it is worth knowing that 11 is the *largest* value that fits this
+# board: `fit-check` reports the tightest sheet (half_ppr_12__slot09) with 0 rows
+# a position to spare. That is the constant being exactly right rather than
+# something being wrong, but it does mean the next clustering shift breaks it
+# again, and the gate rather than a person is what will notice.
+#
+# Five rows a position is what the price costs, and it is worth paying: a ranked
+# player with no price beside him cannot be acted on at a live pick, and the
+# players given up are the 12th to 16th at a position, who by then are being read
+# off the survival block anyway.
 #
 # The column that is really binding here is `Tm`. Dropping it clears all 26
 # sheets at 14, so the team code is worth about two players a position -- kept,
@@ -108,7 +121,7 @@ DEAD_ZONE_MIN_GAP_PP = 10.0
 # MAX_SURVIVAL_PICKS costs no height -- the pick blocks are columns in one flex
 # row, so more of them makes each narrower rather than the page longer.
 MAX_REGRESSION_TEAMS = 8
-MAX_TIER_PLAYERS = 12
+MAX_TIER_PLAYERS = 11
 MAX_SURVIVAL_PICKS = 8
 
 
