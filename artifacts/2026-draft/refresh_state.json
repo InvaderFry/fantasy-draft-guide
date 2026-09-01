@@ -1,35 +1,35 @@
 {
-  "checked": "2026-08-31",
+  "checked": "2026-09-01",
   "edition": "2026-draft",
   "profiles": {
     "half_ppr_12": {
-      "adp_snapshot_date": "2026-08-31",
-      "board_rows": 500,
-      "players_priced": 193,
-      "players_with_spread": 192,
-      "priced": 193,
-      "priced_share": 0.386,
+      "adp_snapshot_date": "2026-09-01",
+      "board_rows": 504,
+      "players_priced": 192,
+      "players_with_spread": 191,
+      "priced": 192,
+      "priced_share": 0.381,
       "survival_slots": 12,
       "tier_players": {
         "QB": 79,
-        "RB": 121,
-        "TE": 124,
-        "WR": 176
+        "RB": 127,
+        "TE": 123,
+        "WR": 175
       }
     },
     "ppr_12": {
-      "adp_snapshot_date": "2026-08-31",
-      "board_rows": 500,
-      "players_priced": 220,
-      "players_with_spread": 220,
-      "priced": 218,
-      "priced_share": 0.436,
+      "adp_snapshot_date": "2026-09-01",
+      "board_rows": 504,
+      "players_priced": 219,
+      "players_with_spread": 219,
+      "priced": 217,
+      "priced_share": 0.4306,
       "survival_slots": 12,
       "tier_players": {
         "QB": 79,
-        "RB": 121,
-        "TE": 124,
-        "WR": 176
+        "RB": 127,
+        "TE": 123,
+        "WR": 175
       }
     }
   }
