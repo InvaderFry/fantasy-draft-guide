@@ -1,0 +1,88 @@
+{
+  "files": {
+    "fantasypros_projections_rb_2026.json": {
+      "bytes": 56760,
+      "endpoint_family": "public_v2",
+      "license": "provider_specific",
+      "notes": "132 RB rows, season 2026. Row keys observed: ['filename', 'fpid', 'mflid', 'name', 'position_id', 'stats', 'team_id']. Stat keys observed: ['2pt_tds', 'fumbles', 'points', 'points_half', 'points_ppr', 'rec_rec', 'rec_tds', 'rec_yds', 'rec_yds_100', 'rec_yds_200', 'ret_tds', 'rush_att', 'rush_tds', 'rush_yds', 'rush_yds_100', 'rush_yds_200', 'scrimage_yards_100', 'scrimage_yards_200']",
+      "observed_row_keys": [
+        "filename",
+        "fpid",
+        "mflid",
+        "name",
+        "position_id",
+        "stats",
+        "team_id"
+      ],
+      "observed_stat_keys": [
+        "2pt_tds",
+        "fumbles",
+        "points",
+        "points_half",
+        "points_ppr",
+        "rec_rec",
+        "rec_tds",
+        "rec_yds",
+        "rec_yds_100",
+        "rec_yds_200",
+        "ret_tds",
+        "rush_att",
+        "rush_tds",
+        "rush_yds",
+        "rush_yds_100",
+        "rush_yds_200",
+        "scrimage_yards_100",
+        "scrimage_yards_200"
+      ],
+      "position": "RB",
+      "provider_id": "fantasypros",
+      "retrieved_at": "2026-09-07T16:18:19+00:00",
+      "row_count": 132,
+      "season": 2026,
+      "sha256": "ed6f7d94849b43ec27aa6ffa2658b646a67b4fb36ec67d6bf63857c76ce7185a",
+      "source": "fantasypros_api",
+      "transport": "api",
+      "url": "https://api.fantasypros.com/public/v2/json/nfl/2026/projections"
+    },
+    "fantasypros_projections_te_2026.json": {
+      "bytes": 44326,
+      "endpoint_family": "public_v2",
+      "license": "provider_specific",
+      "notes": "129 TE rows, season 2026. Row keys observed: ['filename', 'fpid', 'mflid', 'name', 'position_id', 'stats', 'team_id']. Stat keys observed: ['2pt_tds', 'fumbles', 'points', 'points_half', 'points_ppr', 'rec_rec', 'rec_tds', 'rec_yds', 'rec_yds_100', 'rec_yds_200', 'ret_tds', 'scrimage_yards_100', 'scrimage_yards_200']",
+      "observed_row_keys": [
+        "filename",
+        "fpid",
+        "mflid",
+        "name",
+        "position_id",
+        "stats",
+        "team_id"
+      ],
+      "observed_stat_keys": [
+        "2pt_tds",
+        "fumbles",
+        "points",
+        "points_half",
+        "points_ppr",
+        "rec_rec",
+        "rec_tds",
+        "rec_yds",
+        "rec_yds_100",
+        "rec_yds_200",
+        "ret_tds",
+        "scrimage_yards_100",
+        "scrimage_yards_200"
+      ],
+      "position": "TE",
+      "provider_id": "fantasypros",
+      "retrieved_at": "2026-09-07T16:18:19+00:00",
+      "row_count": 129,
+      "season": 2026,
+      "sha256": "8869387bdc6c3146b69e4ffaf27ae66e3096c496a3cae68e1d69d66fe51ea08f",
+      "source": "fantasypros_api",
+      "transport": "api",
+      "url": "https://api.fantasypros.com/public/v2/json/nfl/2026/projections"
+    }
+  },
+  "snapshot_date": "2026-09-07"
+}
