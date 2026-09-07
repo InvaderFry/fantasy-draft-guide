@@ -9,7 +9,7 @@
     "S14",
     "S38.1"
   ],
-  "generated_on": "2026-09-06",
+  "generated_on": "2026-09-07",
   "population": {
     "registry_id": "tiers_and_replacement_level",
     "profile_id": "half_ppr_12",
@@ -40,7 +40,7 @@
       "fantasypros",
       "sleeper"
     ],
-    "agreement_as_of": "2026-09-05",
+    "agreement_as_of": "2026-09-07",
     "adp_snapshot_date": "2026-09-05",
     "price_movement_since": "2026-08-29"
   },
@@ -992,7 +992,7 @@
           "demand": 32,
           "truncated": false
         },
-        "tier_count": 49,
+        "tier_count": 45,
         "players": [
           {
             "player": "Jahmyr Gibbs",
@@ -1141,34 +1141,34 @@
             "player": "Javonte Williams",
             "team": "DAL",
             "tier": 12,
-            "projected_points": 215.0,
-            "value_over_replacement": 71.79,
+            "projected_points": 216.9,
+            "value_over_replacement": 73.66,
             "adp": 30.2,
             "position_adp": 15,
             "adp_delta": -3.5,
-            "provider_agreement": "high"
-          },
-          {
-            "player": "Cam Skattebo",
-            "team": "NYG",
-            "tier": 13,
-            "projected_points": 212.2,
-            "value_over_replacement": 68.9,
-            "adp": 38.3,
-            "position_adp": 18,
-            "adp_delta": -0.6,
             "provider_agreement": "medium"
           },
           {
             "player": "Travis Etienne Jr.",
             "team": "NO",
             "tier": 13,
-            "projected_points": 212.0,
-            "value_over_replacement": 68.76,
+            "projected_points": 212.8,
+            "value_over_replacement": 69.51,
             "adp": 37.4,
             "position_adp": 17,
             "adp_delta": 0.4,
-            "provider_agreement": "high"
+            "provider_agreement": "medium"
+          },
+          {
+            "player": "Cam Skattebo",
+            "team": "NYG",
+            "tier": 13,
+            "projected_points": 211.5,
+            "value_over_replacement": 68.28,
+            "adp": 38.3,
+            "position_adp": 18,
+            "adp_delta": -0.6,
+            "provider_agreement": "medium"
           },
           {
             "player": "Kyren Williams",
@@ -1250,9 +1250,9 @@
           {
             "player": "Rhamondre Stevenson",
             "team": "NE",
-            "tier": 18,
-            "projected_points": 176.5,
-            "value_over_replacement": 33.29,
+            "tier": 17,
+            "projected_points": 177.5,
+            "value_over_replacement": 34.21,
             "adp": 62.9,
             "position_adp": 24,
             "adp_delta": 0.1,
@@ -1261,7 +1261,7 @@
           {
             "player": "Bhayshul Tuten",
             "team": "JAC",
-            "tier": 18,
+            "tier": 17,
             "projected_points": 176.3,
             "value_over_replacement": 33.04,
             "adp": 51.9,
@@ -1272,9 +1272,9 @@
           {
             "player": "TreVeyon Henderson",
             "team": "NE",
-            "tier": 19,
-            "projected_points": 167.2,
-            "value_over_replacement": 23.91,
+            "tier": 18,
+            "projected_points": 165.8,
+            "value_over_replacement": 22.54,
             "adp": 64.2,
             "position_adp": 26,
             "adp_delta": 0.9,
@@ -1283,7 +1283,7 @@
           {
             "player": "J.K. Dobbins",
             "team": "DEN",
-            "tier": 20,
+            "tier": 18,
             "projected_points": 165.5,
             "value_over_replacement": 22.28,
             "adp": 79.5,
@@ -1294,7 +1294,7 @@
           {
             "player": "Tony Pollard",
             "team": "TEN",
-            "tier": 21,
+            "tier": 19,
             "projected_points": 163.4,
             "value_over_replacement": 20.13,
             "adp": 68.6,
@@ -1305,7 +1305,7 @@
           {
             "player": "Rico Dowdle",
             "team": "PIT",
-            "tier": 22,
+            "tier": 20,
             "projected_points": 158.9,
             "value_over_replacement": 15.67,
             "adp": 74.5,
@@ -1316,7 +1316,7 @@
           {
             "player": "Chuba Hubbard",
             "team": "CAR",
-            "tier": 22,
+            "tier": 20,
             "projected_points": 158.8,
             "value_over_replacement": 15.51,
             "adp": 87.9,
@@ -1327,7 +1327,7 @@
           {
             "player": "Jadarian Price",
             "team": "SEA",
-            "tier": 23,
+            "tier": 21,
             "projected_points": 153.7,
             "value_over_replacement": 10.4,
             "adp": 67.1,
@@ -1338,7 +1338,7 @@
           {
             "player": "Aaron Jones Sr.",
             "team": "MIN",
-            "tier": 24,
+            "tier": 22,
             "projected_points": 148.0,
             "value_over_replacement": 4.75,
             "adp": 104.2,
@@ -1349,7 +1349,7 @@
           {
             "player": "Kyle Monangai",
             "team": "CHI",
-            "tier": 25,
+            "tier": 23,
             "projected_points": 143.3,
             "value_over_replacement": 0.0,
             "adp": 107.2,
@@ -1360,7 +1360,7 @@
           {
             "player": "Jacory Croskey-Merritt",
             "team": "WAS",
-            "tier": 26,
+            "tier": 24,
             "projected_points": 140.2,
             "value_over_replacement": -3.01,
             "adp": 101.2,
@@ -1371,7 +1371,7 @@
           {
             "player": "RJ Harvey",
             "team": "DEN",
-            "tier": 26,
+            "tier": 24,
             "projected_points": 139.8,
             "value_over_replacement": -3.47,
             "adp": 108.0,
@@ -1382,7 +1382,7 @@
           {
             "player": "Rachaad White",
             "team": "WAS",
-            "tier": 27,
+            "tier": 25,
             "projected_points": 136.2,
             "value_over_replacement": -7.1,
             "adp": 127.9,
@@ -1393,7 +1393,7 @@
           {
             "player": "Jonathon Brooks",
             "team": "CAR",
-            "tier": 28,
+            "tier": 26,
             "projected_points": 132.6,
             "value_over_replacement": -10.67,
             "adp": 90.5,
@@ -1404,7 +1404,7 @@
           {
             "player": "Kenny Gainwell",
             "team": "TB",
-            "tier": 28,
+            "tier": 26,
             "projected_points": 132.0,
             "value_over_replacement": -11.29,
             "adp": 100.4,
@@ -1415,7 +1415,7 @@
           {
             "player": "Jordan Mason",
             "team": "MIN",
-            "tier": 28,
+            "tier": 26,
             "projected_points": 131.4,
             "value_over_replacement": -11.89,
             "adp": 110.4,
@@ -1426,7 +1426,7 @@
           {
             "player": "Josh Jacobs",
             "team": "GB",
-            "tier": 28,
+            "tier": 26,
             "projected_points": 130.9,
             "value_over_replacement": -12.4,
             "adp": 75.0,
@@ -1437,7 +1437,7 @@
           {
             "player": "Blake Corum",
             "team": "LAR",
-            "tier": 29,
+            "tier": 27,
             "projected_points": 128.6,
             "value_over_replacement": -14.7,
             "adp": 117.7,
@@ -1448,7 +1448,7 @@
           {
             "player": "MarShawn Lloyd",
             "team": "GB",
-            "tier": 30,
+            "tier": 28,
             "projected_points": 125.1,
             "value_over_replacement": -18.17,
             "adp": 114.5,
@@ -1459,7 +1459,7 @@
           {
             "player": "Woody Marks",
             "team": "HOU",
-            "tier": 31,
+            "tier": 29,
             "projected_points": 119.3,
             "value_over_replacement": -23.93,
             "adp": 135.5,
@@ -1470,7 +1470,7 @@
           {
             "player": "Tyjae Spears",
             "team": "TEN",
-            "tier": 32,
+            "tier": 30,
             "projected_points": 108.9,
             "value_over_replacement": -34.32,
             "adp": 137.2,
@@ -1481,7 +1481,7 @@
           {
             "player": "Zach Charbonnet",
             "team": "SEA",
-            "tier": 32,
+            "tier": 30,
             "projected_points": 107.5,
             "value_over_replacement": -35.72,
             "adp": 139.4,
@@ -1492,9 +1492,9 @@
           {
             "player": "Alvin Kamara",
             "team": "NO",
-            "tier": 33,
-            "projected_points": 102.0,
-            "value_over_replacement": -41.29,
+            "tier": 31,
+            "projected_points": 101.2,
+            "value_over_replacement": -42.04,
             "adp": 158.5,
             "position_adp": 52,
             "adp_delta": 0.1,
@@ -1503,7 +1503,7 @@
           {
             "player": "AJ Dillon",
             "team": "CAR",
-            "tier": 34,
+            "tier": 32,
             "projected_points": 90.8,
             "value_over_replacement": -52.45,
             "adp": null,
@@ -1514,7 +1514,7 @@
           {
             "player": "Dylan Sampson",
             "team": "CLE",
-            "tier": 34,
+            "tier": 32,
             "projected_points": 90.3,
             "value_over_replacement": -52.94,
             "adp": 166.7,
@@ -1525,7 +1525,7 @@
           {
             "player": "Tyler Allgeier",
             "team": "ARI",
-            "tier": 35,
+            "tier": 33,
             "projected_points": 88.5,
             "value_over_replacement": -54.78,
             "adp": 152.0,
@@ -1536,7 +1536,7 @@
           {
             "player": "Isiah Pacheco",
             "team": "DET",
-            "tier": 35,
+            "tier": 33,
             "projected_points": 88.1,
             "value_over_replacement": -55.19,
             "adp": 159.3,
@@ -1547,7 +1547,7 @@
           {
             "player": "Braelon Allen",
             "team": "NYJ",
-            "tier": 35,
+            "tier": 33,
             "projected_points": 88.0,
             "value_over_replacement": -55.3,
             "adp": 156.1,
@@ -1558,7 +1558,7 @@
           {
             "player": "Chris Rodriguez Jr.",
             "team": "JAC",
-            "tier": 36,
+            "tier": 33,
             "projected_points": 86.4,
             "value_over_replacement": -56.89,
             "adp": 155.3,
@@ -1569,7 +1569,7 @@
           {
             "player": "Kaelon Black",
             "team": "SF",
-            "tier": 37,
+            "tier": 34,
             "projected_points": 83.4,
             "value_over_replacement": -59.84,
             "adp": 159.2,
@@ -1580,7 +1580,7 @@
           {
             "player": "Jawhar Jordan",
             "team": "FA",
-            "tier": 37,
+            "tier": 34,
             "projected_points": 82.5,
             "value_over_replacement": -60.75,
             "adp": null,
@@ -1591,7 +1591,7 @@
           {
             "player": "Brian Robinson Jr.",
             "team": "ATL",
-            "tier": 37,
+            "tier": 34,
             "projected_points": 81.7,
             "value_over_replacement": -61.51,
             "adp": 161.3,
@@ -1602,7 +1602,7 @@
           {
             "player": "Samaje Perine",
             "team": "CIN",
-            "tier": 38,
+            "tier": 35,
             "projected_points": 77.9,
             "value_over_replacement": -65.31,
             "adp": null,
@@ -1613,7 +1613,7 @@
           {
             "player": "Mike Washington Jr.",
             "team": "LV",
-            "tier": 38,
+            "tier": 35,
             "projected_points": 77.3,
             "value_over_replacement": -65.93,
             "adp": 158.4,
@@ -1624,7 +1624,7 @@
           {
             "player": "Justice Hill",
             "team": "BAL",
-            "tier": 38,
+            "tier": 35,
             "projected_points": 77.1,
             "value_over_replacement": -66.18,
             "adp": 172.2,
@@ -1635,7 +1635,7 @@
           {
             "player": "Tank Bigsby",
             "team": "PHI",
-            "tier": 38,
+            "tier": 35,
             "projected_points": 76.2,
             "value_over_replacement": -67.07,
             "adp": 160.5,
@@ -1646,7 +1646,7 @@
           {
             "player": "Chris Brooks",
             "team": "GB",
-            "tier": 38,
+            "tier": 35,
             "projected_points": 75.1,
             "value_over_replacement": -68.15,
             "adp": null,
@@ -1657,7 +1657,7 @@
           {
             "player": "Keaton Mitchell",
             "team": "LAC",
-            "tier": 39,
+            "tier": 36,
             "projected_points": 72.2,
             "value_over_replacement": -71.05,
             "adp": 156.0,
@@ -1668,7 +1668,7 @@
           {
             "player": "Najee Harris",
             "team": "NYG",
-            "tier": 40,
+            "tier": 37,
             "projected_points": 69.0,
             "value_over_replacement": -74.24,
             "adp": null,
@@ -1679,7 +1679,7 @@
           {
             "player": "Ty Johnson",
             "team": "BUF",
-            "tier": 40,
+            "tier": 37,
             "projected_points": 68.9,
             "value_over_replacement": -74.37,
             "adp": null,
@@ -1690,7 +1690,7 @@
           {
             "player": "Tyrone Tracy Jr.",
             "team": "NYG",
-            "tier": 40,
+            "tier": 37,
             "projected_points": 68.3,
             "value_over_replacement": -74.92,
             "adp": 160.9,
@@ -1701,7 +1701,7 @@
           {
             "player": "Jordan James",
             "team": "SF",
-            "tier": 40,
+            "tier": 37,
             "projected_points": 67.3,
             "value_over_replacement": -75.98,
             "adp": null,
@@ -1712,7 +1712,7 @@
           {
             "player": "Emanuel Wilson",
             "team": "SEA",
-            "tier": 41,
+            "tier": 38,
             "projected_points": 60.1,
             "value_over_replacement": -83.18,
             "adp": null,
@@ -1723,7 +1723,7 @@
           {
             "player": "Jaylen Wright",
             "team": "MIA",
-            "tier": 42,
+            "tier": 39,
             "projected_points": 53.0,
             "value_over_replacement": -90.29,
             "adp": null,
@@ -1734,7 +1734,7 @@
           {
             "player": "Jaydon Blue",
             "team": "DAL",
-            "tier": 43,
+            "tier": 40,
             "projected_points": 50.3,
             "value_over_replacement": -92.96,
             "adp": null,
@@ -1745,7 +1745,7 @@
           {
             "player": "Malik Davis",
             "team": "DAL",
-            "tier": 44,
+            "tier": 40,
             "projected_points": 48.7,
             "value_over_replacement": -94.59,
             "adp": null,
@@ -1756,7 +1756,7 @@
           {
             "player": "Kimani Vidal",
             "team": "LAC",
-            "tier": 45,
+            "tier": 41,
             "projected_points": 44.5,
             "value_over_replacement": -98.7,
             "adp": null,
@@ -1767,7 +1767,7 @@
           {
             "player": "Jonah Coleman",
             "team": "DEN",
-            "tier": 45,
+            "tier": 41,
             "projected_points": 44.3,
             "value_over_replacement": -98.94,
             "adp": 149.1,
@@ -1778,7 +1778,7 @@
           {
             "player": "Zavier Scott",
             "team": "CHI",
-            "tier": 45,
+            "tier": 41,
             "projected_points": 44.1,
             "value_over_replacement": -99.19,
             "adp": null,
@@ -1789,7 +1789,7 @@
           {
             "player": "James Conner",
             "team": "ARI",
-            "tier": 45,
+            "tier": 41,
             "projected_points": 42.8,
             "value_over_replacement": -100.47,
             "adp": null,
@@ -1800,7 +1800,7 @@
           {
             "player": "Brashard Smith",
             "team": "KC",
-            "tier": 45,
+            "tier": 41,
             "projected_points": 42.0,
             "value_over_replacement": -101.22,
             "adp": null,
@@ -1811,7 +1811,7 @@
           {
             "player": "Jaleel McLaughlin",
             "team": "CLE",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 39.4,
             "value_over_replacement": -103.85,
             "adp": null,
@@ -1822,7 +1822,7 @@
           {
             "player": "George Holani",
             "team": "SEA",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 38.8,
             "value_over_replacement": -104.5,
             "adp": null,
@@ -1833,7 +1833,7 @@
           {
             "player": "Sean Tucker",
             "team": "TB",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 37.5,
             "value_over_replacement": -105.73,
             "adp": null,
@@ -1844,7 +1844,7 @@
           {
             "player": "Isaiah Davis",
             "team": "NYJ",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 36.1,
             "value_over_replacement": -107.11,
             "adp": null,
@@ -1855,7 +1855,7 @@
           {
             "player": "Adam Randall",
             "team": "BAL",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 35.2,
             "value_over_replacement": -108.0,
             "adp": null,
@@ -1866,7 +1866,7 @@
           {
             "player": "Jacob Saylors",
             "team": "DET",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 34.7,
             "value_over_replacement": -108.51,
             "adp": null,
@@ -1877,7 +1877,7 @@
           {
             "player": "Kyle Juszczyk",
             "team": "SF",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 34.5,
             "value_over_replacement": -108.78,
             "adp": null,
@@ -1888,7 +1888,7 @@
           {
             "player": "Frank Gore Jr.",
             "team": "FA",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 33.5,
             "value_over_replacement": -109.75,
             "adp": null,
@@ -1899,7 +1899,7 @@
           {
             "player": "Roschon Johnson",
             "team": "CHI",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 32.9,
             "value_over_replacement": -110.35,
             "adp": null,
@@ -1910,7 +1910,7 @@
           {
             "player": "LeQuint Allen Jr.",
             "team": "JAC",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 32.2,
             "value_over_replacement": -111.01,
             "adp": null,
@@ -1921,7 +1921,7 @@
           {
             "player": "Trayveon Williams",
             "team": "FA",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 32.0,
             "value_over_replacement": -111.25,
             "adp": null,
@@ -1932,7 +1932,7 @@
           {
             "player": "Ty Chandler",
             "team": "NO",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 31.7,
             "value_over_replacement": -111.55,
             "adp": null,
@@ -1943,7 +1943,7 @@
           {
             "player": "Phil Mafah",
             "team": "FA",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 31.6,
             "value_over_replacement": -111.65,
             "adp": null,
@@ -1954,7 +1954,7 @@
           {
             "player": "Austin Ekeler",
             "team": "FA",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 30.1,
             "value_over_replacement": -113.15,
             "adp": null,
@@ -1965,7 +1965,7 @@
           {
             "player": "DJ Giddens",
             "team": "IND",
-            "tier": 46,
+            "tier": 42,
             "projected_points": 29.3,
             "value_over_replacement": -113.9,
             "adp": null,
@@ -1976,7 +1976,7 @@
           {
             "player": "Israel Abanikanda",
             "team": "DAL",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 27.0,
             "value_over_replacement": -116.22,
             "adp": null,
@@ -1987,7 +1987,7 @@
           {
             "player": "Devin Singletary",
             "team": "NYG",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 26.9,
             "value_over_replacement": -116.37,
             "adp": null,
@@ -1998,7 +1998,7 @@
           {
             "player": "Emmett Johnson",
             "team": "KC",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 26.5,
             "value_over_replacement": -116.75,
             "adp": 165.9,
@@ -2009,7 +2009,7 @@
           {
             "player": "Ollie Gordon II",
             "team": "MIA",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 26.0,
             "value_over_replacement": -117.28,
             "adp": null,
@@ -2020,7 +2020,7 @@
           {
             "player": "Elijah Mitchell",
             "team": "FA",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 25.1,
             "value_over_replacement": -118.15,
             "adp": null,
@@ -2031,7 +2031,7 @@
           {
             "player": "Seth McGowan",
             "team": "IND",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 25.1,
             "value_over_replacement": -118.18,
             "adp": null,
@@ -2042,7 +2042,7 @@
           {
             "player": "Emari Demercado",
             "team": "DAL",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 24.8,
             "value_over_replacement": -118.43,
             "adp": null,
@@ -2053,7 +2053,7 @@
           {
             "player": "Jam Miller",
             "team": "FA",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 24.0,
             "value_over_replacement": -119.25,
             "adp": null,
@@ -2064,7 +2064,7 @@
           {
             "player": "Hunter Luepke",
             "team": "DAL",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 23.7,
             "value_over_replacement": -119.51,
             "adp": null,
@@ -2075,7 +2075,7 @@
           {
             "player": "Salvon Ahmed",
             "team": "CHI",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 23.0,
             "value_over_replacement": -120.25,
             "adp": null,
@@ -2086,7 +2086,7 @@
           {
             "player": "Dameon Pierce",
             "team": "FA",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 22.1,
             "value_over_replacement": -121.15,
             "adp": null,
@@ -2097,7 +2097,7 @@
           {
             "player": "Donovan Edwards",
             "team": "FA",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 21.9,
             "value_over_replacement": -121.35,
             "adp": null,
@@ -2108,7 +2108,7 @@
           {
             "player": "Carlos Washington Jr.",
             "team": "MIA",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 21.9,
             "value_over_replacement": -121.35,
             "adp": null,
@@ -2119,7 +2119,7 @@
           {
             "player": "Ray Davis",
             "team": "BUF",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 21.9,
             "value_over_replacement": -121.38,
             "adp": 160.3,
@@ -2130,7 +2130,7 @@
           {
             "player": "Deuce Vaughn",
             "team": "HOU",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 21.6,
             "value_over_replacement": -121.65,
             "adp": null,
@@ -2141,7 +2141,7 @@
           {
             "player": "Nicholas Singleton",
             "team": "TEN",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 21.3,
             "value_over_replacement": -121.96,
             "adp": null,
@@ -2152,7 +2152,7 @@
           {
             "player": "Rasheen Ali",
             "team": "BAL",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 21.1,
             "value_over_replacement": -122.11,
             "adp": null,
@@ -2163,7 +2163,7 @@
           {
             "player": "Eli Heidenreich",
             "team": "PIT",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 20.8,
             "value_over_replacement": -122.45,
             "adp": null,
@@ -2174,7 +2174,7 @@
           {
             "player": "Kaytron Allen",
             "team": "WAS",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 20.5,
             "value_over_replacement": -122.73,
             "adp": null,
@@ -2185,7 +2185,7 @@
           {
             "player": "Trevor Etienne",
             "team": "CAR",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 20.0,
             "value_over_replacement": -123.25,
             "adp": null,
@@ -2196,7 +2196,7 @@
           {
             "player": "Ameer Abdullah",
             "team": "JAC",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 19.5,
             "value_over_replacement": -123.71,
             "adp": null,
@@ -2207,7 +2207,7 @@
           {
             "player": "Corey Kiner",
             "team": "NE",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 18.7,
             "value_over_replacement": -124.59,
             "adp": null,
@@ -2218,7 +2218,7 @@
           {
             "player": "Demond Claiborne",
             "team": "MIN",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 18.6,
             "value_over_replacement": -124.7,
             "adp": null,
@@ -2229,7 +2229,7 @@
           {
             "player": "Raheim Sanders",
             "team": "CLE",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 18.4,
             "value_over_replacement": -124.84,
             "adp": null,
@@ -2240,7 +2240,7 @@
           {
             "player": "Kendre Miller",
             "team": "NO",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 17.7,
             "value_over_replacement": -125.53,
             "adp": null,
@@ -2251,7 +2251,7 @@
           {
             "player": "Trey Benson",
             "team": "ARI",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 17.7,
             "value_over_replacement": -125.55,
             "adp": null,
@@ -2262,7 +2262,7 @@
           {
             "player": "Dylan Laube",
             "team": "LV",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 16.8,
             "value_over_replacement": -126.45,
             "adp": null,
@@ -2273,7 +2273,7 @@
           {
             "player": "Patrick Ricard",
             "team": "NYG",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 16.5,
             "value_over_replacement": -126.72,
             "adp": null,
@@ -2284,7 +2284,7 @@
           {
             "player": "Isaac Guerendo",
             "team": "SF",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 16.3,
             "value_over_replacement": -126.94,
             "adp": null,
@@ -2295,7 +2295,7 @@
           {
             "player": "Will Shipley",
             "team": "PHI",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 16.3,
             "value_over_replacement": -127.0,
             "adp": null,
@@ -2306,7 +2306,7 @@
           {
             "player": "Ronnie Rivers",
             "team": "LAR",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 16.0,
             "value_over_replacement": -127.25,
             "adp": null,
@@ -2317,7 +2317,7 @@
           {
             "player": "Tahj Brooks",
             "team": "CIN",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 16.0,
             "value_over_replacement": -127.25,
             "adp": null,
@@ -2328,7 +2328,7 @@
           {
             "player": "Audric Estime",
             "team": "NO",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 15.7,
             "value_over_replacement": -127.54,
             "adp": null,
@@ -2339,7 +2339,7 @@
           {
             "player": "Alec Ingold",
             "team": "LAC",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 14.5,
             "value_over_replacement": -128.73,
             "adp": null,
@@ -2350,7 +2350,7 @@
           {
             "player": "Michael Burton",
             "team": "CLE",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 14.0,
             "value_over_replacement": -129.24,
             "adp": null,
@@ -2361,7 +2361,7 @@
           {
             "player": "Brittain Brown",
             "team": "CHI",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 13.9,
             "value_over_replacement": -129.33,
             "adp": null,
@@ -2372,7 +2372,7 @@
           {
             "player": "Kaleb Johnson",
             "team": "GB",
-            "tier": 47,
+            "tier": 43,
             "projected_points": 13.7,
             "value_over_replacement": -129.52,
             "adp": null,
@@ -2383,7 +2383,7 @@
           {
             "player": "Jarquez Hunter",
             "team": "FA",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 11.3,
             "value_over_replacement": -131.97,
             "adp": null,
@@ -2394,7 +2394,7 @@
           {
             "player": "Andrew Beck",
             "team": "NYJ",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 10.2,
             "value_over_replacement": -133.09,
             "adp": null,
@@ -2405,7 +2405,7 @@
           {
             "player": "Adam Prentice",
             "team": "DEN",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 9.5,
             "value_over_replacement": -133.79,
             "adp": null,
@@ -2416,7 +2416,7 @@
           {
             "player": "Bam Knight",
             "team": "ARI",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 9.3,
             "value_over_replacement": -133.99,
             "adp": null,
@@ -2427,7 +2427,7 @@
           {
             "player": "Kene Nwangwu",
             "team": "NYJ",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 9.2,
             "value_over_replacement": -134.04,
             "adp": null,
@@ -2438,7 +2438,7 @@
           {
             "player": "Terrell Jennings",
             "team": "FA",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 7.7,
             "value_over_replacement": -135.52,
             "adp": null,
@@ -2449,7 +2449,7 @@
           {
             "player": "Max Bredeson",
             "team": "MIN",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 7.4,
             "value_over_replacement": -135.87,
             "adp": null,
@@ -2460,7 +2460,7 @@
           {
             "player": "Tyler Badie",
             "team": "DEN",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 7.4,
             "value_over_replacement": -135.88,
             "adp": null,
@@ -2471,7 +2471,7 @@
           {
             "player": "Kendall Milton",
             "team": "CIN",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 7.2,
             "value_over_replacement": -136.05,
             "adp": null,
@@ -2482,7 +2482,7 @@
           {
             "player": "Sione Vaki",
             "team": "DET",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 6.9,
             "value_over_replacement": -136.36,
             "adp": null,
@@ -2493,7 +2493,7 @@
           {
             "player": "Reggie Gilliam",
             "team": "NE",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 6.8,
             "value_over_replacement": -136.41,
             "adp": null,
@@ -2504,7 +2504,7 @@
           {
             "player": "Julius Chestnut",
             "team": "TEN",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 6.6,
             "value_over_replacement": -136.61,
             "adp": null,
@@ -2515,7 +2515,7 @@
           {
             "player": "Eric Gray",
             "team": "FA",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 5.9,
             "value_over_replacement": -137.34,
             "adp": null,
@@ -2526,7 +2526,7 @@
           {
             "player": "Travis Homer",
             "team": "PIT",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 5.8,
             "value_over_replacement": -137.44,
             "adp": null,
@@ -2537,7 +2537,7 @@
           {
             "player": "Jeremy McNichols",
             "team": "WAS",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 5.6,
             "value_over_replacement": -137.63,
             "adp": null,
@@ -2548,7 +2548,7 @@
           {
             "player": "British Brooks",
             "team": "HOU",
-            "tier": 48,
+            "tier": 44,
             "projected_points": 5.1,
             "value_over_replacement": -138.16,
             "adp": null,
@@ -2559,7 +2559,7 @@
           {
             "player": "Jerome Ford",
             "team": "WAS",
-            "tier": 49,
+            "tier": 45,
             "projected_points": 2.8,
             "value_over_replacement": -140.44,
             "adp": null,
@@ -2570,7 +2570,7 @@
           {
             "player": "Devin Neal",
             "team": "FA",
-            "tier": 49,
+            "tier": 45,
             "projected_points": 1.8,
             "value_over_replacement": -141.48,
             "adp": null,
@@ -4919,7 +4919,7 @@
           "demand": 12,
           "truncated": false
         },
-        "tier_count": 49,
+        "tier_count": 48,
         "players": [
           {
             "player": "Trey McBride",
@@ -4955,11 +4955,22 @@
             "provider_agreement": "high"
           },
           {
+            "player": "George Kittle",
+            "team": "SF",
+            "tier": 4,
+            "projected_points": 156.2,
+            "value_over_replacement": 26.24,
+            "adp": 89.8,
+            "position_adp": 6,
+            "adp_delta": -14.1,
+            "provider_agreement": "medium"
+          },
+          {
             "player": "Sam LaPorta",
             "team": "DET",
             "tier": 4,
-            "projected_points": 155.3,
-            "value_over_replacement": 25.33,
+            "projected_points": 156.0,
+            "value_over_replacement": 26.08,
             "adp": 109.7,
             "position_adp": 9,
             "adp_delta": -14.9,
@@ -4977,20 +4988,9 @@
             "provider_agreement": "high"
           },
           {
-            "player": "George Kittle",
-            "team": "SF",
-            "tier": 6,
-            "projected_points": 151.8,
-            "value_over_replacement": 21.86,
-            "adp": 89.8,
-            "position_adp": 6,
-            "adp_delta": -14.1,
-            "provider_agreement": "high"
-          },
-          {
             "player": "Dallas Goedert",
             "team": "PHI",
-            "tier": 7,
+            "tier": 6,
             "projected_points": 150.2,
             "value_over_replacement": 20.32,
             "adp": 119.3,
@@ -5001,7 +5001,7 @@
           {
             "player": "Harold Fannin Jr.",
             "team": "CLE",
-            "tier": 8,
+            "tier": 7,
             "projected_points": 148.4,
             "value_over_replacement": 18.5,
             "adp": 76.0,
@@ -5012,7 +5012,7 @@
           {
             "player": "Travis Kelce",
             "team": "KC",
-            "tier": 8,
+            "tier": 7,
             "projected_points": 147.9,
             "value_over_replacement": 18.0,
             "adp": 132.3,
@@ -5023,7 +5023,7 @@
           {
             "player": "Tucker Kraft",
             "team": "GB",
-            "tier": 9,
+            "tier": 8,
             "projected_points": 143.9,
             "value_over_replacement": 13.94,
             "adp": 93.5,
@@ -5034,7 +5034,7 @@
           {
             "player": "Kyle Pitts Sr.",
             "team": "ATL",
-            "tier": 9,
+            "tier": 8,
             "projected_points": 143.4,
             "value_over_replacement": 13.49,
             "adp": 94.9,
@@ -5045,7 +5045,7 @@
           {
             "player": "Mark Andrews",
             "team": "BAL",
-            "tier": 10,
+            "tier": 9,
             "projected_points": 138.7,
             "value_over_replacement": 8.8,
             "adp": 134.2,
@@ -5056,7 +5056,7 @@
           {
             "player": "Isaiah Likely",
             "team": "NYG",
-            "tier": 11,
+            "tier": 10,
             "projected_points": 129.9,
             "value_over_replacement": -0.0,
             "adp": 133.7,
@@ -5067,7 +5067,7 @@
           {
             "player": "Hunter Henry",
             "team": "NE",
-            "tier": 12,
+            "tier": 11,
             "projected_points": 129.1,
             "value_over_replacement": -0.86,
             "adp": 160.4,
@@ -5078,9 +5078,9 @@
           {
             "player": "Dalton Kincaid",
             "team": "BUF",
-            "tier": 13,
-            "projected_points": 127.1,
-            "value_over_replacement": -2.87,
+            "tier": 12,
+            "projected_points": 128.2,
+            "value_over_replacement": -1.75,
             "adp": 143.8,
             "position_adp": 14,
             "adp_delta": -5.7,
@@ -5089,7 +5089,7 @@
           {
             "player": "Jake Ferguson",
             "team": "DAL",
-            "tier": 14,
+            "tier": 13,
             "projected_points": 123.5,
             "value_over_replacement": -6.46,
             "adp": 146.7,
@@ -5100,7 +5100,7 @@
           {
             "player": "Brenton Strange",
             "team": "JAC",
-            "tier": 15,
+            "tier": 14,
             "projected_points": 122.7,
             "value_over_replacement": -7.28,
             "adp": 154.9,
@@ -5111,7 +5111,7 @@
           {
             "player": "Juwan Johnson",
             "team": "NO",
-            "tier": 16,
+            "tier": 15,
             "projected_points": 121.1,
             "value_over_replacement": -8.82,
             "adp": 154.7,
@@ -5122,7 +5122,7 @@
           {
             "player": "Dalton Schultz",
             "team": "HOU",
-            "tier": 17,
+            "tier": 16,
             "projected_points": 110.8,
             "value_over_replacement": -19.11,
             "adp": 153.8,
@@ -5133,7 +5133,7 @@
           {
             "player": "Greg Dulcich",
             "team": "MIA",
-            "tier": 18,
+            "tier": 17,
             "projected_points": 109.8,
             "value_over_replacement": -20.14,
             "adp": null,
@@ -5144,7 +5144,7 @@
           {
             "player": "T.J. Hockenson",
             "team": "MIN",
-            "tier": 19,
+            "tier": 18,
             "projected_points": 108.1,
             "value_over_replacement": -21.78,
             "adp": 160.2,
@@ -5155,7 +5155,7 @@
           {
             "player": "Pat Freiermuth",
             "team": "PIT",
-            "tier": 20,
+            "tier": 19,
             "projected_points": 104.0,
             "value_over_replacement": -25.97,
             "adp": null,
@@ -5166,7 +5166,7 @@
           {
             "player": "Kenyon Sadiq",
             "team": "NYJ",
-            "tier": 20,
+            "tier": 19,
             "projected_points": 104.0,
             "value_over_replacement": -25.97,
             "adp": null,
@@ -5177,7 +5177,7 @@
           {
             "player": "Cade Otton",
             "team": "TB",
-            "tier": 21,
+            "tier": 20,
             "projected_points": 98.4,
             "value_over_replacement": -31.5,
             "adp": null,
@@ -5188,7 +5188,7 @@
           {
             "player": "Terrance Ferguson",
             "team": "LAR",
-            "tier": 22,
+            "tier": 21,
             "projected_points": 95.1,
             "value_over_replacement": -34.83,
             "adp": 176.3,
@@ -5199,7 +5199,7 @@
           {
             "player": "Darren Waller",
             "team": "CAR",
-            "tier": 23,
+            "tier": 22,
             "projected_points": 94.1,
             "value_over_replacement": -35.8,
             "adp": null,
@@ -5210,7 +5210,7 @@
           {
             "player": "Chig Okonkwo",
             "team": "WAS",
-            "tier": 23,
+            "tier": 22,
             "projected_points": 93.9,
             "value_over_replacement": -35.99,
             "adp": 171.1,
@@ -5221,7 +5221,7 @@
           {
             "player": "AJ Barner",
             "team": "SEA",
-            "tier": 24,
+            "tier": 23,
             "projected_points": 90.5,
             "value_over_replacement": -39.41,
             "adp": null,
@@ -5232,7 +5232,7 @@
           {
             "player": "Mike Gesicki",
             "team": "CIN",
-            "tier": 25,
+            "tier": 24,
             "projected_points": 88.2,
             "value_over_replacement": -41.78,
             "adp": null,
@@ -5243,7 +5243,7 @@
           {
             "player": "Oronde Gadsden II",
             "team": "LAC",
-            "tier": 26,
+            "tier": 25,
             "projected_points": 86.4,
             "value_over_replacement": -43.54,
             "adp": null,
@@ -5254,7 +5254,7 @@
           {
             "player": "Evan Engram",
             "team": "DEN",
-            "tier": 27,
+            "tier": 26,
             "projected_points": 83.5,
             "value_over_replacement": -46.41,
             "adp": null,
@@ -5265,7 +5265,7 @@
           {
             "player": "David Njoku",
             "team": "LAC",
-            "tier": 28,
+            "tier": 27,
             "projected_points": 79.4,
             "value_over_replacement": -50.57,
             "adp": null,
@@ -5276,7 +5276,7 @@
           {
             "player": "Colby Parkinson",
             "team": "LAR",
-            "tier": 29,
+            "tier": 28,
             "projected_points": 72.0,
             "value_over_replacement": -57.95,
             "adp": null,
@@ -5287,7 +5287,7 @@
           {
             "player": "Gunnar Helm",
             "team": "TEN",
-            "tier": 29,
+            "tier": 28,
             "projected_points": 72.0,
             "value_over_replacement": -57.97,
             "adp": null,
@@ -5298,9 +5298,9 @@
           {
             "player": "Dawson Knox",
             "team": "BUF",
-            "tier": 30,
-            "projected_points": 69.6,
-            "value_over_replacement": -60.33,
+            "tier": 29,
+            "projected_points": 69.0,
+            "value_over_replacement": -60.95,
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
@@ -5309,7 +5309,7 @@
           {
             "player": "Mason Taylor",
             "team": "NYJ",
-            "tier": 31,
+            "tier": 29,
             "projected_points": 68.5,
             "value_over_replacement": -61.45,
             "adp": null,
@@ -5320,7 +5320,7 @@
           {
             "player": "Michael Mayer",
             "team": "LV",
-            "tier": 32,
+            "tier": 30,
             "projected_points": 66.8,
             "value_over_replacement": -63.11,
             "adp": null,
@@ -5331,7 +5331,7 @@
           {
             "player": "Darnell Washington",
             "team": "PIT",
-            "tier": 33,
+            "tier": 31,
             "projected_points": 62.2,
             "value_over_replacement": -67.69,
             "adp": null,
@@ -5342,7 +5342,7 @@
           {
             "player": "Theo Johnson",
             "team": "NYG",
-            "tier": 34,
+            "tier": 32,
             "projected_points": 56.3,
             "value_over_replacement": -73.68,
             "adp": null,
@@ -5353,7 +5353,7 @@
           {
             "player": "Cole Kmet",
             "team": "CHI",
-            "tier": 34,
+            "tier": 32,
             "projected_points": 56.1,
             "value_over_replacement": -73.8,
             "adp": null,
@@ -5364,7 +5364,7 @@
           {
             "player": "Tyler Higbee",
             "team": "LAR",
-            "tier": 35,
+            "tier": 33,
             "projected_points": 52.9,
             "value_over_replacement": -77.05,
             "adp": null,
@@ -5375,7 +5375,7 @@
           {
             "player": "Will Kacmarek",
             "team": "MIA",
-            "tier": 36,
+            "tier": 34,
             "projected_points": 48.6,
             "value_over_replacement": -81.36,
             "adp": null,
@@ -5386,7 +5386,7 @@
           {
             "player": "Erick All Jr.",
             "team": "CIN",
-            "tier": 37,
+            "tier": 35,
             "projected_points": 44.3,
             "value_over_replacement": -85.66,
             "adp": null,
@@ -5397,7 +5397,7 @@
           {
             "player": "Noah Fant",
             "team": "NO",
-            "tier": 37,
+            "tier": 35,
             "projected_points": 44.2,
             "value_over_replacement": -85.68,
             "adp": null,
@@ -5408,7 +5408,7 @@
           {
             "player": "Austin Hooper",
             "team": "ATL",
-            "tier": 37,
+            "tier": 35,
             "projected_points": 44.0,
             "value_over_replacement": -85.95,
             "adp": null,
@@ -5419,7 +5419,7 @@
           {
             "player": "Tommy Tremble",
             "team": "CAR",
-            "tier": 37,
+            "tier": 35,
             "projected_points": 43.6,
             "value_over_replacement": -86.33,
             "adp": null,
@@ -5430,7 +5430,7 @@
           {
             "player": "Ben Yurosek",
             "team": "MIN",
-            "tier": 37,
+            "tier": 35,
             "projected_points": 43.3,
             "value_over_replacement": -86.64,
             "adp": null,
@@ -5441,7 +5441,7 @@
           {
             "player": "Josh Oliver",
             "team": "MIN",
-            "tier": 37,
+            "tier": 35,
             "projected_points": 43.2,
             "value_over_replacement": -86.71,
             "adp": null,
@@ -5452,7 +5452,7 @@
           {
             "player": "Brock Wright",
             "team": "DET",
-            "tier": 37,
+            "tier": 35,
             "projected_points": 43.0,
             "value_over_replacement": -86.91,
             "adp": null,
@@ -5463,7 +5463,7 @@
           {
             "player": "Charlie Kolar",
             "team": "LAC",
-            "tier": 38,
+            "tier": 36,
             "projected_points": 41.5,
             "value_over_replacement": -88.42,
             "adp": null,
@@ -5474,7 +5474,7 @@
           {
             "player": "Adam Trautman",
             "team": "DEN",
-            "tier": 38,
+            "tier": 36,
             "projected_points": 41.1,
             "value_over_replacement": -88.87,
             "adp": null,
@@ -5485,7 +5485,7 @@
           {
             "player": "Jonnu Smith",
             "team": "GB",
-            "tier": 38,
+            "tier": 36,
             "projected_points": 40.3,
             "value_over_replacement": -89.61,
             "adp": null,
@@ -5496,7 +5496,7 @@
           {
             "player": "Eli Stowers",
             "team": "PHI",
-            "tier": 39,
+            "tier": 37,
             "projected_points": 39.2,
             "value_over_replacement": -90.76,
             "adp": null,
@@ -5507,7 +5507,7 @@
           {
             "player": "Noah Gray",
             "team": "KC",
-            "tier": 39,
+            "tier": 37,
             "projected_points": 38.5,
             "value_over_replacement": -91.42,
             "adp": null,
@@ -5518,7 +5518,7 @@
           {
             "player": "Ja'Tavion Sanders",
             "team": "CAR",
-            "tier": 40,
+            "tier": 38,
             "projected_points": 36.3,
             "value_over_replacement": -93.68,
             "adp": null,
@@ -5529,7 +5529,7 @@
           {
             "player": "Elijah Arroyo",
             "team": "SEA",
-            "tier": 41,
+            "tier": 39,
             "projected_points": 34.8,
             "value_over_replacement": -95.17,
             "adp": null,
@@ -5540,9 +5540,9 @@
           {
             "player": "Elijah Higgins",
             "team": "ARI",
-            "tier": 42,
-            "projected_points": 31.0,
-            "value_over_replacement": -98.97,
+            "tier": 40,
+            "projected_points": 31.4,
+            "value_over_replacement": -98.53,
             "adp": null,
             "position_adp": null,
             "adp_delta": null,
@@ -5551,7 +5551,7 @@
           {
             "player": "Daniel Bellinger",
             "team": "TEN",
-            "tier": 42,
+            "tier": 40,
             "projected_points": 30.7,
             "value_over_replacement": -99.21,
             "adp": null,
@@ -5562,7 +5562,7 @@
           {
             "player": "Luke Musgrave",
             "team": "GB",
-            "tier": 42,
+            "tier": 40,
             "projected_points": 30.7,
             "value_over_replacement": -99.26,
             "adp": null,
@@ -5573,7 +5573,7 @@
           {
             "player": "John Bates",
             "team": "WAS",
-            "tier": 42,
+            "tier": 40,
             "projected_points": 30.5,
             "value_over_replacement": -99.4,
             "adp": null,
@@ -5584,7 +5584,7 @@
           {
             "player": "Luke Schoonmaker",
             "team": "DAL",
-            "tier": 42,
+            "tier": 40,
             "projected_points": 30.4,
             "value_over_replacement": -99.55,
             "adp": null,
@@ -5595,7 +5595,7 @@
           {
             "player": "Mo Alie-Cox",
             "team": "IND",
-            "tier": 42,
+            "tier": 40,
             "projected_points": 29.9,
             "value_over_replacement": -100.08,
             "adp": null,
@@ -5606,7 +5606,7 @@
           {
             "player": "Nate Boerkircher",
             "team": "JAC",
-            "tier": 42,
+            "tier": 40,
             "projected_points": 29.8,
             "value_over_replacement": -100.17,
             "adp": null,
@@ -5617,7 +5617,7 @@
           {
             "player": "Eli Raridon",
             "team": "NE",
-            "tier": 42,
+            "tier": 40,
             "projected_points": 29.6,
             "value_over_replacement": -100.31,
             "adp": null,
@@ -5628,7 +5628,7 @@
           {
             "player": "Foster Moreau",
             "team": "HOU",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 28.7,
             "value_over_replacement": -101.27,
             "adp": null,
@@ -5639,7 +5639,7 @@
           {
             "player": "Tanner Conner",
             "team": "FA",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 28.3,
             "value_over_replacement": -101.67,
             "adp": null,
@@ -5650,7 +5650,7 @@
           {
             "player": "Drew Sample",
             "team": "CIN",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 28.1,
             "value_over_replacement": -101.83,
             "adp": null,
@@ -5661,7 +5661,7 @@
           {
             "player": "Ben Sinnott",
             "team": "WAS",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 27.6,
             "value_over_replacement": -102.34,
             "adp": null,
@@ -5672,7 +5672,7 @@
           {
             "player": "Jeremy Ruckert",
             "team": "NYJ",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 27.1,
             "value_over_replacement": -102.78,
             "adp": null,
@@ -5683,7 +5683,7 @@
           {
             "player": "Charlie Woerner",
             "team": "ATL",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 26.6,
             "value_over_replacement": -103.34,
             "adp": null,
@@ -5694,7 +5694,7 @@
           {
             "player": "Nick Vannett",
             "team": "SEA",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 26.5,
             "value_over_replacement": -103.43,
             "adp": null,
@@ -5705,7 +5705,7 @@
           {
             "player": "Davis Allen",
             "team": "LAR",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 26.3,
             "value_over_replacement": -103.67,
             "adp": null,
@@ -5716,7 +5716,7 @@
           {
             "player": "Durham Smythe",
             "team": "BAL",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 25.9,
             "value_over_replacement": -103.99,
             "adp": null,
@@ -5727,7 +5727,7 @@
           {
             "player": "Anthony Firkser",
             "team": "FA",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 25.9,
             "value_over_replacement": -104.04,
             "adp": null,
@@ -5738,7 +5738,7 @@
           {
             "player": "Marlin Klein",
             "team": "HOU",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 25.2,
             "value_over_replacement": -104.72,
             "adp": null,
@@ -5749,7 +5749,7 @@
           {
             "player": "Jack Endries",
             "team": "CIN",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 24.8,
             "value_over_replacement": -105.13,
             "adp": null,
@@ -5760,7 +5760,7 @@
           {
             "player": "Zack Kuntz",
             "team": "DAL",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 24.7,
             "value_over_replacement": -105.23,
             "adp": null,
@@ -5771,7 +5771,7 @@
           {
             "player": "Will Mallory",
             "team": "IND",
-            "tier": 43,
+            "tier": 41,
             "projected_points": 24.7,
             "value_over_replacement": -105.24,
             "adp": null,
@@ -5780,20 +5780,9 @@
             "provider_agreement": "low"
           },
           {
-            "player": "Jake Tonges",
-            "team": "SF",
-            "tier": 43,
-            "projected_points": 24.4,
-            "value_over_replacement": -105.57,
-            "adp": null,
-            "position_adp": null,
-            "adp_delta": null,
-            "provider_agreement": "low"
-          },
-          {
             "player": "Hayden Rucci",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 23.7,
             "value_over_replacement": -106.23,
             "adp": null,
@@ -5804,7 +5793,7 @@
           {
             "player": "Hunter Long",
             "team": "ARI",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 23.5,
             "value_over_replacement": -106.47,
             "adp": null,
@@ -5815,7 +5804,7 @@
           {
             "player": "Bauer Sharp",
             "team": "TB",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.8,
             "value_over_replacement": -107.13,
             "adp": null,
@@ -5826,7 +5815,7 @@
           {
             "player": "Travis Vokolek",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.8,
             "value_over_replacement": -107.13,
             "adp": null,
@@ -5837,7 +5826,7 @@
           {
             "player": "Rivaldo Fairweather",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.8,
             "value_over_replacement": -107.13,
             "adp": null,
@@ -5848,7 +5837,7 @@
           {
             "player": "Teagan Quitoriano",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.8,
             "value_over_replacement": -107.13,
             "adp": null,
@@ -5859,7 +5848,7 @@
           {
             "player": "Tanner McLachlan",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.6,
             "value_over_replacement": -107.33,
             "adp": null,
@@ -5870,7 +5859,7 @@
           {
             "player": "Cam Grandy",
             "team": "CIN",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.5,
             "value_over_replacement": -107.43,
             "adp": null,
@@ -5881,7 +5870,7 @@
           {
             "player": "Jackson Hawes",
             "team": "BUF",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.5,
             "value_over_replacement": -107.48,
             "adp": null,
@@ -5892,7 +5881,7 @@
           {
             "player": "Mitchell Evans",
             "team": "CAR",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.4,
             "value_over_replacement": -107.49,
             "adp": null,
@@ -5903,7 +5892,7 @@
           {
             "player": "Dallen Bentley",
             "team": "DEN",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.4,
             "value_over_replacement": -107.53,
             "adp": null,
@@ -5914,7 +5903,7 @@
           {
             "player": "Zaire Mitchell-Paden",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.3,
             "value_over_replacement": -107.63,
             "adp": null,
@@ -5925,7 +5914,7 @@
           {
             "player": "Nate Adkins",
             "team": "DEN",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.1,
             "value_over_replacement": -107.8,
             "adp": null,
@@ -5936,7 +5925,7 @@
           {
             "player": "Max Klare",
             "team": "LAR",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 22.0,
             "value_over_replacement": -107.9,
             "adp": null,
@@ -5947,7 +5936,7 @@
           {
             "player": "Blake Whiteheart",
             "team": "CLE",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 21.8,
             "value_over_replacement": -108.14,
             "adp": null,
@@ -5958,7 +5947,7 @@
           {
             "player": "Cade Stover",
             "team": "HOU",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 21.7,
             "value_over_replacement": -108.23,
             "adp": null,
@@ -5969,7 +5958,7 @@
           {
             "player": "Payne Durham",
             "team": "TB",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 21.4,
             "value_over_replacement": -108.55,
             "adp": null,
@@ -5980,7 +5969,7 @@
           {
             "player": "Thomas Fidone II",
             "team": "NYG",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 21.1,
             "value_over_replacement": -108.83,
             "adp": null,
@@ -5991,7 +5980,7 @@
           {
             "player": "Connor Heyward",
             "team": "LV",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 20.9,
             "value_over_replacement": -109.02,
             "adp": null,
@@ -6002,7 +5991,7 @@
           {
             "player": "Jaheim Bell",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 20.8,
             "value_over_replacement": -109.13,
             "adp": null,
@@ -6013,7 +6002,7 @@
           {
             "player": "Drew Ogletree",
             "team": "IND",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 20.7,
             "value_over_replacement": -109.25,
             "adp": null,
@@ -6024,7 +6013,7 @@
           {
             "player": "Jaren Kanak",
             "team": "TEN",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 20.6,
             "value_over_replacement": -109.33,
             "adp": null,
@@ -6035,7 +6024,7 @@
           {
             "player": "Donald Parham Jr.",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 20.5,
             "value_over_replacement": -109.43,
             "adp": null,
@@ -6046,7 +6035,7 @@
           {
             "player": "James Mitchell",
             "team": "DAL",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 20.3,
             "value_over_replacement": -109.66,
             "adp": null,
@@ -6057,7 +6046,7 @@
           {
             "player": "Zach Ertz",
             "team": "FA",
-            "tier": 43,
+            "tier": 42,
             "projected_points": 20.0,
             "value_over_replacement": -109.93,
             "adp": null,
@@ -6068,7 +6057,7 @@
           {
             "player": "Oscar Delp",
             "team": "NO",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 18.5,
             "value_over_replacement": -111.41,
             "adp": null,
@@ -6079,7 +6068,7 @@
           {
             "player": "Quintin Morris",
             "team": "JAC",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 18.5,
             "value_over_replacement": -111.47,
             "adp": null,
@@ -6090,7 +6079,7 @@
           {
             "player": "Eric Saubert",
             "team": "SEA",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 18.3,
             "value_over_replacement": -111.64,
             "adp": null,
@@ -6101,7 +6090,7 @@
           {
             "player": "Tanner Hudson",
             "team": "CIN",
-            "tier": 44,
+            "tier": 43,
             "projected_points": 17.7,
             "value_over_replacement": -112.19,
             "adp": null,
@@ -6112,7 +6101,7 @@
           {
             "player": "Keleki Latu",
             "team": "BUF",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 16.1,
             "value_over_replacement": -113.78,
             "adp": null,
@@ -6123,7 +6112,7 @@
           {
             "player": "Seydou Traore",
             "team": "MIA",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 15.8,
             "value_over_replacement": -114.17,
             "adp": null,
@@ -6134,7 +6123,7 @@
           {
             "player": "Nick Kallerup",
             "team": "SEA",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 15.5,
             "value_over_replacement": -114.46,
             "adp": null,
@@ -6143,9 +6132,20 @@
             "provider_agreement": "low"
           },
           {
+            "player": "Jake Tonges",
+            "team": "SF",
+            "tier": 44,
+            "projected_points": 15.5,
+            "value_over_replacement": -114.47,
+            "adp": null,
+            "position_adp": null,
+            "adp_delta": null,
+            "provider_agreement": "low"
+          },
+          {
             "player": "Ian Thomas",
             "team": "LV",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 14.8,
             "value_over_replacement": -115.17,
             "adp": null,
@@ -6156,7 +6156,7 @@
           {
             "player": "Josh Cuevas",
             "team": "BAL",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 14.7,
             "value_over_replacement": -115.21,
             "adp": null,
@@ -6167,7 +6167,7 @@
           {
             "player": "Tanner Koziol",
             "team": "JAC",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 14.7,
             "value_over_replacement": -115.27,
             "adp": null,
@@ -6178,7 +6178,7 @@
           {
             "player": "Jared Wiley",
             "team": "KC",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 14.6,
             "value_over_replacement": -115.31,
             "adp": null,
@@ -6189,7 +6189,7 @@
           {
             "player": "Sam Roush",
             "team": "CHI",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 14.5,
             "value_over_replacement": -115.47,
             "adp": null,
@@ -6200,7 +6200,7 @@
           {
             "player": "Josh Whyle",
             "team": "GB",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 13.9,
             "value_over_replacement": -116.05,
             "adp": null,
@@ -6211,7 +6211,7 @@
           {
             "player": "Kylen Granson",
             "team": "TEN",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 13.2,
             "value_over_replacement": -116.68,
             "adp": null,
@@ -6222,7 +6222,7 @@
           {
             "player": "Grant Calcaterra",
             "team": "PHI",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 13.1,
             "value_over_replacement": -116.86,
             "adp": null,
@@ -6233,7 +6233,7 @@
           {
             "player": "Brevyn Spann-Ford",
             "team": "DAL",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 12.8,
             "value_over_replacement": -117.17,
             "adp": null,
@@ -6244,7 +6244,7 @@
           {
             "player": "Ko Kieft",
             "team": "TB",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 12.6,
             "value_over_replacement": -117.3,
             "adp": null,
@@ -6255,7 +6255,7 @@
           {
             "player": "Chris Manhertz",
             "team": "NYG",
-            "tier": 45,
+            "tier": 44,
             "projected_points": 12.4,
             "value_over_replacement": -117.58,
             "adp": null,
@@ -6266,7 +6266,7 @@
           {
             "player": "Lucas Krull",
             "team": "DEN",
-            "tier": 46,
+            "tier": 45,
             "projected_points": 11.2,
             "value_over_replacement": -118.7,
             "adp": null,
@@ -6277,7 +6277,7 @@
           {
             "player": "Justin Joly",
             "team": "MIA",
-            "tier": 47,
+            "tier": 46,
             "projected_points": 9.7,
             "value_over_replacement": -120.28,
             "adp": null,
@@ -6288,7 +6288,7 @@
           {
             "player": "Julian Hill",
             "team": "NE",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 7.8,
             "value_over_replacement": -122.11,
             "adp": null,
@@ -6299,7 +6299,7 @@
           {
             "player": "Tip Reiman",
             "team": "ARI",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 7.7,
             "value_over_replacement": -122.21,
             "adp": null,
@@ -6310,7 +6310,7 @@
           {
             "player": "Ben Sims",
             "team": "MIA",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 7.7,
             "value_over_replacement": -122.25,
             "adp": null,
@@ -6321,7 +6321,7 @@
           {
             "player": "Luke Farrell",
             "team": "SF",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 7.5,
             "value_over_replacement": -122.47,
             "adp": null,
@@ -6332,7 +6332,7 @@
           {
             "player": "Tyler Conklin",
             "team": "DET",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 7.3,
             "value_over_replacement": -122.64,
             "adp": null,
@@ -6343,7 +6343,7 @@
           {
             "player": "John FitzPatrick",
             "team": "FA",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 7.3,
             "value_over_replacement": -122.66,
             "adp": null,
@@ -6354,7 +6354,7 @@
           {
             "player": "David Martin-Robinson",
             "team": "TEN",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 7.2,
             "value_over_replacement": -122.68,
             "adp": null,
@@ -6365,7 +6365,7 @@
           {
             "player": "Johnny Mundt",
             "team": "PHI",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 6.6,
             "value_over_replacement": -123.35,
             "adp": null,
@@ -6376,7 +6376,7 @@
           {
             "player": "Feleipe Franks",
             "team": "CAR",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 6.4,
             "value_over_replacement": -123.5,
             "adp": null,
@@ -6387,7 +6387,7 @@
           {
             "player": "Carter Runyon",
             "team": "LV",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 6.4,
             "value_over_replacement": -123.53,
             "adp": null,
@@ -6398,7 +6398,7 @@
           {
             "player": "Carsen Ryan",
             "team": "CLE",
-            "tier": 48,
+            "tier": 47,
             "projected_points": 6.2,
             "value_over_replacement": -123.69,
             "adp": null,
@@ -6409,7 +6409,7 @@
           {
             "player": "Drake Dabney",
             "team": "GB",
-            "tier": 49,
+            "tier": 48,
             "projected_points": 3.3,
             "value_over_replacement": -126.64,
             "adp": null,
@@ -6428,8 +6428,8 @@
       ],
       "board_provider": "fantasypros",
       "other_provider": "sleeper",
-      "board_as_of": "2026-09-05",
-      "comparison_as_of": "2026-09-05",
+      "board_as_of": "2026-09-07",
+      "comparison_as_of": "2026-09-07",
       "comparison_pinned_to_shared_capture": true,
       "days_behind_board": 0,
       "max_vintage_gap_days": 7,
@@ -6441,8 +6441,8 @@
       "players_compared": 560,
       "unpriced_by_other": 11,
       "counts_by_agreement": {
-        "high": 165,
-        "medium": 67,
+        "high": 162,
+        "medium": 70,
         "low": 328
       },
       "median_cv": 0.2303,
@@ -6483,7 +6483,7 @@
         "2026-08-30",
         "2026-08-31",
         "2026-09-05",
-        "2026-09-06"
+        "2026-09-07"
       ]
     },
     "adp_coverage": {
