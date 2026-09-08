@@ -1,0 +1,65 @@
+{
+  "files": {
+    "depth_charts_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 2310552,
+      "capture_reason": "last day before week 1",
+      "dataset": "depth_charts",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "preseason depth chart rank as a role signal (S86)",
+      "retrieved_at": "2026-09-08T12:38:24+00:00",
+      "season": 2026,
+      "sha256": "eef7134593f02a2a8c320fa0b7d5ba1aca0955da1cf6334f1565c80c8457e8c1",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.parquet",
+      "week1_start": "2026-09-09"
+    },
+    "injuries_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 6407,
+      "capture_reason": "last day before week 1",
+      "dataset": "injuries",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "weekly injury designations; inactive_reason for S15.1",
+      "retrieved_at": "2026-09-08T12:38:24+00:00",
+      "season": 2026,
+      "sha256": "6c54b52d9147cd13c979436ff05f12ac2c7c701c2794d87b4b666bc610a231dd",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2026.parquet",
+      "week1_start": "2026-09-09"
+    },
+    "roster_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 537581,
+      "capture_reason": "last day before week 1",
+      "dataset": "rosters",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "team, position, age, experience",
+      "retrieved_at": "2026-09-08T12:38:24+00:00",
+      "season": 2026,
+      "sha256": "093f28d0f694421e0dddbf0b4edbfd1285ebe2a6da96b60f8e166b80f21c4749",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2026.parquet",
+      "week1_start": "2026-09-09"
+    },
+    "roster_weekly_2026.parquet": {
+      "attribution": "Data from nflverse (nflverse-data), CC-BY-4.0.",
+      "bytes": 537630,
+      "capture_reason": "last day before week 1",
+      "dataset": "weekly_rosters",
+      "decision_date": "2026-08-29",
+      "license": "CC-BY-4.0",
+      "notes": "in-season roster status by week",
+      "retrieved_at": "2026-09-08T12:38:24+00:00",
+      "season": 2026,
+      "sha256": "8cda391904a385aa3a44612b17d63c97115ba962e938280ffb012ecd1dd8e556",
+      "source": "nflverse",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2026.parquet",
+      "week1_start": "2026-09-09"
+    }
+  },
+  "snapshot_date": "2026-09-08"
+}
